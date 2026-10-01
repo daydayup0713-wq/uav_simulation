@@ -1,0 +1,180 @@
+{
+  "passed": true,
+  "code_commit": "5cb3c29c8a318064ee4d42217c45b22728fc88a8",
+  "ci_run_url": "https://github.com/daydayup0713-wq/uav_simulation/actions/runs/36913384176",
+  "artifact_url": "https://github.com/daydayup0713-wq/uav_simulation/actions/runs/36913384176/artifacts/11189656363",
+  "ci_run_id": "20261001T192522Z-529d2cb7",
+  "archive_revision": "f2e5b74e0bf2d1f24651aa76c42295db88020a95",
+  "tests_passed": 50,
+  "flight": {
+    "passed": true,
+    "runs": [
+      {
+        "seconds": 10.0,
+        "samples": 43,
+        "maximum_error_m": 0.11572887134963655,
+        "run": 1,
+        "elapsed_s": 51.920997317,
+        "landed": true,
+        "disarmed": true
+      },
+      {
+        "seconds": 10.0,
+        "samples": 44,
+        "maximum_error_m": 0.09879043094036079,
+        "run": 2,
+        "elapsed_s": 51.90902484200001,
+        "landed": true,
+        "disarmed": true
+      },
+      {
+        "seconds": 10.0,
+        "samples": 44,
+        "maximum_error_m": 0.09258317694678575,
+        "run": 3,
+        "elapsed_s": 51.8167950620001,
+        "landed": true,
+        "disarmed": true
+      }
+    ]
+  },
+  "bridge_loss": {
+    "passed": true,
+    "failure": "bridge_exit",
+    "elapsed_s": 7.584150149999914,
+    "final": {
+      "armed": false,
+      "offboard": true,
+      "landed": true
+    },
+    "failsafe_landing_observed": true,
+    "events": [
+      {
+        "time": 584.032490211,
+        "nav_state": 14,
+        "armed": true,
+        "offboard": true,
+        "landed": false
+      },
+      {
+        "time": 584.536381782,
+        "nav_state": 14,
+        "armed": true,
+        "offboard": true,
+        "landed": false
+      },
+      {
+        "time": 585.040466217,
+        "nav_state": 14,
+        "armed": true,
+        "offboard": true,
+        "landed": false
+      },
+      {
+        "time": 585.052399667,
+        "nav_state": 18,
+        "armed": true,
+        "offboard": false,
+        "landed": false
+      },
+      {
+        "time": 585.31650337,
+        "nav_state": 18,
+        "armed": true,
+        "offboard": false,
+        "landed": false
+      },
+      {
+        "time": 585.820567214,
+        "nav_state": 18,
+        "armed": true,
+        "offboard": false,
+        "landed": false
+      },
+      {
+        "time": 586.324420081,
+        "nav_state": 18,
+        "armed": true,
+        "offboard": false,
+        "landed": false
+      },
+      {
+        "time": 586.828580747,
+        "nav_state": 18,
+        "armed": true,
+        "offboard": false,
+        "landed": false
+      },
+      {
+        "time": 587.332324672,
+        "nav_state": 18,
+        "armed": true,
+        "offboard": false,
+        "landed": false
+      },
+      {
+        "time": 587.836518571,
+        "nav_state": 18,
+        "armed": true,
+        "offboard": false,
+        "landed": false
+      },
+      {
+        "time": 588.340512166,
+        "nav_state": 18,
+        "armed": true,
+        "offboard": false,
+        "landed": false
+      },
+      {
+        "time": 588.844398646,
+        "nav_state": 18,
+        "armed": true,
+        "offboard": false,
+        "landed": false
+      },
+      {
+        "time": 589.348511715,
+        "nav_state": 18,
+        "armed": true,
+        "offboard": false,
+        "landed": false
+      },
+      {
+        "time": 589.852585148,
+        "nav_state": 18,
+        "armed": true,
+        "offboard": false,
+        "landed": true
+      },
+      {
+        "time": 590.356396699,
+        "nav_state": 18,
+        "armed": true,
+        "offboard": false,
+        "landed": true
+      },
+      {
+        "time": 590.860547477,
+        "nav_state": 18,
+        "armed": true,
+        "offboard": false,
+        "landed": true
+      },
+      {
+        "time": 591.364485495,
+        "nav_state": 18,
+        "armed": true,
+        "offboard": false,
+        "landed": true
+      },
+      {
+        "time": 591.616638117,
+        "nav_state": 14,
+        "armed": false,
+        "offboard": true,
+        "landed": true
+      }
+    ]
+  }
+}

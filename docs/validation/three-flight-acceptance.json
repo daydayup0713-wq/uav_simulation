@@ -3,32 +3,32 @@
   "runs": [
     {
       "seconds": 10.0,
-      "samples": 43,
-      "maximum_error_m": 0.09966444947480645,
+      "samples": 45,
+      "maximum_error_m": 0.11621449832276749,
       "run": 1,
-      "elapsed_s": 51.569635207997635,
+      "elapsed_s": 51.74248670700035,
       "landed": true,
       "disarmed": true
     },
     {
       "seconds": 10.0,
-      "samples": 44,
-      "maximum_error_m": 0.10587093980175,
+      "samples": 43,
+      "maximum_error_m": 0.11078267189469904,
       "run": 2,
-      "elapsed_s": 51.868777053001395,
+      "elapsed_s": 52.07745258700015,
       "landed": true,
       "disarmed": true
     },
     {
       "seconds": 10.0,
       "samples": 44,
-      "maximum_error_m": 0.10666725288291855,
+      "maximum_error_m": 0.10670837608551492,
       "run": 3,
-      "elapsed_s": 52.005207204001636,
+      "elapsed_s": 51.9358997920026,
       "landed": true,
       "disarmed": true
     }
   ],
-  "run_id": "20261001T174806Z-45168795",
-  "implementation_commit": "9dd5e5395cde0e04ef22de51ba154246f48833be"
+  "run_id": "20261001T191902Z-63c44ac4",
+  "platform_commit": "5cb3c29c8a318064ee4d42217c45b22728fc88a8"
 }

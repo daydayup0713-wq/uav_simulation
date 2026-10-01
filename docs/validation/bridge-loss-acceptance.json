@@ -1,7 +1,7 @@
 {
   "passed": true,
   "failure": "bridge_exit",
-  "elapsed_s": 7.4920612089990755,
+  "elapsed_s": 7.620412338997994,
   "final": {
     "armed": false,
     "offboard": true,
@@ -10,146 +10,139 @@
   "failsafe_landing_observed": true,
   "events": [
     {
-      "time": 21767.620125375,
-      "nav_state": 14,
-      "armed": true,
-      "offboard": true,
-      "landed": null
-    },
-    {
-      "time": 21768.123249793,
-      "nav_state": 14,
-      "armed": true,
-      "offboard": true,
-      "landed": null
-    },
-    {
-      "time": 21768.627387362,
+      "time": 26721.647386436,
       "nav_state": 14,
       "armed": true,
       "offboard": true,
       "landed": false
     },
     {
-      "time": 21769.131739992,
+      "time": 26722.151642383,
       "nav_state": 14,
       "armed": true,
       "offboard": true,
       "landed": false
     },
     {
-      "time": 21769.204149227,
+      "time": 26722.655288908,
       "nav_state": 14,
       "armed": true,
       "offboard": true,
       "landed": false
     },
     {
-      "time": 21769.331870767,
+      "time": 26722.70422286,
+      "nav_state": 14,
+      "armed": true,
+      "offboard": true,
+      "landed": false
+    },
+    {
+      "time": 26722.85625526,
       "nav_state": 18,
       "armed": true,
       "offboard": false,
       "landed": false
     },
     {
-      "time": 21769.531809287,
+      "time": 26723.056332123,
       "nav_state": 18,
       "armed": true,
       "offboard": false,
       "landed": false
     },
     {
-      "time": 21769.984261587,
+      "time": 26723.483710418,
       "nav_state": 18,
       "armed": true,
       "offboard": false,
       "landed": false
     },
     {
-      "time": 21770.488258601,
+      "time": 26723.98727048,
       "nav_state": 18,
       "armed": true,
       "offboard": false,
       "landed": false
     },
     {
-      "time": 21770.991620175,
+      "time": 26724.491365534,
       "nav_state": 18,
       "armed": true,
       "offboard": false,
       "landed": false
     },
     {
-      "time": 21771.495713627,
+      "time": 26724.99539238,
       "nav_state": 18,
       "armed": true,
       "offboard": false,
       "landed": false
     },
     {
-      "time": 21772.000192138,
+      "time": 26725.500387209,
       "nav_state": 18,
       "armed": true,
       "offboard": false,
       "landed": false
     },
     {
-      "time": 21772.50364761,
+      "time": 26726.004587265,
       "nav_state": 18,
       "armed": true,
       "offboard": false,
       "landed": false
     },
     {
-      "time": 21773.007785825,
+      "time": 26726.507862083,
       "nav_state": 18,
       "armed": true,
       "offboard": false,
       "landed": false
     },
     {
-      "time": 21773.511607656,
+      "time": 26727.011355372,
       "nav_state": 18,
       "armed": true,
       "offboard": false,
       "landed": false
     },
     {
-      "time": 21774.016082171,
+      "time": 26727.515680786,
       "nav_state": 18,
       "armed": true,
       "offboard": false,
       "landed": true
     },
     {
-      "time": 21774.520223471,
+      "time": 26728.019217882,
       "nav_state": 18,
       "armed": true,
       "offboard": false,
       "landed": true
     },
     {
-      "time": 21775.023612678,
+      "time": 26728.523392863,
       "nav_state": 18,
       "armed": true,
       "offboard": false,
       "landed": true
     },
     {
-      "time": 21775.527714484,
+      "time": 26729.02770554,
       "nav_state": 18,
       "armed": true,
       "offboard": false,
       "landed": true
     },
     {
-      "time": 21775.683855323,
+      "time": 26729.267776264,
       "nav_state": 14,
       "armed": false,
       "offboard": true,
       "landed": true
     }
   ],
-  "run_id": "20261001T175820Z-848ce18e",
-  "implementation_commit": "5ee3e7afce7d63c7ae8ef56ab8f62cae81d0d326"
+  "run_id": "20261001T191902Z-63c44ac4",
+  "platform_commit": "5cb3c29c8a318064ee4d42217c45b22728fc88a8"
 }

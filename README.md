@@ -1,6 +1,6 @@
 # UAV Simulation Lab
 
-面向 PX4 学习、算法验证和巡检仿真的独立实验室。当前交付 **V0.1 候选版**：单架 x500、Gazebo Harmonic 空旷世界、ROS 2 Humble 飞控适配、CLI 和 RViz 轨迹。后续按[版本路线](docs/ROADMAP.md)接入传感器、SLAM、三维导航、任务、Web、AI 和数字孪生。
+面向 PX4 学习、算法验证和巡检仿真的独立实验室。当前交付 **V0.1.0**：单架 x500、Gazebo Harmonic 空旷世界、ROS 2 Humble 飞控适配、CLI 和 RViz 轨迹。本机与[干净环境 CI](https://github.com/daydayup0713-wq/uav_simulation/actions/runs/36913384176)均通过三轮飞行及失控降落验收，见[验收记录](docs/validation/V0.1-local.md)。后续按[版本路线](docs/ROADMAP.md)接入传感器、SLAM、三维导航、任务、Web、AI 和数字孪生。
 
 系统关系和后续接口边界见[架构说明](docs/ARCHITECTURE.md)。
 
