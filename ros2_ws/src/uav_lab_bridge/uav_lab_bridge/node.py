@@ -201,7 +201,7 @@ class Bridge(Node):
         status = DiagnosticStatus()
         status.name = 'uav001/flight'
         status.hardware_id = 'PX4-SITL-1'
-        status.level = 0 if self.policy.fresh(wall) and self.policy.state != 'FAILSAFE' else 2
+        status.level = DiagnosticStatus.OK if self.policy.fresh(wall) and self.policy.state != 'FAILSAFE' else DiagnosticStatus.ERROR
         status.message = self.policy.state
         status.values = [KeyValue(key=k, value=str(v)) for k, v in {
             'reason': self.policy.reason, 'armed': self.policy.t.armed, 'offboard': self.policy.t.offboard,
