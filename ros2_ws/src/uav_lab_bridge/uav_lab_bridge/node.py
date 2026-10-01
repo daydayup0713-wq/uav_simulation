@@ -36,6 +36,7 @@ class Bridge(Node):
         self.orientation = (0., 0., 0., 1.)
         self.velocity = (0., 0., 0.)
         self.previous_sim = None
+        self.reset_counters = None
         self.last_observe = 0.
         self.last_state = None
         self.path = NavPath()
@@ -78,6 +79,18 @@ class Bridge(Node):
 
     def position_callback(self, msg):
         with self.lock:
+            counters = (msg.xy_reset_counter, msg.z_reset_counter, msg.heading_reset_counter)
+            if (self.reset_counters is not None and counters != self.reset_counters
+                    and (self.policy.streaming or self.policy.active is not None)):
+                # PX4 re-aligns magnetic heading above 1.5m. This updates the
+                # attitude estimate, not the ENU position frame. Bound it by
+                # the same yaw tolerance used by target acceptance.
+                heading_only = counters[:2] == self.reset_counters[:2]
+                self.record('estimator_reset', previous=self.reset_counters, current=counters,
+                            delta_heading=float(msg.delta_heading))
+                if not (heading_only and math.isfinite(msg.delta_heading) and abs(msg.delta_heading) <= .15):
+                    self.policy.fail('estimator coordinate reset; restart lab')
+            self.reset_counters = counters
             try:
                 self.px4_clock.observe(msg.timestamp, self.get_clock().now().nanoseconds)
             except RuntimeError as exc:
@@ -89,6 +102,7 @@ class Bridge(Node):
         with self.lock:
             self.policy.update(time.monotonic(), armed=msg.arming_state == VehicleStatus.ARMING_STATE_ARMED,
                                offboard=msg.nav_state == VehicleStatus.NAVIGATION_STATE_OFFBOARD,
+                               preflight=bool(msg.pre_flight_checks_pass),
                                landing_mode=msg.nav_state == VehicleStatus.NAVIGATION_STATE_AUTO_LAND)
 
     def attitude_callback(self, msg):
@@ -201,11 +215,12 @@ class Bridge(Node):
         status = DiagnosticStatus()
         status.name = 'uav001/flight'
         status.hardware_id = 'PX4-SITL-1'
-        status.level = 0 if self.policy.fresh(wall) and self.policy.state != 'FAILSAFE' else 2
+        status.level = DiagnosticStatus.OK if self.policy.fresh(wall) and self.policy.state != 'FAILSAFE' else DiagnosticStatus.ERROR
         status.message = self.policy.state
         status.values = [KeyValue(key=k, value=str(v)) for k, v in {
             'reason': self.policy.reason, 'armed': self.policy.t.armed, 'offboard': self.policy.t.offboard,
             'landed': self.policy.t.landed, 'position': self.policy.t.position,
+            'preflight': self.policy.t.preflight,
             'fresh': self.policy.fresh(wall)}.items()]
         diag.status = [status]
         self.diag_pub.publish(diag)

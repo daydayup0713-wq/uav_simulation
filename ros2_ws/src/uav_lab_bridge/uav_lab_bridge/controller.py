@@ -12,6 +12,7 @@ class Telemetry:
     offboard: bool = False
     landing_mode: bool = False
     landed: bool = True
+    preflight: bool = False
     position_at: float = -math.inf
     attitude_at: float = -math.inf
     status_at: float = -math.inf
@@ -34,6 +35,7 @@ class FlightController:
         self.pending = None
         self.since = 0.
         self.within = None
+        self.takeoff_origin = None
 
     def update(self, now, **values):
         for key, value in values.items():
@@ -50,7 +52,9 @@ class FlightController:
     def fresh(self, now):
         return (self.t.valid and all(math.isfinite(v) for v in self.t.position)
                 and now-self.t.position_at <= .5 and now-self.t.attitude_at <= .5
-                and now-self.t.status_at <= 1. and now-self.t.land_at <= 1.)
+                # PX4 LandDetector publishes at 1Hz when unchanged. Allow
+                # transport/scheduling jitter beyond that nominal interval.
+                and now-self.t.status_at <= 1. and now-self.t.land_at <= 2.)
 
     def require_ready(self, now):
         if self.state == 'FAILSAFE' or not self.fresh(now):
@@ -92,6 +96,7 @@ class FlightController:
         self.pending = None
         self.commands.clear()
         self.streaming = False
+        self.takeoff_origin = None
         self.state = 'FAILSAFE'
 
     def arm(self, now):
@@ -100,6 +105,7 @@ class FlightController:
             raise ValueError('arm requires an idle, landed, disarmed vehicle')
         token = self.begin(now)
         self.setpoint = self.target = self.t.position
+        self.takeoff_origin = self.t.position
         self.yaw = self.t.yaw
         self.streaming = True
         self.state = 'WARMUP'
@@ -111,6 +117,7 @@ class FlightController:
             raise ValueError('disarm requires landed vehicle and no active operation')
         token = self.begin(now)
         self.state = 'DISARMING'
+        self.takeoff_origin = None
         self.send(400, (0.,), now, 'disarmed')
         return token
 
@@ -134,6 +141,7 @@ class FlightController:
         if self.state == 'LANDING':
             raise ValueError('landing already in progress')
         if operation == 'LAND':
+            self.takeoff_origin = None
             self.finish(False, 'interrupted by land')
             token = self.begin(now)
             self.state = 'LANDING'
@@ -142,9 +150,9 @@ class FlightController:
         if self.active is not None or not self.t.offboard:
             raise ValueError('motion requires idle Offboard vehicle')
         if operation == 'TAKEOFF':
-            if not self.t.landed:
-                raise ValueError('takeoff requires landed vehicle')
-            target = (self.t.position[0], self.t.position[1], self.t.position[2]+height)
+            if self.takeoff_origin is None or math.dist(self.t.position, self.takeoff_origin) > .3:
+                raise ValueError('takeoff requires explicit ground arm and remaining within 0.3m of its origin')
+            target = (self.takeoff_origin[0], self.takeoff_origin[1], self.takeoff_origin[2]+height)
         if target is None or len(target) != 3 or not all(math.isfinite(v) for v in target):
             raise ValueError('finite target required')
         if abs(target[0]) > 10 or abs(target[1]) > 10 or not .2 <= target[2] <= 5:
@@ -152,6 +160,7 @@ class FlightController:
         if yaw is not None and not math.isfinite(yaw):
             raise ValueError('finite yaw required')
         token = self.begin(now)
+        self.takeoff_origin = None
         self.target = tuple(target)
         self.setpoint = self.t.position
         self.yaw = self.t.yaw if yaw is None else yaw
@@ -182,7 +191,7 @@ class FlightController:
             self.send(176, (1., 6.), now, 'offboard')
         if self.pending:
             p = self.pending
-            confirmed = {'offboard': self.t.offboard, 'armed': self.t.armed,
+            confirmed = {'offboard': self.t.offboard and self.t.preflight, 'armed': self.t.armed,
                          'disarmed': not self.t.armed,
                          'landing': self.t.landing_mode or self.t.landed and not self.t.armed}[p['expectation']]
             if p['ack'] and confirmed:
@@ -217,8 +226,7 @@ class FlightController:
             if math.dist(self.t.position, self.target) <= self.tolerance and yaw_error <= .15:
                 if self.within is None:
                     self.within = now
-                if now-self.within >= self.settle:
-                    self.setpoint = self.target
+                if now-self.within >= self.settle and math.dist(self.setpoint, self.target) < 1e-9:
                     self.state = 'HOLDING'
                     self.finish(True, 'target reached within tolerance continuously')
             else:

@@ -3,6 +3,12 @@
   "repositories": {
     "px4": {"url": "https://github.com/PX4/PX4-Autopilot.git", "ref": "d6f12ad1c4f70ad3230afd7d86e971421e02fef4", "local_cache": "/home/pine/PX4-Autopilot"},
     "px4_msgs": {"url": "https://github.com/PX4/px4_msgs.git", "ref": "86d8239e962f6939e05c3737784f60c02fa884db", "local_cache": "/home/pine/ros2_ws/src/px4_msgs"},
-    "agent": {"url": "https://github.com/eProsima/Micro-XRCE-DDS-Agent.git", "ref": "v2.4.3"}
+    "agent": {"url": "https://github.com/eProsima/Micro-XRCE-DDS-Agent.git", "ref": "73622810d984349b80bbac0ef55fc0b694d62222", "version": "2.4.3"}
+  },
+  "agent_transitives": {
+    "_fastcdr_tag": "757d5e422253568c487ad97c22e44680fc1ddbaf",
+    "_fastdds_tag": "834b0718e7e28825d98f9b5ed45fc76941cd14bd",
+    "_foonathan_memory_tag": "0f0775770fd1c506fa9c5ad566bd6ba59659db66",
+    "_spdlog_tag": "eb3220622e73a4889eee355ffa37972b3cac3df5"
   }
 }

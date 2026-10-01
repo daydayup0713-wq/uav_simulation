@@ -4,7 +4,7 @@ from uav_lab_bridge.controller import FlightController
 
 def refresh(c, now, **kwargs):
     c.update(now, position=(0, 0, .05), yaw=0, valid=True,
-             armed=False, offboard=False, landed=True, **kwargs)
+             armed=False, offboard=False, landed=True, preflight=True, **kwargs)
 
 def start():
     c = FlightController()
@@ -47,6 +47,45 @@ def test_arm_ack_alone_does_not_report_success():
     c.tick(2.2, .05)
     assert token not in c.results
 
+def test_ground_rearm_can_warm_heartbeat_when_old_offboard_health_is_false():
+    c = FlightController()
+    refresh(c, 0)
+    c.update(0, preflight=False)
+    c.update(0, offboard=True)
+    c.arm(0)
+    assert c.streaming and not c.drain_commands()
+    c.tick(.1, .05)
+    assert c.state == 'WARMUP' and not c.drain_commands()
+
+def test_mode_confirmation_waits_for_healthy_offboard_before_arm_command():
+    c, token = start()
+    c.ack(176, 0)
+    c.update(2.1, offboard=True, preflight=False)
+    c.tick(2.1, .05)
+    assert not c.drain_commands() and token not in c.results
+    c.update(2.2, preflight=True)
+    c.tick(2.2, .05)
+    assert c.drain_commands() == [(400, (1.,))]
+
+def test_one_hz_land_detection_tolerates_delivery_jitter_but_still_expires():
+    c = FlightController()
+    refresh(c, 0)
+    c.update(1.1, position=(0., 0., 2.), yaw=0., armed=True, offboard=True)
+    assert c.fresh(1.1)
+    c.update(2.1, position=(0., 0., 2.), yaw=0., armed=True, offboard=True)
+    assert not c.fresh(2.1)
+
+@pytest.mark.parametrize('ack', [False, True])
+def test_command_timeout_with_fresh_telemetry_never_arms(ack):
+    c, token = start()
+    if ack:
+        c.ack(176, 0)
+    refresh(c, 7.1)
+    c.tick(7.1, .05)
+    assert c.state == 'FAILSAFE'
+    assert not c.streaming and not c.drain_commands()
+    assert c.results[token] == (False, 'command ACK/state confirmation timeout')
+
 def test_disarm_in_air_and_unarmed_takeoff_are_rejected():
     c = FlightController()
     refresh(c, 0)
@@ -56,6 +95,19 @@ def test_disarm_in_air_and_unarmed_takeoff_are_rejected():
     c.update(2.3, landed=False)
     with pytest.raises(ValueError):
         c.disarm(2.3)
+
+def test_delayed_takeoff_uses_explicit_arm_ground_anchor():
+    c = armed()
+    # PX4 land detector can clear after motors spin, while still near ground.
+    c.update(2.3, position=(.02, .01, .08), landed=False)
+    c.fly('TAKEOFF', 2.3, height=2)
+    assert c.target == (0., 0., 2.05)
+
+def test_takeoff_from_uncommanded_airborne_location_is_rejected():
+    c = armed()
+    c.update(2.3, position=(0., 0., 1.), landed=False)
+    with pytest.raises(ValueError, match='ground'):
+        c.fly('TAKEOFF', 2.3, height=2)
 
 def test_target_speed_and_continuous_tolerance():
     c = armed()
@@ -71,6 +123,10 @@ def test_target_speed_and_continuous_tolerance():
     for t in (4, 4.5, 5, 5.5, 6.01):
         c.update(t, position=(3, 4, 2), yaw=0, valid=True, armed=True, offboard=True, landed=False)
         c.tick(t, .05)
+    for index in range(1,121):
+        now = 6.01+index*.05
+        c.update(now, position=(3,4,2), yaw=0, valid=True, armed=True, offboard=True, landed=False)
+        c.tick(now, .05)
     assert c.results[token][0]
 
 def test_cancel_old_goal_cannot_cancel_landing():
@@ -85,6 +141,15 @@ def test_cancel_old_goal_cannot_cancel_landing():
     c.update(2.4, armed=False, offboard=False, landed=True, landing_mode=True)
     c.tick(2.4, .05)
     assert c.results[landing][0]
+
+def test_cancel_motion_holds_measured_pose_and_finishes_old_goal():
+    c = armed()
+    token = c.fly('GOTO', 2.2, target=(3., 4., 2.))
+    c.update(2.3, position=(.1, .2, .3), landed=False)
+    assert c.cancel(token, 2.3)
+    assert c.state == 'HOLDING'
+    assert c.setpoint == c.target == (.1, .2, .3)
+    assert not c.results[token][0] and c.active is None
 
 def test_stale_telemetry_latches_and_cannot_resume():
     c = armed()
