@@ -1,0 +1,13 @@
+.deps/
+.runtime/
+.superpowers/
+ros2_ws/build/
+ros2_ws/install/
+ros2_ws/log/
+ros2_ws/src/px4_msgs/
+__pycache__/
+.pytest_cache/
+*.pyc
+*.egg-info/
+recordings/
+reconstructions/

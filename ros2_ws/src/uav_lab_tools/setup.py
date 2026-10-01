@@ -1,0 +1,3 @@
+from setuptools import setup, find_packages
+from glob import glob
+setup(name='uav_lab_tools', version="0.1.0", packages=find_packages(), data_files=[("share/ament_index/resource_index/packages", ["resource/uav_lab_tools"]), ("share/uav_lab_tools", ["package.xml"]), ("share/uav_lab_tools/launch", glob("launch/*.launch.py"))], install_requires=["setuptools"], zip_safe=True, maintainer="UAV Lab", maintainer_email="maintainers@example.invalid", description="PX4 simulation lab", license="Apache-2.0", entry_points={"console_scripts": ['labctl = uav_lab_tools.cli:main']})

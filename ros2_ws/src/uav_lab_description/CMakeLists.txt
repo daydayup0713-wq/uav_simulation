@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.16)
+project(uav_lab_description)
+find_package(ament_cmake REQUIRED)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../../simulation/worlds DESTINATION share/${PROJECT_NAME})
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../../configs/lab.rviz DESTINATION share/${PROJECT_NAME})
+ament_package()
