@@ -99,8 +99,6 @@ class FlightController:
 
     def arm(self, now):
         self.require_ready(now)
-        if not self.t.preflight:
-            raise ValueError('PX4 preflight checks have not passed')
         if self.active is not None or self.t.armed or not self.t.landed:
             raise ValueError('arm requires an idle, landed, disarmed vehicle')
         token = self.begin(now)

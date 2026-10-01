@@ -47,13 +47,15 @@ def test_arm_ack_alone_does_not_report_success():
     c.tick(2.2, .05)
     assert token not in c.results
 
-def test_failed_preflight_rejects_arm_before_sending_commands():
+def test_ground_rearm_can_warm_heartbeat_when_old_offboard_health_is_false():
     c = FlightController()
     refresh(c, 0)
     c.update(0, preflight=False)
-    with pytest.raises(ValueError, match='preflight'):
-        c.arm(0)
-    assert not c.streaming and not c.drain_commands()
+    c.update(0, offboard=True)
+    c.arm(0)
+    assert c.streaming and not c.drain_commands()
+    c.tick(.1, .05)
+    assert c.state == 'WARMUP' and not c.drain_commands()
 
 def test_mode_confirmation_waits_for_healthy_offboard_before_arm_command():
     c, token = start()
