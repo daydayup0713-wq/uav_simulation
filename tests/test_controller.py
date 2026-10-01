@@ -67,6 +67,14 @@ def test_mode_confirmation_waits_for_healthy_offboard_before_arm_command():
     c.tick(2.2, .05)
     assert c.drain_commands() == [(400, (1.,))]
 
+def test_one_hz_land_detection_tolerates_delivery_jitter_but_still_expires():
+    c = FlightController()
+    refresh(c, 0)
+    c.update(1.1, position=(0., 0., 2.), yaw=0., armed=True, offboard=True)
+    assert c.fresh(1.1)
+    c.update(2.1, position=(0., 0., 2.), yaw=0., armed=True, offboard=True)
+    assert not c.fresh(2.1)
+
 @pytest.mark.parametrize('ack', [False, True])
 def test_command_timeout_with_fresh_telemetry_never_arms(ack):
     c, token = start()

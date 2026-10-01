@@ -52,7 +52,9 @@ class FlightController:
     def fresh(self, now):
         return (self.t.valid and all(math.isfinite(v) for v in self.t.position)
                 and now-self.t.position_at <= .5 and now-self.t.attitude_at <= .5
-                and now-self.t.status_at <= 1. and now-self.t.land_at <= 1.)
+                # PX4 LandDetector publishes at 1Hz when unchanged. Allow
+                # transport/scheduling jitter beyond that nominal interval.
+                and now-self.t.status_at <= 1. and now-self.t.land_at <= 2.)
 
     def require_ready(self, now):
         if self.state == 'FAILSAFE' or not self.fresh(now):

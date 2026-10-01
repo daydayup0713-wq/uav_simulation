@@ -18,7 +18,7 @@ Pre-flight: interface package must build before bridge/tools; dependency checkou
 
 ## 本机验收通过
 
-本机源码构建及六个 ROS 包构建通过。49 项纯策略与真实 ROS 消息回归测试通过；接口测试使用独立 DDS 域和日志目录，并避开活动实例记录的域。八种 PX4 消息静态匹配。实例冲突返回非零，空中普通 DISARM 被拒绝。CLI 中断 GOTO 后进入悬停；中断 LAND 保持降落，未接受的请求不误报继续降落。审查发现的问题已修复并复查。
+本机源码构建及六个 ROS 包构建通过。50 项纯策略与真实 ROS 消息回归测试通过；接口测试使用独立 DDS 域和日志目录，并避开活动实例记录的域。八种 PX4 消息静态匹配。实例冲突返回非零，空中普通 DISARM 被拒绝。CLI 中断 GOTO 后进入悬停；中断 LAND 保持降落，未接受的请求不误报继续降落。审查发现的问题已修复并复查。
 
 最终正式三轮全部通过，悬停最大误差 0.100m、0.106m、0.107m，每轮 landed + disarmed 确认。显式解锁后延迟起飞通过。适配器退出后独立观察到 armed AUTO_LAND，7.49 秒内确认 landed + disarmed。该 PX4 解除解锁后会恢复旧 nav_state，因此最终 offboard 标签不作为失控降落失败依据。
 
