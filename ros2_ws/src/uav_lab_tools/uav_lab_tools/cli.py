@@ -75,15 +75,43 @@ class Operator:
             if self.sampling:
                 pose = message.feedback.current_pose.pose.position
                 self.samples.append((time.monotonic(), (pose.x, pose.y, pose.z)))
-        handle = self.wait(self.action.send_goal_async(goal, feedback_callback=feedback))
-        if not handle.accepted:
-            raise RuntimeError('flight goal rejected')
-        self.goal_handle = handle
+        submitted = self.action.send_goal_async(goal, feedback_callback=feedback)
+        handle = None
         try:
+            handle = self.wait(submitted)
+            if not handle.accepted:
+                raise RuntimeError('flight goal rejected')
+            self.goal_handle = handle
             response = self.wait(handle.get_result_async())
-        except (RuntimeError, KeyboardInterrupt):
-            if operation != 'LAND':
-                self.wait(handle.cancel_goal_async(), 3)
+        except (RuntimeError, KeyboardInterrupt) as interrupted:
+            prefix = 'CLI interrupted' if isinstance(interrupted, KeyboardInterrupt) else str(interrupted)
+            if operation == 'LAND':
+                if isinstance(interrupted, KeyboardInterrupt):
+                    try:
+                        if handle is None:
+                            handle = self.wait(submitted, 3)
+                        if not handle.accepted:
+                            raise RuntimeError('flight goal was rejected')
+                    except (RuntimeError, KeyboardInterrupt) as error:
+                        raise RuntimeError(prefix+'; landing acceptance unconfirmed: '+str(error)) from interrupted
+                    raise RuntimeError(prefix+'; landing continues') from interrupted
+                raise
+            # The server may have accepted the goal before the response reaches
+            # us. Keep its future/context alive and include that window in cleanup.
+            deadline = time.monotonic()+3
+            try:
+                if handle is None:
+                    handle = self.wait(submitted, max(.001, deadline-time.monotonic()))
+                if handle.accepted:
+                    canceled = self.wait(handle.cancel_goal_async(), max(.001, deadline-time.monotonic()))
+                    if not canceled.goals_canceling:
+                        raise RuntimeError('server did not confirm cancellation')
+                elif isinstance(interrupted, KeyboardInterrupt):
+                    raise RuntimeError('flight goal was rejected')
+            except (RuntimeError, KeyboardInterrupt) as error:
+                raise RuntimeError(prefix+'; motion cancellation unconfirmed: '+str(error)) from interrupted
+            if isinstance(interrupted, KeyboardInterrupt):
+                raise RuntimeError(prefix+'; motion cancellation requested') from interrupted
             raise
         finally:
             self.goal_handle = None
@@ -147,7 +175,10 @@ class Operator:
 def main(args=None):
     options = parser().parse_args(args)
     import rclpy
-    rclpy.init()
+    from rclpy.signals import SignalHandlerOptions
+    # Keep the context alive while the flight client sends SIGINT cancellation.
+    # The standard rclpy handler otherwise shuts DDS down before that exchange.
+    rclpy.init(signal_handler_options=SignalHandlerOptions.NO)
     node = rclpy.create_node('lab_operator')
     operator = Operator(node, options.timeout)
     try:
@@ -165,7 +196,11 @@ def main(args=None):
                                      yaw=math.radians(getattr(options, 'yaw', 0)))
         print(json.dumps(result, ensure_ascii=False))
         return 0
-    except (RuntimeError, ValueError, KeyboardInterrupt) as exc:
+    except KeyboardInterrupt:
+        # No motion has been submitted when interruption reaches this handler.
+        print(json.dumps({'success': False, 'reason': 'CLI interrupted'}), flush=True)
+        return 1
+    except (RuntimeError, ValueError) as exc:
         print(json.dumps({'success': False, 'reason': str(exc)}, ensure_ascii=False), flush=True)
         return 1
     finally:

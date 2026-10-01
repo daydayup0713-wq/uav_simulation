@@ -18,7 +18,7 @@ Pre-flight: interface package must build before bridge/tools; dependency checkou
 
 ## 本机验收通过
 
-本机源码构建及六个 ROS 包构建通过。39 项纯策略与真实 ROS 消息回归测试通过；接口测试使用独立 DDS 域和日志目录。八种 PX4 消息静态匹配。实例冲突返回非零，空中普通 DISARM 被拒绝。审查发现的问题已修复并复查。
+本机源码构建及六个 ROS 包构建通过。49 项纯策略与真实 ROS 消息回归测试通过；接口测试使用独立 DDS 域和日志目录，并避开活动实例记录的域。八种 PX4 消息静态匹配。实例冲突返回非零，空中普通 DISARM 被拒绝。CLI 中断 GOTO 后进入悬停；中断 LAND 保持降落，未接受的请求不误报继续降落。审查发现的问题已修复并复查。
 
 最终正式三轮全部通过，悬停最大误差 0.100m、0.106m、0.107m，每轮 landed + disarmed 确认。显式解锁后延迟起飞通过。适配器退出后独立观察到 armed AUTO_LAND，7.49 秒内确认 landed + disarmed。该 PX4 解除解锁后会恢复旧 nav_state，因此最终 offboard 标签不作为失控降落失败依据。
 
@@ -26,7 +26,7 @@ Gazebo GUI 与 RViz 启动通过，RViz 报告 OpenGL 4.6。没有做界面截�
 
 ## 限制与发布条件
 
-- 本机尚未安装 Docker；容器/干净安装由 [GitHub CI](https://github.com/daydayup0713-wq/uav_simulation/actions) 验证，当前构建中。策略 CI 已通过。容器兼容无主仓库 .git 的源码归档，由构建参数提供版本标识；系统依赖、固定源码依赖和平台构建分层缓存。
+- 本机尚未安装 Docker；容器/干净安装由 [GitHub CI](https://github.com/daydayup0713-wq/uav_simulation/actions) 验证。干净构建与策略测试已通过，首次解锁暴露了高度估计初始化的飞前失败；补齐健康门禁后重新执行飞行验收。容器兼容无主仓库 .git 的源码归档，由构建参数提供版本标识；系统依赖、固定源码依赖和平台构建分层缓存。
 - GUI/GPU 传感器验收与本机无头飞行验收分别记录。nvidia-smi 在正常本机环境枚举 RTX 3050 Laptop GPU / 4096MiB；此前无法枚举是沙箱限制。未宣称 CUDA、相机、雷达渲染通过。
 - ACK 拒绝、超时、模式未切换、遥测过期、恢复不续飞通过策略注入验证；独立真实故障实验为适配节点退出。
 - 尚未打 V0.1.0 标签，保留为候选版，待干净安装门禁通过。实现位于 [PR #1](https://github.com/daydayup0713-wq/uav_simulation/pull/1)。

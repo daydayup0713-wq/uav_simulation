@@ -7,14 +7,17 @@ from uav_lab_bridge.node import Bridge
 from px4_msgs.msg import VehicleLocalPosition
 
 @pytest.fixture(autouse=True)
-def isolated_ros_contract_domain(monkeypatch, tmp_path):
+def isolated_ros_contract_domain(monkeypatch, tmp_path, isolated_ros_domain):
     # Message serialization tests create fake /fmu publishers. Never allow
     # them onto the live lab domain or into its evidence directory.
     monkeypatch.delenv('LAB_RUN_DIR', raising=False)
     monkeypatch.setenv('ROS_LOG_DIR', str(tmp_path/'ros'))
+    monkeypatch.setenv('LAB_TEST_DOMAIN', str(isolated_ros_domain))
 
 def initialize_test_context():
-    rclpy.init(domain_id=181, args=['--ros-args', '-r', '__ns:=/bridge_contract_test'])
+    import os
+    domain = int(os.environ['LAB_TEST_DOMAIN'])
+    rclpy.init(domain_id=domain, args=['--ros-args', '-r', '__ns:=/bridge_contract_test'])
 
 def test_observation_serializes_real_ros_messages_before_and_after_telemetry():
     initialize_test_context()

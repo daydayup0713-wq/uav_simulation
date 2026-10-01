@@ -12,6 +12,7 @@ class Telemetry:
     offboard: bool = False
     landing_mode: bool = False
     landed: bool = True
+    preflight: bool = False
     position_at: float = -math.inf
     attitude_at: float = -math.inf
     status_at: float = -math.inf
@@ -98,6 +99,8 @@ class FlightController:
 
     def arm(self, now):
         self.require_ready(now)
+        if not self.t.preflight:
+            raise ValueError('PX4 preflight checks have not passed')
         if self.active is not None or self.t.armed or not self.t.landed:
             raise ValueError('arm requires an idle, landed, disarmed vehicle')
         token = self.begin(now)
@@ -188,7 +191,7 @@ class FlightController:
             self.send(176, (1., 6.), now, 'offboard')
         if self.pending:
             p = self.pending
-            confirmed = {'offboard': self.t.offboard, 'armed': self.t.armed,
+            confirmed = {'offboard': self.t.offboard and self.t.preflight, 'armed': self.t.armed,
                          'disarmed': not self.t.armed,
                          'landing': self.t.landing_mode or self.t.landed and not self.t.armed}[p['expectation']]
             if p['ack'] and confirmed:

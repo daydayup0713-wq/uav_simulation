@@ -14,7 +14,7 @@ cd /home/pine/workspace/ai/UAV/uav_simulation
 ./scripts/start_lab.sh --rviz
 ```
 
-等待终端输出 `LAB READY`。Gazebo 显示飞行器，RViz 使用 `odom` 观察 `/uav001/path`。另一终端执行：
+等待终端输出 `LAB READY`：遥测新鲜、已落地、未解锁，PX4 飞前检查连续通过 5 秒。Gazebo 显示飞行器，RViz 使用 `odom` 观察 `/uav001/path`。另一终端执行：
 
 ```bash
 cd /home/pine/workspace/ai/UAV/uav_simulation

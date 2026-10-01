@@ -35,6 +35,29 @@ def owned_run_ready(runtime, supervisor_pid):
     except (OSError, KeyError, ValueError):
         return False
 
+class FlightReadiness:
+    """Wait out EKF/barometer initialization, not merely DDS discovery."""
+    def __init__(self, settle=5.):
+        self.settle, self.since = settle, None
+
+    def update(self, status, now):
+        healthy = all(status.get(key) == expected for key, expected in
+                      (('fresh', 'True'), ('armed', 'False'), ('landed', 'True'), ('preflight', 'True')))
+        if not healthy:
+            self.since = None
+            return False
+        if self.since is None:
+            self.since = now
+        return now-self.since >= self.settle
+
+def read_vehicle_status(environment):
+    try:
+        result = subprocess.run(['ros2','run','uav_lab_tools','labctl','--timeout','2','status'],
+                                env=environment, capture_output=True, text=True, timeout=5)
+        return json.loads(result.stdout) if result.returncode == 0 else {}
+    except (subprocess.TimeoutExpired, ValueError):
+        return {}
+
 def check_port(port):
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
         try:
@@ -158,11 +181,10 @@ def main():
         build = ROOT/'.deps/px4/build/px4_sitl_default'
         manager.start('px4', [build/'bin/px4', '-d', build/'etc', '-w', run_dir/'px4', '-s', ROOT/'configs/px4-start.sh'], env=px4_env)
         manager.start('bridge', ['ros2', 'run', 'uav_lab_bridge', 'bridge'], env=env)
+        flight_readiness = FlightReadiness()
         def vehicle_ready():
-            result = subprocess.run(['ros2','run','uav_lab_tools','labctl','--timeout','2','status'],
-                                    env=env, capture_output=True, text=True, timeout=5)
-            return result.returncode == 0
-        wait_for(manager, vehicle_ready, 'PX4 fresh valid telemetry', 60)
+            return flight_readiness.update(read_vehicle_status(env), time.monotonic())
+        wait_for(manager, vehicle_ready, 'PX4 fresh landed telemetry and stable preflight checks', 60)
         if options.rviz:
             manager.start('rviz', ['rviz2','-d', ROOT/'configs/lab.rviz'], env=env)
         (run_dir/'ready').write_text('ready\n')

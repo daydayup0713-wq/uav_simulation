@@ -4,7 +4,7 @@ from uav_lab_bridge.controller import FlightController
 
 def refresh(c, now, **kwargs):
     c.update(now, position=(0, 0, .05), yaw=0, valid=True,
-             armed=False, offboard=False, landed=True, **kwargs)
+             armed=False, offboard=False, landed=True, preflight=True, **kwargs)
 
 def start():
     c = FlightController()
@@ -46,6 +46,24 @@ def test_arm_ack_alone_does_not_report_success():
     c.ack(400, 0)
     c.tick(2.2, .05)
     assert token not in c.results
+
+def test_failed_preflight_rejects_arm_before_sending_commands():
+    c = FlightController()
+    refresh(c, 0)
+    c.update(0, preflight=False)
+    with pytest.raises(ValueError, match='preflight'):
+        c.arm(0)
+    assert not c.streaming and not c.drain_commands()
+
+def test_mode_confirmation_waits_for_healthy_offboard_before_arm_command():
+    c, token = start()
+    c.ack(176, 0)
+    c.update(2.1, offboard=True, preflight=False)
+    c.tick(2.1, .05)
+    assert not c.drain_commands() and token not in c.results
+    c.update(2.2, preflight=True)
+    c.tick(2.2, .05)
+    assert c.drain_commands() == [(400, (1.,))]
 
 @pytest.mark.parametrize('ack', [False, True])
 def test_command_timeout_with_fresh_telemetry_never_arms(ack):

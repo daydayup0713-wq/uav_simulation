@@ -102,6 +102,7 @@ class Bridge(Node):
         with self.lock:
             self.policy.update(time.monotonic(), armed=msg.arming_state == VehicleStatus.ARMING_STATE_ARMED,
                                offboard=msg.nav_state == VehicleStatus.NAVIGATION_STATE_OFFBOARD,
+                               preflight=bool(msg.pre_flight_checks_pass),
                                landing_mode=msg.nav_state == VehicleStatus.NAVIGATION_STATE_AUTO_LAND)
 
     def attitude_callback(self, msg):
@@ -219,6 +220,7 @@ class Bridge(Node):
         status.values = [KeyValue(key=k, value=str(v)) for k, v in {
             'reason': self.policy.reason, 'armed': self.policy.t.armed, 'offboard': self.policy.t.offboard,
             'landed': self.policy.t.landed, 'position': self.policy.t.position,
+            'preflight': self.policy.t.preflight,
             'fresh': self.policy.fresh(wall)}.items()]
         diag.status = [status]
         self.diag_pub.publish(diag)
