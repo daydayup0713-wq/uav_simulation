@@ -1,0 +1,155 @@
+{
+  "passed": true,
+  "failure": "bridge_exit",
+  "elapsed_s": 7.4920612089990755,
+  "final": {
+    "armed": false,
+    "offboard": true,
+    "landed": true
+  },
+  "failsafe_landing_observed": true,
+  "events": [
+    {
+      "time": 21767.620125375,
+      "nav_state": 14,
+      "armed": true,
+      "offboard": true,
+      "landed": null
+    },
+    {
+      "time": 21768.123249793,
+      "nav_state": 14,
+      "armed": true,
+      "offboard": true,
+      "landed": null
+    },
+    {
+      "time": 21768.627387362,
+      "nav_state": 14,
+      "armed": true,
+      "offboard": true,
+      "landed": false
+    },
+    {
+      "time": 21769.131739992,
+      "nav_state": 14,
+      "armed": true,
+      "offboard": true,
+      "landed": false
+    },
+    {
+      "time": 21769.204149227,
+      "nav_state": 14,
+      "armed": true,
+      "offboard": true,
+      "landed": false
+    },
+    {
+      "time": 21769.331870767,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 21769.531809287,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 21769.984261587,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 21770.488258601,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 21770.991620175,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 21771.495713627,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 21772.000192138,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 21772.50364761,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 21773.007785825,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 21773.511607656,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 21774.016082171,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": true
+    },
+    {
+      "time": 21774.520223471,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": true
+    },
+    {
+      "time": 21775.023612678,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": true
+    },
+    {
+      "time": 21775.527714484,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": true
+    },
+    {
+      "time": 21775.683855323,
+      "nav_state": 14,
+      "armed": false,
+      "offboard": true,
+      "landed": true
+    }
+  ],
+  "run_id": "20261001T175820Z-848ce18e",
+  "implementation_commit": "5ee3e7afce7d63c7ae8ef56ab8f62cae81d0d326"
+}

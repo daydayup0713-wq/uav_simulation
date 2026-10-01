@@ -19,7 +19,16 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
-      - run: docker build -t uav-lab -f containers/Dockerfile .
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: containers/Dockerfile
+          load: true
+          tags: uav-lab
+          build-args: LAB_REVISION=${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
       - name: Three flights and bridge-loss landing
         run: |
           mkdir -p ci-evidence

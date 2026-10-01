@@ -19,6 +19,13 @@ def isolated_environment(base, run_dir):
     return {**base, 'GZ_PARTITION': 'uav-lab-'+uuid.uuid4().hex,
             'LAB_RUN_DIR': str(run_dir), 'ROS_LOG_DIR': str(Path(run_dir)/'ros')}
 
+def source_identity(root, environment):
+    revision = subprocess.run(['git', '-C', str(root), 'rev-parse', 'HEAD'], capture_output=True, text=True)
+    if revision.returncode != 0:
+        return environment.get('LAB_REVISION') or 'source-archive', None
+    status = subprocess.run(['git', '-C', str(root), 'status', '--porcelain'], capture_output=True, text=True)
+    return revision.stdout.strip(), bool(status.stdout.strip()) if status.returncode == 0 else None
+
 def owned_run_ready(runtime, supervisor_pid):
     try:
         runtime = Path(runtime)
@@ -125,8 +132,7 @@ def main():
         metadata['configuration_sha256'][relative] = hashlib.sha256(contents).hexdigest()
     metadata['frames'] = {'world': 'ENU', 'body': 'FLU', 'tf': 'odom -> base_link',
                           'px4_world': 'NED', 'px4_body': 'FRD'}
-    metadata['platform_commit'] = subprocess.check_output(['git','-C',str(ROOT),'rev-parse','HEAD'], text=True).strip()
-    metadata['platform_dirty'] = bool(subprocess.check_output(['git','-C',str(ROOT),'status','--porcelain'], text=True).strip())
+    metadata['platform_commit'], metadata['platform_dirty'] = source_identity(ROOT, env)
     (run_dir / 'manifest.json').write_text(json.dumps(metadata, indent=2)+'\n')
     def stop(*_):
         raise KeyboardInterrupt

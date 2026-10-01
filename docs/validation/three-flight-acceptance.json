@@ -1,0 +1,34 @@
+{
+  "passed": true,
+  "runs": [
+    {
+      "seconds": 10.0,
+      "samples": 43,
+      "maximum_error_m": 0.09966444947480645,
+      "run": 1,
+      "elapsed_s": 51.569635207997635,
+      "landed": true,
+      "disarmed": true
+    },
+    {
+      "seconds": 10.0,
+      "samples": 44,
+      "maximum_error_m": 0.10587093980175,
+      "run": 2,
+      "elapsed_s": 51.868777053001395,
+      "landed": true,
+      "disarmed": true
+    },
+    {
+      "seconds": 10.0,
+      "samples": 44,
+      "maximum_error_m": 0.10666725288291855,
+      "run": 3,
+      "elapsed_s": 52.005207204001636,
+      "landed": true,
+      "disarmed": true
+    }
+  ],
+  "run_id": "20261001T174806Z-45168795",
+  "implementation_commit": "9dd5e5395cde0e04ef22de51ba154246f48833be"
+}

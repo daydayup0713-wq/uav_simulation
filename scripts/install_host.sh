@@ -3,6 +3,8 @@
 set -euo pipefail
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 source /etc/os-release
+INSTALL_SCOPE="${1:-all}"
+case "$INSTALL_SCOPE" in all|--system-only) ;; *) echo 'Usage: install_host.sh [--system-only]'; exit 2 ;; esac
 [ "$ID" = ubuntu ] && [ "$VERSION_ID" = 22.04 ] || { echo 'Requires Ubuntu 22.04'; exit 1; }
 SUDO=()
 [ "$EUID" -eq 0 ] || SUDO=(sudo)
@@ -27,6 +29,7 @@ echo 'deb [signed-by=/usr/share/keyrings/gazebo-archive-keyring.gpg] https://pac
   ros-humble-tf2-ros ros-humble-diagnostic-msgs ros-humble-nav-msgs ros-humble-geometry-msgs \
   ros-humble-std-srvs ros-humble-rosidl-default-generators
 /usr/bin/python3 -m pip install --user -r "$ROOT/dependencies/build-requirements.txt"
+[ "$INSTALL_SCOPE" != --system-only ] || exit 0
 /usr/bin/python3 "$ROOT/scripts/bootstrap.py" --jobs 2
 "$ROOT/scripts/build.sh"
 /usr/bin/python3 "$ROOT/scripts/doctor.py" --runtime

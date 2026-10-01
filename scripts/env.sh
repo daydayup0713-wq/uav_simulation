@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 exec env -i HOME="$HOME" USER="${USER:-pine}" LANG=C.UTF-8 PATH=/usr/bin:/bin \
   DISPLAY="${DISPLAY:-}" XAUTHORITY="${XAUTHORITY:-$HOME/.Xauthority}" \
-  LAB_ROOT="$ROOT" ROS_DOMAIN_ID="${LAB_DOMAIN_ID:-42}" ROS_LOCALHOST_ONLY=1 \
+  LAB_ROOT="$ROOT" LAB_REVISION="${LAB_REVISION:-}" ROS_DOMAIN_ID="${LAB_DOMAIN_ID:-42}" ROS_LOCALHOST_ONLY=1 \
   GZ_PARTITION="uav-lab-${USER:-pine}" GZ_IP=127.0.0.1 \
   /bin/bash --noprofile --norc -c '
     set -e
