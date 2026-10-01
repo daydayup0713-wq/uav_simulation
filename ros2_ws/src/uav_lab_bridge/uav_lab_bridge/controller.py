@@ -34,6 +34,7 @@ class FlightController:
         self.pending = None
         self.since = 0.
         self.within = None
+        self.takeoff_origin = None
 
     def update(self, now, **values):
         for key, value in values.items():
@@ -92,6 +93,7 @@ class FlightController:
         self.pending = None
         self.commands.clear()
         self.streaming = False
+        self.takeoff_origin = None
         self.state = 'FAILSAFE'
 
     def arm(self, now):
@@ -100,6 +102,7 @@ class FlightController:
             raise ValueError('arm requires an idle, landed, disarmed vehicle')
         token = self.begin(now)
         self.setpoint = self.target = self.t.position
+        self.takeoff_origin = self.t.position
         self.yaw = self.t.yaw
         self.streaming = True
         self.state = 'WARMUP'
@@ -111,6 +114,7 @@ class FlightController:
             raise ValueError('disarm requires landed vehicle and no active operation')
         token = self.begin(now)
         self.state = 'DISARMING'
+        self.takeoff_origin = None
         self.send(400, (0.,), now, 'disarmed')
         return token
 
@@ -134,6 +138,7 @@ class FlightController:
         if self.state == 'LANDING':
             raise ValueError('landing already in progress')
         if operation == 'LAND':
+            self.takeoff_origin = None
             self.finish(False, 'interrupted by land')
             token = self.begin(now)
             self.state = 'LANDING'
@@ -142,9 +147,9 @@ class FlightController:
         if self.active is not None or not self.t.offboard:
             raise ValueError('motion requires idle Offboard vehicle')
         if operation == 'TAKEOFF':
-            if not self.t.landed:
-                raise ValueError('takeoff requires landed vehicle')
-            target = (self.t.position[0], self.t.position[1], self.t.position[2]+height)
+            if self.takeoff_origin is None or math.dist(self.t.position, self.takeoff_origin) > .3:
+                raise ValueError('takeoff requires explicit ground arm and remaining within 0.3m of its origin')
+            target = (self.takeoff_origin[0], self.takeoff_origin[1], self.takeoff_origin[2]+height)
         if target is None or len(target) != 3 or not all(math.isfinite(v) for v in target):
             raise ValueError('finite target required')
         if abs(target[0]) > 10 or abs(target[1]) > 10 or not .2 <= target[2] <= 5:
@@ -152,6 +157,7 @@ class FlightController:
         if yaw is not None and not math.isfinite(yaw):
             raise ValueError('finite yaw required')
         token = self.begin(now)
+        self.takeoff_origin = None
         self.target = tuple(target)
         self.setpoint = self.t.position
         self.yaw = self.t.yaw if yaw is None else yaw
@@ -217,8 +223,7 @@ class FlightController:
             if math.dist(self.t.position, self.target) <= self.tolerance and yaw_error <= .15:
                 if self.within is None:
                     self.within = now
-                if now-self.within >= self.settle:
-                    self.setpoint = self.target
+                if now-self.within >= self.settle and math.dist(self.setpoint, self.target) < 1e-9:
                     self.state = 'HOLDING'
                     self.finish(True, 'target reached within tolerance continuously')
             else:

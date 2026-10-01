@@ -3,6 +3,7 @@
 import argparse
 from datetime import datetime, timezone
 import fcntl
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -10,8 +11,22 @@ import signal
 import socket
 import subprocess
 import time
+import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
+
+def isolated_environment(base, run_dir):
+    return {**base, 'GZ_PARTITION': 'uav-lab-'+uuid.uuid4().hex,
+            'LAB_RUN_DIR': str(run_dir), 'ROS_LOG_DIR': str(Path(run_dir)/'ros')}
+
+def owned_run_ready(runtime, supervisor_pid):
+    try:
+        runtime = Path(runtime)
+        run = Path((runtime/'current-run').read_text().strip())
+        return (run.parent == runtime and (run/'ready').exists()
+                and json.loads((run/'manifest.json').read_text())['supervisor_pid'] == supervisor_pid)
+    except (OSError, KeyError, ValueError):
+        return False
 
 def check_port(port):
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
@@ -88,20 +103,30 @@ def main():
     except BlockingIOError:
         print('another lab instance owns the runtime lock', flush=True)
         return 1
-    run_dir = runtime / datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
+    run_dir = runtime / (datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')+'-'+uuid.uuid4().hex[:8])
     run_dir.mkdir()
     manager = ManagedProcesses(run_dir)
-    env = dict(os.environ)
-    env.update(LAB_RUN_DIR=str(run_dir), ROS_LOG_DIR=str(run_dir / 'ros'),
-               GZ_SIM_RESOURCE_PATH=str(ROOT / '.deps/px4/Tools/simulation/gz/models'))
+    env = isolated_environment(dict(os.environ), run_dir)
+    env.update(GZ_SIM_RESOURCE_PATH=str(ROOT / '.deps/px4/Tools/simulation/gz/models'))
     (runtime / 'current-run').write_text(str(run_dir)+'\n')
-    metadata = {'run_id': run_dir.name, 'dependencies': json.loads((ROOT/'dependencies/lock.json').read_text()),
+    metadata = {'run_id': run_dir.name, 'supervisor_pid': os.getpid(), 'dependencies': json.loads((ROOT/'dependencies/lock.json').read_text()),
                 'environment': {k: env.get(k) for k in ('ROS_DOMAIN_ID','GZ_PARTITION','RMW_IMPLEMENTATION')},
                 'headless': options.headless,
                 'parameters': {'COM_RC_IN_MODE': 4, 'COM_OF_LOSS_T': 1, 'COM_OBL_RC_ACT': 4,
                                'COM_DL_LOSS_T': 300, 'NAV_DLL_ACT': 0, 'UXRCE_DDS_SYNCT': 0,
                                'UXRCE_DDS_PTCFG': 1,
                                'UXRCE_DDS_DOM_ID': int(env.get('ROS_DOMAIN_ID','42'))}}
+    snapshots = run_dir/'configuration'
+    snapshots.mkdir()
+    metadata['configuration_sha256'] = {}
+    for relative in ('simulation/worlds/lab.sdf', 'configs/px4-start.sh', 'configs/lab.rviz', 'dependencies/lock.json'):
+        contents = (ROOT/relative).read_bytes()
+        (snapshots/Path(relative).name).write_bytes(contents)
+        metadata['configuration_sha256'][relative] = hashlib.sha256(contents).hexdigest()
+    metadata['frames'] = {'world': 'ENU', 'body': 'FLU', 'tf': 'odom -> base_link',
+                          'px4_world': 'NED', 'px4_body': 'FRD'}
+    metadata['platform_commit'] = subprocess.check_output(['git','-C',str(ROOT),'rev-parse','HEAD'], text=True).strip()
+    metadata['platform_dirty'] = bool(subprocess.check_output(['git','-C',str(ROOT),'status','--porcelain'], text=True).strip())
     (run_dir / 'manifest.json').write_text(json.dumps(metadata, indent=2)+'\n')
     def stop(*_):
         raise KeyboardInterrupt
@@ -155,6 +180,8 @@ def main():
         return 1
     finally:
         manager.close()
+        (run_dir/'ready').unlink(missing_ok=True)
+        (run_dir/'closed').write_text('all owned process groups stopped\n')
         lock.close()
 
 if __name__ == '__main__':

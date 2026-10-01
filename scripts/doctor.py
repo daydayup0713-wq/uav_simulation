@@ -6,6 +6,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+from check_messages import check_messages
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -36,11 +37,17 @@ def checks(runtime=False, sensors=False):
         for path in paths:
             add(path, (ROOT/path).exists(), 'exists' if (ROOT/path).exists() else 'run bootstrap/build')
         lock = json.loads((ROOT/'dependencies/lock.json').read_text())
-        for name, path in [('px4','.deps/px4'), ('px4_msgs','ros2_ws/src/px4_msgs')]:
+        for name, path in [('px4','.deps/px4'), ('px4_msgs','ros2_ws/src/px4_msgs'), ('agent','.deps/agent')]:
             code, out, err = command(['git','-C',str(ROOT/path),'rev-parse','HEAD'])
             add(name+' revision', code==0 and out==lock['repositories'][name]['ref'], out or err)
             code, out, err = command(['git','-C',str(ROOT/path),'status','--porcelain','--untracked-files=no'])
             add(name+' clean', code==0 and not out, out or err or 'clean')
+        stamp = ROOT/'.deps/agent-install/build-manifest.json'
+        expected = {'repository': lock['repositories']['agent'], 'transitives': lock['agent_transitives'], 'p2p_profile': False}
+        add('private Agent build manifest', stamp.exists() and json.loads(stamp.read_text()) == expected,
+            'matches lock' if stamp.exists() else 're-run bootstrap --only agent')
+        for name, match in check_messages(ROOT).items():
+            add(name+' schema', match, 'matching fields/constants/version' if match else 'schema mismatch or missing')
     code, out, err = command(['nvidia-smi','--query-gpu=name,memory.total','--format=csv,noheader'])
     add('GPU/CUDA', code==0, out or err, required=sensors)
     return report

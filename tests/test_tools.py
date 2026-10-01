@@ -3,7 +3,7 @@ import sys
 import time
 import pytest
 from uav_lab_tools.arguments import parser
-from supervise import ManagedProcesses, check_port
+from supervise import ManagedProcesses, check_port, isolated_environment, owned_run_ready
 import socket
 from pathlib import Path
 
@@ -60,3 +60,23 @@ def test_cleanup_reaches_descendants_after_group_leader_exits(tmp_path):
             os.kill(descendant, signal.SIGKILL)
         except ProcessLookupError:
             pass
+
+def test_each_run_has_a_unique_gazebo_partition(tmp_path):
+    base = {'GZ_PARTITION': 'existing-world'}
+    first = isolated_environment(base, tmp_path/'a')
+    second = isolated_environment(base, tmp_path/'b')
+    assert first['GZ_PARTITION'] != second['GZ_PARTITION']
+    assert first['GZ_PARTITION'] != 'existing-world'
+    assert base['GZ_PARTITION'] == 'existing-world'
+
+def test_readiness_does_not_accept_another_supervisors_run(tmp_path):
+    import json
+    run = tmp_path/'run'
+    run.mkdir()
+    (tmp_path/'current-run').write_text(str(run))
+    (run/'ready').write_text('ready')
+    (run/'manifest.json').write_text(json.dumps({'supervisor_pid': 123}))
+    assert not owned_run_ready(tmp_path, 456)
+    assert owned_run_ready(tmp_path, 123)
+    (run/'ready').unlink()
+    assert not owned_run_ready(tmp_path, 123)

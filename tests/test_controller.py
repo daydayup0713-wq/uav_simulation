@@ -47,6 +47,17 @@ def test_arm_ack_alone_does_not_report_success():
     c.tick(2.2, .05)
     assert token not in c.results
 
+@pytest.mark.parametrize('ack', [False, True])
+def test_command_timeout_with_fresh_telemetry_never_arms(ack):
+    c, token = start()
+    if ack:
+        c.ack(176, 0)
+    refresh(c, 7.1)
+    c.tick(7.1, .05)
+    assert c.state == 'FAILSAFE'
+    assert not c.streaming and not c.drain_commands()
+    assert c.results[token] == (False, 'command ACK/state confirmation timeout')
+
 def test_disarm_in_air_and_unarmed_takeoff_are_rejected():
     c = FlightController()
     refresh(c, 0)
@@ -56,6 +67,19 @@ def test_disarm_in_air_and_unarmed_takeoff_are_rejected():
     c.update(2.3, landed=False)
     with pytest.raises(ValueError):
         c.disarm(2.3)
+
+def test_delayed_takeoff_uses_explicit_arm_ground_anchor():
+    c = armed()
+    # PX4 land detector can clear after motors spin, while still near ground.
+    c.update(2.3, position=(.02, .01, .08), landed=False)
+    c.fly('TAKEOFF', 2.3, height=2)
+    assert c.target == (0., 0., 2.05)
+
+def test_takeoff_from_uncommanded_airborne_location_is_rejected():
+    c = armed()
+    c.update(2.3, position=(0., 0., 1.), landed=False)
+    with pytest.raises(ValueError, match='ground'):
+        c.fly('TAKEOFF', 2.3, height=2)
 
 def test_target_speed_and_continuous_tolerance():
     c = armed()
@@ -71,6 +95,10 @@ def test_target_speed_and_continuous_tolerance():
     for t in (4, 4.5, 5, 5.5, 6.01):
         c.update(t, position=(3, 4, 2), yaw=0, valid=True, armed=True, offboard=True, landed=False)
         c.tick(t, .05)
+    for index in range(1,121):
+        now = 6.01+index*.05
+        c.update(now, position=(3,4,2), yaw=0, valid=True, armed=True, offboard=True, landed=False)
+        c.tick(now, .05)
     assert c.results[token][0]
 
 def test_cancel_old_goal_cannot_cancel_landing():
@@ -85,6 +113,15 @@ def test_cancel_old_goal_cannot_cancel_landing():
     c.update(2.4, armed=False, offboard=False, landed=True, landing_mode=True)
     c.tick(2.4, .05)
     assert c.results[landing][0]
+
+def test_cancel_motion_holds_measured_pose_and_finishes_old_goal():
+    c = armed()
+    token = c.fly('GOTO', 2.2, target=(3., 4., 2.))
+    c.update(2.3, position=(.1, .2, .3), landed=False)
+    assert c.cancel(token, 2.3)
+    assert c.state == 'HOLDING'
+    assert c.setpoint == c.target == (.1, .2, .3)
+    assert not c.results[token][0] and c.active is None
 
 def test_stale_telemetry_latches_and_cannot_resume():
     c = armed()
