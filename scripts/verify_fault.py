@@ -5,11 +5,16 @@ import os
 from pathlib import Path
 import signal
 import time
-import rclpy
-from rclpy.qos import qos_profile_sensor_data
-from px4_msgs.msg import VehicleStatus, VehicleLandDetected
+
+def landing_completed(status, fresh, landing_observed):
+    # PX4 can restore the previous nav_state after disarming. Observe the
+    # airborne landing transition, then require actual landed + disarmed.
+    return fresh and landing_observed and status['landed'] and not status['armed']
 
 def main():
+    import rclpy
+    from rclpy.qos import qos_profile_sensor_data
+    from px4_msgs.msg import VehicleStatus, VehicleLandDetected
     root = Path(os.environ['LAB_ROOT'])
     run = Path((root/'.runtime/current-run').read_text().strip())
     if run.parent != root/'.runtime' or not (run/'ready').exists():
@@ -25,11 +30,15 @@ def main():
     status = {'armed': None, 'offboard': None, 'landed': None}
     received = {}
     events = []
+    started = None
+    observed = {'landing_while_armed': False}
     def state(msg):
         status.update(armed=msg.arming_state==VehicleStatus.ARMING_STATE_ARMED,
                       offboard=msg.nav_state==VehicleStatus.NAVIGATION_STATE_OFFBOARD)
         received['status'] = time.monotonic()
         events.append({'time': time.monotonic(), 'nav_state': msg.nav_state, **status})
+        if started is not None and status['armed'] and msg.nav_state == VehicleStatus.NAVIGATION_STATE_AUTO_LAND:
+            observed['landing_while_armed'] = True
     def land(msg):
         status['landed'] = bool(msg.landed)
         received['land'] = time.monotonic()
@@ -47,13 +56,15 @@ def main():
         while time.monotonic()<deadline:
             rclpy.spin_once(node, timeout_sec=.1)
             fresh = all(time.monotonic()-received.get(k,0)<1 for k in ('status','land'))
-            if fresh and status['landed'] and not status['armed'] and not status['offboard']:
+            if landing_completed(status, fresh, observed['landing_while_armed']):
                 report = {'passed': True, 'failure': 'bridge_exit', 'elapsed_s': time.monotonic()-started,
-                          'final': status, 'events': events}
+                          'final': status, 'failsafe_landing_observed': True, 'events': events}
                 (run/'fault-acceptance.json').write_text(json.dumps(report, indent=2)+'\n')
                 print(json.dumps({k:v for k,v in report.items() if k!='events'}), flush=True)
                 return 0
-        raise RuntimeError('PX4 did not land/disarm after bridge exit within 50s')
+        (run/'fault-acceptance.json').write_text(json.dumps({'passed': False, 'failure': 'bridge_exit',
+            'final': status, 'observed': observed, 'events': events}, indent=2)+'\n')
+        raise RuntimeError('PX4 failsafe landing/disarm not independently confirmed within 50s')
     finally:
         node.destroy_node()
         rclpy.shutdown()
