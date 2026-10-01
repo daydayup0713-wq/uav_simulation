@@ -1,0 +1,31 @@
+name: flight-lab
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+concurrency:
+  group: flight-lab-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  policy:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y python3-pytest
+      - run: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python3 -m pytest -q
+  headless-sitl:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t uav-lab -f containers/Dockerfile .
+      - name: Three flights and bridge-loss landing
+        run: |
+          mkdir -p ci-evidence
+          docker run --rm --shm-size=1g -v "$PWD/ci-evidence:/opt/uav_lab/.runtime" uav-lab bash scripts/ci_acceptance.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sitl-evidence
+          path: ci-evidence
