@@ -46,3 +46,30 @@ def test_checksum_path_traversal_rejected(tmp_path):
     (tmp_path/'dataset.json').write_text(json.dumps({'complete':True,'configuration_sha256':{'../outside': 'deadbeef'}}))
     with pytest.raises(ValueError,match='path'):
         module().load_dataset(tmp_path)
+
+def test_slow_simulation_replay_uses_receive_timeline():
+    from uav_lab_tools import data_cli
+    assert getattr(data_cli,'playback_timeout',lambda report:0)({'sim_duration_s':30.,'bag_duration_s':120.})>=135
+
+def test_owned_cleanup_stops_child_after_wrapper_already_exited(tmp_path):
+    import os,signal,subprocess,time
+    from uav_lab_tools.data_cli import stop_owned
+    pidfile=tmp_path/'child.pid'
+    code="import os,signal,time,sys; child=os.fork();\nif child: os._exit(0)\nsignal.signal(signal.SIGINT,signal.SIG_IGN)\nopen(sys.argv[1],'w').write(str(os.getpid()))\ntime.sleep(300)\n"
+    wrapper=subprocess.Popen(['/usr/bin/python3','-c',code,str(pidfile)],start_new_session=True)
+    def alive(pid):
+        try:return open('/proc/'+str(pid)+'/stat').read().split()[2]!='Z'
+        except FileNotFoundError:return False
+    try:
+        end=time.monotonic()+2
+        while not pidfile.exists() and time.monotonic()<end:time.sleep(.02)
+        child=int(pidfile.read_text());wrapper.wait(timeout=2)
+        assert alive(child)
+        stop_owned(wrapper)
+        end=time.monotonic()+1
+        while alive(child) and time.monotonic()<end:time.sleep(.02)
+        assert not alive(child)
+    finally:
+        try:os.killpg(wrapper.pid,signal.SIGKILL)
+        except ProcessLookupError:pass
+        wrapper.wait(timeout=2)

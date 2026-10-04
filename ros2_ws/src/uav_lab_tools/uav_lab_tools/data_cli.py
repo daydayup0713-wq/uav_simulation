@@ -10,6 +10,7 @@ import signal
 import subprocess
 import time
 import uuid
+from contextlib import contextmanager
 from .sensor_contract import SENSOR_TOPICS,RECORD_TOPICS,stamp_ns
 from .sensor_audit import SensorAudit
 from .datasets import inspect_bag,load_dataset,file_hash,check_replay_domain
@@ -59,18 +60,45 @@ class LiveAudit:
         while time.monotonic()<end:
             if process and process.poll() is not None:raise RuntimeError('recorder exited early: '+str(process.returncode))
             self.spin()
-        return self.audit.report()
+        return self.audit.report(live=True)
 
     def close(self):self.node.destroy_node()
 
 def stop_owned(process):
-    if process.poll() is None:
-        os.killpg(process.pid,signal.SIGINT)
+    def send(sig):
+        try:os.killpg(process.pid,sig)
+        except ProcessLookupError:pass
+    def group_exists():
+        try:os.killpg(process.pid,0);return True
+        except ProcessLookupError:return False
+    # The ros2 wrapper can exit before its recorder/player descendants.
+    # Group ownership, not leader poll(), governs all cleanup signals.
+    send(signal.SIGINT)
     try:process.wait(timeout=15)
-    except subprocess.TimeoutExpired:
-        os.killpg(process.pid,signal.SIGTERM)
-        try:process.wait(timeout=3)
-        except subprocess.TimeoutExpired:os.killpg(process.pid,signal.SIGKILL);process.wait(timeout=3)
+    except subprocess.TimeoutExpired:pass
+    send(signal.SIGTERM)
+    deadline=time.monotonic()+3
+    while group_exists() and time.monotonic()<deadline:
+        process.poll();time.sleep(.05)
+    send(signal.SIGKILL)
+    process.wait(timeout=3)
+
+@contextmanager
+def scoped_signals():
+    previous={sig:signal.getsignal(sig) for sig in (signal.SIGINT,signal.SIGTERM)}
+    received=False
+    def interrupt(signum,_):
+        nonlocal received
+        if not received:
+            received=True
+            raise KeyboardInterrupt(signal.Signals(signum).name)
+    for sig in previous:signal.signal(sig,interrupt)
+    try:yield
+    finally:
+        for sig,handler in previous.items():signal.signal(sig,handler)
+
+def playback_timeout(report):
+    return max(30,report['bag_duration_s']*1.2+15)
 
 def record(root, duration):
     run,manifest=runtime_manifest(root,ready=True)
@@ -91,7 +119,10 @@ def record(root, duration):
             process=subprocess.Popen(['ros2','bag','record','--storage','sqlite3','-o',str(destination/'bag'),
                  '--qos-profile-overrides-path',str(destination/'configuration/recording-qos.yaml'),*RECORD_TOPICS],
                  stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
-            monitor.collect(duration,process)
+            metadata['recorder_pid']=process.pid;save()
+            live_report=monitor.collect(duration,process)
+            (destination/'live-audit.json').write_text(json.dumps(live_report,indent=2)+'\n')
+            if not live_report['passed']:raise RuntimeError('live recording sensor contract failed; see live-audit.json')
             stop_owned(process)
         if process.returncode not in (0,-signal.SIGINT):raise RuntimeError('recorder failed: '+str(process.returncode))
         report,_=inspect_bag(destination,allow_incomplete=True)
@@ -102,6 +133,7 @@ def record(root, duration):
         save()
         return {'passed':metadata['complete'],'dataset':str(destination),'reason':metadata['reason'],'audit':report}
     except BaseException as exc:
+        metadata['complete']=False
         interrupted=isinstance(exc,KeyboardInterrupt)
         metadata['reason']='recording interrupted' if interrupted else str(exc);save()
         if interrupted:raise RuntimeError('recording interrupted; incomplete dataset: '+str(destination)) from exc
@@ -134,14 +166,14 @@ def replay(root,options):
             process=subprocess.Popen(['ros2','bag','play',str(options.dataset/'bag'),
                    '--qos-profile-overrides-path',str(options.dataset/'configuration/recording-qos.yaml'),
                    '--topics',*sorted(types)],stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
-            deadline=time.monotonic()+max(30,report['sim_duration_s']*2+15)
+            deadline=time.monotonic()+playback_timeout(report)
             while process.poll() is None:
                 if time.monotonic()>deadline:raise RuntimeError('replay timeout')
                 monitor.spin()
             # Drain final queued samples.
             end=time.monotonic()+.5
             while time.monotonic()<end:monitor.spin()
-        result=monitor.audit.report()
+        result=monitor.audit.report(live=True)
         result.update(domain=options.domain,player_exit_code=process.returncode,dataset=str(options.dataset))
         result['passed']=result['passed'] and process.returncode==0
         (options.dataset/'replay-audit.json').write_text(json.dumps(result,indent=2)+'\n')
@@ -151,6 +183,9 @@ def replay(root,options):
         monitor.close()
 
 def main(args=None):
+    with scoped_signals():return run_cli(args)
+
+def run_cli(args=None):
     options=parser().parse_args(args)
     root=Path(os.environ.get('LAB_ROOT','.')).resolve()
     import rclpy

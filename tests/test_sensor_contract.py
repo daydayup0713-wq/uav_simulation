@@ -85,3 +85,35 @@ def test_imu_orientation_is_not_an_algorithm_observation():
     assert msg.orientation_covariance[0] == -1
     assert (msg.orientation.x,msg.orientation.y,msg.orientation.z,msg.orientation.w)==(0,0,0,1)
     assert msg.header.stamp.nanosec==123 and msg.angular_velocity.x==1
+
+def test_long_sensor_outage_cannot_hide_in_average_frequency():
+    stats=module().StreamStats(10)
+    for index in range(1001):
+        if not 500<=index<550:stats.observe(10**9+index*100000000)
+    report=stats.report()
+    assert 9<report['source_hz']<10
+    assert report['maximum_gap_s']>5
+    assert not report['passed']
+
+def test_paused_live_clock_fails_but_offline_read_speed_does_not(tmp_path,monkeypatch):
+    audit_module=module();now=[0.]
+    monkeypatch.setattr(audit_module.time,'monotonic',lambda:now[0])
+    audit=audit_module.SensorAudit(calibration(tmp_path))
+    audit.observe_clock(10**9)
+    audit.observe('/uav001/lidar/points',cloud(),10**9)
+    audit.observe('/uav001/lidar/points',cloud(1100000000),1100000000)
+    for topic,(frame,hz) in {'/uav001/imu/data':('imu_link',200),'/uav001/camera/image_raw':('camera_optical_frame',15),'/uav001/camera/camera_info':('camera_optical_frame',15),'/uav001/ground_truth/odometry':('sim_world',25)}.items():
+        for ns in (10**9,10**9+int(1e9/hz)):
+            header=stamp(ns,frame)
+            if topic.endswith('/data'):msg=N(header=header,angular_velocity=N(x=0.,y=0.,z=0.),linear_acceleration=N(x=0.,y=0.,z=9.81),orientation_covariance=[-1.]+[0.]*8)
+            elif topic.endswith('/image_raw'):msg=N(header=header,width=320,height=240,encoding='rgb8',step=960,data=b'\x00\x7f\xff'*76800)
+            elif topic.endswith('/camera_info'):msg=N(header=header,width=320,height=240,k=[160.,0,160.,0,160.,120.,0,0,1],d=[0.]*5,p=[160.,0,160.,0,0,160.,120.,0,0,0,1.,0],distortion_model='plumb_bob')
+            else:msg=N(header=header,child_frame_id='truth_base_link',pose=N(pose=N(position=N(x=0.,y=0.,z=.227),orientation=N(x=0.,y=0.,z=0.,w=1.))))
+            audit.observe(topic,msg,ns)
+    transforms=[]
+    for t in audit.calibration['transforms']:
+        transforms.append(N(header=N(frame_id=t['parent']),child_frame_id=t['child'],transform=N(translation=N(**dict(zip('xyz',t['xyz']))),rotation=N(**dict(zip('xyzw',t['xyzw']))))))
+    audit.observe_static(N(transforms=transforms));audit.observe_clock(1100000000)
+    now[0]=59.
+    assert audit.report()['passed'], 'offline source validation must ignore reader speed'
+    assert not audit.report(live=True)['passed']

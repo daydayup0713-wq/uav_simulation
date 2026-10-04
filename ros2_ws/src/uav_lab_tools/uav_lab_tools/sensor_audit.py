@@ -8,6 +8,7 @@ class StreamStats:
     def __init__(self, hz):
         self.hz, self.count, self.first, self.last = hz,0,None,None
         self.regressions, self.maximum_gap_ns = 0,0
+        self.last_receipt_wall=None
 
     def observe(self, ns):
         if self.last is not None:
@@ -16,14 +17,17 @@ class StreamStats:
         if self.first is None:
             self.first=ns
         self.last=ns; self.count+=1
+        self.last_receipt_wall=time.monotonic()
 
     def report(self):
         span=(self.last-self.first)/1e9 if self.count>1 else 0
         hz=(self.count-1)/span if span>0 else 0
+        gap_limit=max(.25,5/self.hz)
         return {'count':self.count,'source_hz':hz,'expected_hz':self.hz,
                 'first_ns':self.first,'last_ns':self.last,'regressions':self.regressions,
                 'maximum_gap_s':self.maximum_gap_ns/1e9,
-                'passed':self.count>=2 and self.first>0 and not self.regressions and .8*self.hz<=hz<=1.2*self.hz}
+                'maximum_allowed_gap_s':gap_limit,
+                'passed':self.count>=2 and self.first>0 and not self.regressions and .8*self.hz<=hz<=1.2*self.hz and self.maximum_gap_ns/1e9<=gap_limit}
 
 class SensorAudit:
     def __init__(self, calibration):
@@ -32,6 +36,7 @@ class SensorAudit:
         self.errors=set(); self.transforms=set()
         self.clock_first=None; self.clock_last=None; self.clock_count=0
         self.wall_first=time.monotonic()
+        self.clock_progress_wall=None
         self.cloud_summary={}; self.imu_norm_sum=0.;self.imu_count=0
 
     def error(self, message):
@@ -41,6 +46,7 @@ class SensorAudit:
         if self.clock_last is not None and ns<self.clock_last:
             self.error('simulation clock regression')
         if self.clock_first is None: self.clock_first=ns
+        if self.clock_last is None or ns>self.clock_last:self.clock_progress_wall=time.monotonic()
         self.clock_last=ns;self.clock_count+=1
 
     def observe_static(self, msg):
@@ -116,7 +122,7 @@ class SensorAudit:
             self.error('camera intrinsics mismatch')
         if msg.distortion_model!='plumb_bob' or any(v!=0 for v in msg.d): self.error('camera distortion mismatch')
 
-    def report(self):
+    def report(self,live=False):
         streams={t:s.report() for t,s in self.stats.items()}
         missing=[t for t,r in streams.items() if r['count']<2]
         missing_tf=[v['child'] for v in self.calibration['transforms'] if v['child'] not in self.transforms]
@@ -127,7 +133,19 @@ class SensorAudit:
         mean_imu=self.imu_norm_sum/self.imu_count if self.imu_count else None
         if mean_imu is not None and not 5<mean_imu<20: self.error('IMU mean specific force outside flight envelope')
         span=(self.clock_last-self.clock_first)/1e9 if self.clock_count>=2 else 0
+        wall_duration=max(.001,time.monotonic()-self.wall_first)
+        rtf=span/wall_duration
+        if live:
+            now=time.monotonic()
+            if self.clock_progress_wall is None or now-self.clock_progress_wall>2:
+                self.error('live simulation clock stalled for >2s')
+            for topic,s in self.stats.items():
+                # Receipt deadlines expand with measured simulation speed. The
+                # independent clock progress check still detects a full pause.
+                deadline=max(2,3/(s.hz*max(.001,rtf)))
+                if s.last_receipt_wall is None or now-s.last_receipt_wall>deadline:
+                    self.error(topic+': live stream receipt stalled')
         return {'passed':not self.errors and not missing and not missing_tf and self.clock_count>=2 and all(v['passed'] for v in streams.values()),
                 'streams':streams,'missing':missing,'missing_transforms':missing_tf,'errors':sorted(self.errors),
-                'clock_samples':self.clock_count,'sim_duration_s':span,'real_time_factor':span/max(.001,time.monotonic()-self.wall_first),
+                'clock_samples':self.clock_count,'sim_duration_s':span,'real_time_factor':rtf,
                 'lidar':self.cloud_summary,'imu_mean_specific_force_m_s2':mean_imu}

@@ -15,6 +15,8 @@
 
 命令都通过 `./scripts/labctl` 执行。直接 echo 传感器建议用 `./scripts/env.sh ros2 topic echo /uav001/imu/data --qos-reliability best_effort`。查看静态变换使用 `--qos-durability transient_local`。图像和点云量较大，避免长期在终端打印全文。
 
-验收频率按源时间计算；`real_time_factor` 则比较 /clock 与墙钟。低实时率不等于源频率改变。回放采用 best effort，报告实际接收数量和最大间隔，不宣称无损传输；算法基准应从 bag 文件离线读取并检查间隔。
+验收频率按源时间计算；`real_time_factor` 则比较 /clock 与墙钟。低实时率不等于源频率改变。源数据最大间隔不得超过 `max(0.25秒, 5/配置Hz)`，防止长时间断流被平均频率掩盖。实时检查还要求 /clock 在最近2秒墙钟内推进，传感器接收超时按实时率调整；暂停仿真会明确失败。离线检查不受文件读取速度影响。
+
+回放按 bag 的接收时间轴播放，并据此计算超时；在低实时率下，墙钟录制时长可能大于源时长。回放采用 best effort，报告实际接收数量和最大间隔，不宣称无损传输；算法基准应从 bag 文件离线读取并检查间隔。录制被 SIGINT/SIGTERM 中断时关闭本次 recorder 进程组，数据标记为 complete=false，保留诊断和已写入文件。
 
 通用雷达白噪声0.01m，无逐点时间；IMU只含白噪声；相机无畸变。完整 SLAM、去畸变、Mid-360 近似和标定误差实验将在后续版本交付。
