@@ -1,0 +1,72 @@
+{
+  "passed": true,
+  "streams": {
+    "/uav001/lidar/points": {
+      "count": 98,
+      "source_hz": 10.0,
+      "expected_hz": 10,
+      "first_ns": 87700000000,
+      "last_ns": 97400000000,
+      "regressions": 0,
+      "maximum_gap_s": 0.1,
+      "maximum_allowed_gap_s": 0.5,
+      "passed": true
+    },
+    "/uav001/imu/data": {
+      "count": 1963,
+      "source_hz": 200.04078303425774,
+      "expected_hz": 200,
+      "first_ns": 87672000000,
+      "last_ns": 97480000000,
+      "regressions": 0,
+      "maximum_gap_s": 0.008,
+      "maximum_allowed_gap_s": 0.25,
+      "passed": true
+    },
+    "/uav001/camera/image_raw": {
+      "count": 148,
+      "source_hz": 15.154639175257733,
+      "expected_hz": 15,
+      "first_ns": 87716000000,
+      "last_ns": 97416000000,
+      "regressions": 0,
+      "maximum_gap_s": 0.068,
+      "maximum_allowed_gap_s": 0.3333333333333333,
+      "passed": true
+    },
+    "/uav001/camera/camera_info": {
+      "count": 149,
+      "source_hz": 15.15151515151515,
+      "expected_hz": 15,
+      "first_ns": 87716000000,
+      "last_ns": 97484000000,
+      "regressions": 0,
+      "maximum_gap_s": 0.068,
+      "maximum_allowed_gap_s": 0.3333333333333333,
+      "passed": true
+    },
+    "/uav001/ground_truth/odometry": {
+      "count": 246,
+      "source_hz": 24.999999999999996,
+      "expected_hz": 25,
+      "first_ns": 87680000000,
+      "last_ns": 97480000000,
+      "regressions": 0,
+      "maximum_gap_s": 0.04,
+      "maximum_allowed_gap_s": 0.25,
+      "passed": true
+    }
+  },
+  "missing": [],
+  "missing_transforms": [],
+  "errors": [],
+  "clock_samples": 2452,
+  "sim_duration_s": 9.804,
+  "real_time_factor": 0.9725674752989081,
+  "lidar": {
+    "points_per_scan": 5760,
+    "finite_sample_fraction": 1.0,
+    "sampled_z_extent_m": 3.7697013914585114
+  },
+  "imu_mean_specific_force_m_s2": 9.810189438117533
+}

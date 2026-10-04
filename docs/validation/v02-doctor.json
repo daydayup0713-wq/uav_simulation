@@ -212,10 +212,10 @@
       "detail": "/usr/lib/x86_64-linux-gnu/gz-sim-8/plugins/libgz-sim8-sensors-system.so"
     },
     {
-      "name": "actual sensor rendering",
+      "name": "sensor runtime gate",
       "ok": true,
-      "required": true,
-      "detail": "startup gates on real image and 3D point cloud; GPU enumeration alone is not acceptance"
+      "required": false,
+      "detail": "doctor checks prerequisites; start_lab --profile sensors checks actual image and 3D point cloud"
     }
   ]
 }
