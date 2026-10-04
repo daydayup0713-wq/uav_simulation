@@ -20,11 +20,12 @@ from nav_msgs.msg import Odometry, Path as NavPath
 from tf2_ros import TransformBroadcaster
 from px4_msgs.msg import (VehicleLocalPosition, VehicleStatus, VehicleAttitude,
                           VehicleLandDetected, VehicleCommandAck, VehicleCommand,
-                          OffboardControlMode, TrajectorySetpoint)
+                          OffboardControlMode, TrajectorySetpoint, VehicleOdometry, EstimatorStatusFlags)
 from uav_lab_interfaces.action import ExecuteFlight
 from .controller import FlightController
 from .coordinate import ned_to_enu, enu_to_ned, px4_to_ros_quaternion, yaw_to_ned
 from .clock import Px4Clock
+from .external_odometry import convert_external, ExternalOdometryGate
 
 class Bridge(Node):
     def __init__(self):
@@ -32,6 +33,12 @@ class Bridge(Node):
         self.declare_parameter('use_sim_time', True) if not self.has_parameter('use_sim_time') else self.set_parameters([rclpy.parameter.Parameter('use_sim_time', value=True)])
         self.lock = threading.RLock()
         self.policy = FlightController()
+        self.declare_parameter('external_odometry', False)
+        self.external_enabled = bool(self.get_parameter('external_odometry').value)
+        self.external = ExternalOdometryGate()
+        self.external_sent = None
+        self.fusion_flags, self.fusion_received = {}, 0.
+        self.nav_state = None
         self.px4_clock = Px4Clock()
         self.orientation = (0., 0., 0., 1.)
         self.velocity = (0., 0., 0.)
@@ -53,6 +60,15 @@ class Bridge(Node):
         self.control_pub = self.create_publisher(OffboardControlMode, '/fmu/in/offboard_control_mode', 10)
         self.setpoint_pub = self.create_publisher(TrajectorySetpoint, '/fmu/in/trajectory_setpoint', 10)
         self.command_pub = self.create_publisher(VehicleCommand, '/fmu/in/vehicle_command', 10)
+        if self.external_enabled:
+            self.external_pub = self.create_publisher(VehicleOdometry, '/fmu/in/vehicle_visual_odometry', 10)
+            self.create_subscription(Odometry, '/uav001/localization/odometry', self.external_callback, 20,
+                                     callback_group=self.telemetry_group)
+            self.create_subscription(DiagnosticArray, '/uav001/localization/diagnostics', self.quality_callback, 10,
+                                     callback_group=self.telemetry_group)
+            version = getattr(EstimatorStatusFlags, 'MESSAGE_VERSION', 0)
+            self.create_subscription(EstimatorStatusFlags, '/fmu/out/estimator_status_flags'+(f'_v{version}' if version else ''),
+                                     self.fusion_callback, qos_profile_sensor_data, callback_group=self.telemetry_group)
         for name, msg, callback in [
                 ('vehicle_local_position', VehicleLocalPosition, self.position_callback),
                 ('vehicle_status', VehicleStatus, self.status_callback),
@@ -80,6 +96,36 @@ class Bridge(Node):
                                          'sim_ns': self.get_clock().now().nanoseconds,
                                          'event': event, **values}, allow_nan=False)+'\n')
 
+    def external_callback(self, msg):
+        with self.lock:
+            p, q = msg.pose.pose.position, msg.pose.pose.orientation
+            v, w = msg.twist.twist.linear, msg.twist.twist.angular
+            self.external.observe_sample({'source_ns': msg.header.stamp.sec*10**9+msg.header.stamp.nanosec,
+                'frame': msg.header.frame_id, 'child_frame': msg.child_frame_id,
+                'position': [p.x,p.y,p.z], 'quaternion': [q.x,q.y,q.z,q.w],
+                'body_velocity': [v.x,v.y,v.z], 'body_angular_velocity': [w.x,w.y,w.z],
+                'pose_covariance': list(msg.pose.covariance), 'twist_covariance': list(msg.twist.covariance)}, time.monotonic())
+
+    def quality_callback(self, msg):
+        with self.lock:
+            for status in msg.status:
+                if status.name == 'uav001/localization':
+                    values = {v.key: v.value for v in status.values}
+                    self.external.observe_quality(status.level == DiagnosticStatus.OK and values.get('ready') == 'True', time.monotonic())
+
+    def fusion_callback(self, msg):
+        with self.lock:
+            self.fusion_flags = {k: bool(getattr(msg,k)) for k in
+                ('cs_ev_pos','cs_ev_hgt','cs_ev_yaw','cs_gnss_pos','cs_gnss_vel','cs_gps_hgt','cs_gnss_yaw')}
+            self.fusion_received = time.monotonic()
+            self.record('fusion', **self.fusion_flags)
+
+    def external_ready(self, now):
+        return (not self.external_enabled or (self.external.ready(now) and now-self.fusion_received < 1.5 and
+                all(self.fusion_flags.get(k) is True for k in ('cs_ev_pos','cs_ev_hgt','cs_ev_yaw')) and
+                all(self.fusion_flags.get(k) is False for k in ('cs_gnss_pos','cs_gnss_vel','cs_gps_hgt','cs_gnss_yaw'))))
+
+
     def position_callback(self, msg):
         with self.lock:
             counters = (msg.xy_reset_counter, msg.z_reset_counter, msg.heading_reset_counter)
@@ -106,6 +152,7 @@ class Bridge(Node):
 
     def status_callback(self, msg):
         with self.lock:
+            self.nav_state = msg.nav_state
             self.policy.update(time.monotonic(), armed=msg.arming_state == VehicleStatus.ARMING_STATE_ARMED,
                                offboard=msg.nav_state == VehicleStatus.NAVIGATION_STATE_OFFBOARD,
                                preflight=bool(msg.pre_flight_checks_pass),
@@ -148,6 +195,24 @@ class Bridge(Node):
             if dt < 0:
                 self.policy.fail('simulation clock regression')
             self.previous_sim = sim
+            if self.external_enabled:
+                if self.external.ready(wall) and self.external.sample['source_ns'] != self.external_sent and self.external.sample['source_ns'] <= sim:
+                    try:
+                        values = convert_external(self.external.sample, self.px4_clock, sim)
+                        msg = VehicleOdometry()
+                        for key, value in values.items(): setattr(msg, key, value)
+                        if self.count_publishers('/fmu/in/vehicle_visual_odometry') != 1:
+                            raise ValueError('another external odometry writer detected')
+                        self.external_pub.publish(msg)
+                        self.external_sent = self.external.sample['source_ns']
+                        self.record('external_odometry', source_ns=self.external_sent,
+                                    position=values['position'], sample_us=values['timestamp_sample'])
+                    except (ValueError, RuntimeError) as error:
+                        # Wait for the first clock anchor before fusion starts.
+                        if self.px4_clock.px4_us is not None:
+                            self.external.failed = self.external.failed or str(error)
+                if self.external.failed:
+                    self.policy.fail(self.external.failed)
             self.policy.tick(wall, dt)
             if self.policy.streaming:
                 for topic in ('/fmu/in/offboard_control_mode', '/fmu/in/trajectory_setpoint', '/fmu/in/vehicle_command'):
@@ -227,6 +292,7 @@ class Bridge(Node):
             'reason': self.policy.reason, 'armed': self.policy.t.armed, 'offboard': self.policy.t.offboard,
             'landed': self.policy.t.landed, 'position': self.policy.t.position,
             'preflight': self.policy.t.preflight,
+            'external_ready': self.external_ready(wall), 'fusion': self.fusion_flags, 'nav_state': self.nav_state,
             'fresh': self.policy.fresh(wall)}.items()]
         diag.status = [status]
         self.diag_pub.publish(diag)
@@ -235,6 +301,8 @@ class Bridge(Node):
         def callback(request, response):
             try:
                 with self.lock:
+                    if operation == 'arm' and not self.external_ready(time.monotonic()):
+                        raise ValueError('validated external localization and no GNSS fusion required')
                     token = getattr(self.policy, operation)(time.monotonic())
                 if operation == 'hold':
                     response.success, response.message = True, 'hold commanded'
@@ -257,6 +325,8 @@ class Bridge(Node):
         with self.lock:
             try:
                 self.policy.require_ready(time.monotonic())
+                if not self.external_ready(time.monotonic()):
+                    return GoalResponse.REJECT
                 if not self.policy.t.armed or goal.operation not in (0, 1, 2):
                     return GoalResponse.REJECT
                 if goal.operation != 2 and (self.policy.active is not None or not self.policy.t.offboard):

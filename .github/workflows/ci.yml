@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get update && sudo apt-get install -y python3-pytest
+      - run: sudo apt-get update && sudo apt-get install -y python3-pytest python3-numpy python3-scipy
       - run: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python3 -m pytest -q
   headless-sitl:
     runs-on: ubuntu-22.04
@@ -33,6 +33,8 @@ jobs:
         run: |
           mkdir -p ci-evidence
           docker run --rm --shm-size=1g -v "$PWD/ci-evidence:/opt/uav_lab/.runtime" uav-lab bash scripts/ci_acceptance.sh
+      - name: CPU LIO fixed observation replay and native map export
+        run: docker run --rm --shm-size=1g -v "$PWD/ci-evidence:/opt/uav_lab/.runtime" uav-lab bash scripts/ci_localization.sh
       - uses: actions/upload-artifact@v4
         if: always()
         with:

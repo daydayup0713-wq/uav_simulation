@@ -1,0 +1,153 @@
+{
+  "passed": true,
+  "failure": "lio_exit",
+  "elapsed_s": 8.05587287200251,
+  "final": {
+    "armed": false,
+    "offboard": true,
+    "landed": true
+  },
+  "failsafe_landing_observed": true,
+  "events": [
+    {
+      "time": 25384.352028312,
+      "nav_state": 14,
+      "armed": true,
+      "offboard": true,
+      "landed": null
+    },
+    {
+      "time": 25384.855740381,
+      "nav_state": 14,
+      "armed": true,
+      "offboard": true,
+      "landed": false
+    },
+    {
+      "time": 25385.369550449,
+      "nav_state": 14,
+      "armed": true,
+      "offboard": true,
+      "landed": false
+    },
+    {
+      "time": 25385.873593633,
+      "nav_state": 14,
+      "armed": true,
+      "offboard": true,
+      "landed": false
+    },
+    {
+      "time": 25386.161560981,
+      "nav_state": 14,
+      "armed": true,
+      "offboard": true,
+      "landed": false
+    },
+    {
+      "time": 25386.173645728,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 25386.437650512,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 25386.941567585,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 25387.445460697,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 25387.949405693,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 25388.459343867,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 25388.963415442,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 25389.467110211,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 25389.971379084,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 25390.475449645,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 25390.97921484,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": true
+    },
+    {
+      "time": 25391.483629501,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": true
+    },
+    {
+      "time": 25391.99170144,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": true
+    },
+    {
+      "time": 25392.495522075,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": true
+    },
+    {
+      "time": 25392.663705595,
+      "nav_state": 14,
+      "armed": false,
+      "offboard": true,
+      "landed": true
+    }
+  ]
+}

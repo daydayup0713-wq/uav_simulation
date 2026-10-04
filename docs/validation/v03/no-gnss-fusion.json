@@ -1,0 +1,67 @@
+{
+  "samples": 182,
+  "first_sim_s": 49.848,
+  "last_sim_s": 223.392,
+  "flags": {
+    "cs_ev_pos": [
+      true
+    ],
+    "cs_ev_hgt": [
+      true
+    ],
+    "cs_ev_yaw": [
+      true
+    ],
+    "cs_gnss_pos": [
+      false
+    ],
+    "cs_gnss_vel": [
+      false
+    ],
+    "cs_gps_hgt": [
+      false
+    ],
+    "cs_gnss_yaw": [
+      false
+    ]
+  },
+  "event_file_sha256": "598579591e2e5d6ce99cc3be60538a296f06930b0b60c1091eb44ca3ec99039c",
+  "relocalization": [
+    {
+      "event": "relocalized",
+      "map_to_odom": [
+        [
+          0.9999998760479685,
+          -4.642098081848265e-05,
+          0.0004957309148650363,
+          -0.0014069542447703739
+        ],
+        [
+          4.6495433000735407e-05,
+          0.9999999876426395,
+          -0.00015017621547858145,
+          -0.0008952738532053755
+        ],
+        [
+          -0.0004957239374118926,
+          0.00015019924608747302,
+          0.9999998658489733,
+          -0.00546227652518258
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "rmse_m": 0.0486525042163858,
+      "inlier_fraction": 1.0
+    }
+  ],
+  "post_fault_arm": {
+    "exit_code": 1,
+    "success": false,
+    "reason": "validated external localization and no GNSS fusion required"
+  }
+}

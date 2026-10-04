@@ -37,6 +37,11 @@ def main():
             env=environment)
         run(['cmake', '--build', build, '-j', str(args.jobs)], env=environment)
         run(['cmake', '--install', build], env=environment)
+    helper_build = ROOT / '.deps/slam/build-v1.1.0/platform'
+    run(['cmake', '-S', ROOT/'localization/native', '-B', helper_build,
+         '-DCMAKE_BUILD_TYPE=Release', '-DCMAKE_INSTALL_PREFIX='+str(prefix)], env=environment)
+    run(['cmake', '--build', helper_build, '-j', str(args.jobs)], env=environment)
+    run(['cmake', '--install', helper_build], env=environment)
     (prefix / 'build-manifest.json').write_text(json.dumps({
         'repositories': {name: git(ROOT / '.deps' / name, 'rev-parse', 'HEAD')
                          for name in lock['repositories']},

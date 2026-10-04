@@ -16,8 +16,8 @@
     "extension_modules": [
       "librviz_viewer.so"
     ],
-    "imu_topic": "/uav001/imu/data",
-    "points_topic": "/uav001/lidar/points",
+    "imu_topic": "/uav001/localization/input/imu",
+    "points_topic": "/uav001/localization/input/points",
     "image_topic": "/uav001/localization/unused_image",
     "imu_qos": {
       "profile": "sensor_data",

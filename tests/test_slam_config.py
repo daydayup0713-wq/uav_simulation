@@ -21,8 +21,8 @@ def test_cpu_config_preserves_physical_sensor_contract(tmp_path):
     assert cfg['global_shutter_lidar'] is True
     assert cfg['autoconf_perpoint_times'] is False
     ros = json.loads((tmp_path / 'config_ros.json').read_text())['glim_ros']
-    assert ros['imu_topic'] == '/uav001/imu/data'
-    assert ros['points_topic'] == '/uav001/lidar/points'
+    assert ros['imu_topic'] == '/uav001/localization/input/imu'
+    assert ros['points_topic'] == '/uav001/localization/input/points'
     assert ros['acc_scale'] == 1.0
     assert ros['base_frame_id'] == ros['imu_frame_id'] == 'lio_base_link'
     assert ros['publish_imu2lidar'] is False

@@ -1,0 +1,154 @@
+{
+  "dataset": "/home/pine/workspace/ai/UAV/uav_simulation/recordings/20261004T103659Z-5d426e73-104356-128d1b",
+  "input_topics": {
+    "/uav001/lidar/points": "sensor_msgs/msg/PointCloud2",
+    "/uav001/imu/data": "sensor_msgs/msg/Imu"
+  },
+  "bag_sha256": {
+    "metadata.yaml": "527f26cac291aeb7bbc43259ba2833831d0a3f158a2657220a9b22d52fbfd331",
+    "bag_0.db3": "46c1b6c8b40e727d294821644de35bb844349c3cc46f3778947ef25f4c54e47a"
+  },
+  "calibration": {
+    "schema_version": 1,
+    "model_to_base_link": [
+      0,
+      0,
+      0.24
+    ],
+    "payload_mass_kg": 0.05,
+    "lidar": {
+      "frame": "lidar_link",
+      "xyz": [
+        0,
+        0,
+        0.16
+      ],
+      "rpy": [
+        0,
+        0,
+        0
+      ],
+      "hz": 10,
+      "horizontal_samples": 360,
+      "vertical_samples": 16,
+      "horizontal_fov_rad": 6.283185307179586,
+      "vertical_fov_rad": 0.5235987755982988,
+      "min_m": 0.15,
+      "max_m": 20,
+      "noise_stddev_m": 0.01
+    },
+    "imu": {
+      "frame": "imu_link",
+      "xyz": [
+        0,
+        0,
+        0
+      ],
+      "rpy": [
+        0,
+        0,
+        0
+      ],
+      "hz": 200,
+      "gyro_stddev": 0.0002,
+      "accel_stddev": 0.01
+    },
+    "camera": {
+      "frame": "camera_link",
+      "optical_frame": "camera_optical_frame",
+      "xyz": [
+        0.2,
+        0,
+        0.06
+      ],
+      "rpy": [
+        0,
+        0,
+        0
+      ],
+      "optical_rpy": [
+        -1.5707963267948966,
+        0,
+        -1.5707963267948966
+      ],
+      "hz": 15,
+      "width": 320,
+      "height": 240,
+      "horizontal_fov_rad": 1.5707963267948966,
+      "near_m": 0.1,
+      "far_m": 25
+    },
+    "truth": {
+      "hz": 25,
+      "frame": "sim_world",
+      "child_frame": "truth_base_link"
+    },
+    "transforms": [
+      {
+        "parent": "base_link",
+        "child": "lidar_link",
+        "xyz": [
+          0,
+          0,
+          0.16
+        ],
+        "xyzw": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      {
+        "parent": "base_link",
+        "child": "imu_link",
+        "xyz": [
+          0,
+          0,
+          0
+        ],
+        "xyzw": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      {
+        "parent": "base_link",
+        "child": "camera_link",
+        "xyz": [
+          0.2,
+          0,
+          0.06
+        ],
+        "xyzw": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      {
+        "parent": "camera_link",
+        "child": "camera_optical_frame",
+        "xyz": [
+          0,
+          0,
+          0
+        ],
+        "xyzw": [
+          -0.5,
+          0.4999999999999999,
+          -0.5,
+          0.5000000000000001
+        ]
+      }
+    ]
+  },
+  "counts": {
+    "/uav001/lidar/points": 796,
+    "/uav001/imu/data": 15908
+  },
+  "ordering": "original source timestamps, stable chronological order"
+}

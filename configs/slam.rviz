@@ -1,0 +1,54 @@
+Panels:
+- Class: rviz_common/Displays
+  Name: Displays
+Visualization Manager:
+  Global Options:
+    Fixed Frame: map
+  Displays:
+  - Class: rviz_default_plugins/Grid
+    Name: Grid
+    Enabled: true
+  - Class: rviz_default_plugins/TF
+    Name: Localization frames
+    Enabled: true
+  - Class: rviz_default_plugins/Odometry
+    Name: Continuous LIO
+    Enabled: true
+    Topic:
+      Value: /uav001/localization/odometry
+  - Class: rviz_default_plugins/Path
+    Name: Continuous LIO path
+    Enabled: true
+    Topic:
+      Value: /uav001/localization/path
+  - Class: rviz_default_plugins/PointCloud2
+    Name: SLAM map
+    Enabled: true
+    Topic:
+      Value: /uav001/localization/map
+      Reliability Policy: Reliable
+      Durability Policy: Transient Local
+    Size (Pixels): 2
+    Style: Points
+    Color Transformer: AxisColor
+    Axis: Z
+  - Class: rviz_default_plugins/PointCloud2
+    Name: Registered scan
+    Enabled: true
+    Topic:
+      Value: /glim_ros/points_corrected
+    Size (Pixels): 2
+    Style: Points
+    Color Transformer: AxisColor
+    Axis: Z
+  Tools:
+  - Class: rviz_default_plugins/MoveCamera
+  - Class: rviz_default_plugins/Interact
+  - Class: rviz_default_plugins/Select
+  - Class: rviz_default_plugins/FocusCamera
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Distance: 15
+      Pitch: 0.8
+      Yaw: 0.8

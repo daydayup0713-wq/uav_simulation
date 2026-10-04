@@ -19,7 +19,12 @@ def prepare_slam(root, destination, sensors=None):
     sensors = sensors or json.loads((root / 'configs/sensors.json').read_text())
     if sensors['lidar'].get('scan_timing', 'synchronous') != 'synchronous':
         raise ValueError('only synchronous generic lidar is supported')
-    configs = {p.name: read_json_comments(p) for p in (root / '.deps/glim/config').glob('*.json')}
+    source = root / '.deps/glim/config'
+    if not source.is_dir():
+        source = root / 'configs/slam'
+    configs = {p.name: read_json_comments(p) for p in source.glob('*.json')}
+    if not configs:
+        raise ValueError('pinned GLIM configuration templates missing')
     cfg = configs['config.json']['global']
     cfg.update(config_odometry='config_odometry_cpu.json',
                config_sub_mapping='config_sub_mapping_passthrough.json',
@@ -33,7 +38,7 @@ def prepare_slam(root, destination, sensors=None):
         global_shutter_lidar=True, autoconf_perpoint_times=False, ring_field='',
         imu_acc_noise=0.02, imu_gyro_noise=0.002)
     configs['config_ros.json']['glim_ros'].update(
-        imu_topic='/uav001/imu/data', points_topic='/uav001/lidar/points',
+        imu_topic='/uav001/localization/input/imu', points_topic='/uav001/localization/input/points',
         image_topic='/uav001/localization/unused_image', acc_scale=1.0, ang_scale=1.0,
         imu_frame_id='lio_base_link', base_frame_id='lio_base_link',
         lidar_frame_id='lio_lidar', odom_frame_id='lio_odom', map_frame_id='lio_map',

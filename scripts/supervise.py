@@ -13,6 +13,7 @@ import subprocess
 import time
 import uuid
 from sensor_model import select_profile, prepare_sensors
+from slam_config import prepare_slam
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -38,12 +39,14 @@ def owned_run_ready(runtime, supervisor_pid):
 
 class FlightReadiness:
     """Wait out EKF/barometer initialization, not merely DDS discovery."""
-    def __init__(self, settle=5.):
+    def __init__(self, settle=5., require_preflight=True):
         self.settle, self.since = settle, None
+        self.require_preflight = require_preflight
 
     def update(self, status, now):
-        healthy = all(status.get(key) == expected for key, expected in
-                      (('fresh', 'True'), ('armed', 'False'), ('landed', 'True'), ('preflight', 'True')))
+        requirements = [('fresh', 'True'), ('armed', 'False'), ('landed', 'True')]
+        requirements.append(('preflight' if self.require_preflight else 'external_ready', 'True'))
+        healthy = all(status.get(key) == expected for key, expected in requirements)
         if not healthy:
             self.since = None
             return False
@@ -125,7 +128,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--headless', action='store_true')
     p.add_argument('--rviz', action='store_true')
-    p.add_argument('--profile', choices=('flight', 'sensors'), default='flight')
+    p.add_argument('--profile', choices=('flight', 'sensors', 'localization', 'slam'), default='flight')
     options = p.parse_args()
     runtime = ROOT / '.runtime'
     runtime.mkdir(exist_ok=True)
@@ -148,9 +151,15 @@ def main():
                                'COM_DL_LOSS_T': 300, 'NAV_DLL_ACT': 0, 'UXRCE_DDS_SYNCT': 0,
                                'UXRCE_DDS_PTCFG': 1,
                                'UXRCE_DDS_DOM_ID': int(env.get('ROS_DOMAIN_ID','42'))}}
+    if options.profile == 'slam':
+        metadata['parameters'].update(EKF2_GPS_CTRL=0, SIM_GPS_USED=0, SENS_EN_GPSSIM=0,
+            EKF2_EV_CTRL=11, EKF2_HGT_REF=3, EKF2_BARO_CTRL=0, EKF2_MAG_TYPE=5, EKF2_EV_DELAY=0)
     snapshots = run_dir/'configuration'
     snapshots.mkdir()
-    sensor = prepare_sensors(ROOT, run_dir) if options.profile == 'sensors' else None
+    localization = options.profile in ('localization', 'slam')
+    if localization and not (ROOT/'.deps/slam/install/build-manifest.json').is_file():
+        raise RuntimeError('private CPU localization backend missing; run bootstrap_slam.py')
+    sensor = prepare_sensors(ROOT, run_dir) if options.profile != 'flight' else None
     world_path = sensor['world'] if sensor else select_profile(ROOT, options.profile)
     if sensor:
         env['GZ_SIM_RESOURCE_PATH'] = str(sensor['resource_path'])+':'+env['GZ_SIM_RESOURCE_PATH']
@@ -197,41 +206,61 @@ def main():
         px4_env.update({'PX4_PARAM_'+k: str(v) for k,v in metadata['parameters'].items()})
         build = ROOT/'.deps/px4/build/px4_sitl_default'
         manager.start('px4', [build/'bin/px4', '-d', build/'etc', '-w', run_dir/'px4', '-s', ROOT/'configs/px4-start.sh'], env=px4_env)
-        manager.start('bridge', ['ros2', 'run', 'uav_lab_bridge', 'bridge'], env=env)
+        bridge_command = ['ros2', 'run', 'uav_lab_bridge', 'bridge']
+        if options.profile == 'slam':
+            bridge_command += ['--ros-args','-p','external_odometry:=true']
+        manager.start('bridge', bridge_command, env=env)
         if sensor:
             manager.start('sensor-bridge', ['ros2','run','ros_gz_bridge','parameter_bridge',
                                            '--ros-args','-p','config_file:='+str(sensor['bridge'])], env=env)
             manager.start('sensors', ['ros2','run','uav_lab_tools','sensors','--ros-args',
                                      '-p','calibration_file:='+str(sensor['calibration_path'])], env=env)
-        flight_readiness = FlightReadiness()
+        flight_readiness = FlightReadiness(require_preflight=options.profile != 'slam')
         def vehicle_ready():
             return flight_readiness.update(read_vehicle_status(env), time.monotonic())
-        wait_for(manager, vehicle_ready, 'PX4 fresh landed telemetry and stable preflight checks', 60)
+        if not localization:
+            wait_for(manager, vehicle_ready, 'PX4 fresh landed telemetry and stable preflight checks', 60)
         if sensor:
             result = subprocess.run(['ros2','run','uav_lab_tools','datactl','sensors','--duration','3'],
                                     env=env, capture_output=True, text=True, timeout=20)
             (run_dir/'sensor-readiness.json').write_text(result.stdout)
             if result.returncode:
                 raise RuntimeError('sensor data readiness failed: '+result.stdout.strip()+' '+result.stderr.strip())
+        if localization:
+            slam_config = prepare_slam(ROOT, snapshots/'slam', sensor['calibration'])
+            manager.start('lio', ['ros2','run','glim_ros','glim_rosnode','--ros-args',
+                                  '-p','config_path:='+str(slam_config), '-p','use_sim_time:=true',
+                                  '-r','/tf:=/uav001/localization/raw_tf'], env=env)
+            manager.start('localization', ['ros2','run','uav_lab_localization','localization'], env=env)
+            def lio_ready():
+                result = subprocess.run(['ros2','run','uav_lab_localization','slamctl','status','--timeout','2'],
+                                        env=env, capture_output=True, text=True, timeout=5)
+                (run_dir/'localization-readiness.json').write_text(result.stdout)
+                return result.returncode == 0
+            wait_for(manager, lio_ready, 'validated continuous LIO', 45)
+            wait_for(manager, vehicle_ready, 'PX4 ready after localization initialization', 60)
         if options.rviz:
-            manager.start('rviz', ['rviz2','-d', ROOT/'configs'/('sensors.rviz' if sensor else 'lab.rviz')], env=env)
+            manager.start('rviz', ['rviz2','-d', ROOT/'configs'/('slam.rviz' if localization else 'sensors.rviz' if sensor else 'lab.rviz')], env=env)
         (run_dir/'ready').write_text('ready\n')
         print('LAB READY '+str(run_dir), flush=True)
         failure_started = None
         while True:
-            broken = [name for name, process in manager.processes if name in ('bridge','agent','clock') and process.poll() is not None]
+            control_components = ('bridge','agent','clock','lio','localization')
+            broken = [name for name, process in manager.processes if name in control_components and process.poll() is not None]
             if broken and failure_started is None:
                 failure_started = time.monotonic()
+                (run_dir/'failed-processes.json').write_text(json.dumps({name: {'pid': process.pid, 'returncode': process.poll()} for name, process in manager.processes if name in broken}, indent=2)+'\n')
                 (run_dir/'failure.txt').write_text('control link exited: '+','.join(broken)+'; preserving physics/PX4 for failsafe landing\n')
                 print('control link failed; keeping physics/PX4 alive for 60s failsafe window', flush=True)
-            manager.check(ignore=('bridge','agent','clock') if failure_started is not None else ())
+            manager.check(ignore=control_components if failure_started is not None else ())
             if failure_started is not None and time.monotonic()-failure_started > 60:
                 raise RuntimeError('control link failed; failsafe observation window complete')
             time.sleep(.5)
     except KeyboardInterrupt:
         return 0
     except (RuntimeError, OSError) as exc:
-        (run_dir/'failure.txt').write_text(str(exc)+'\n')
+        with (run_dir/'failure.txt').open('a') as failure:
+            failure.write(str(exc)+'\n')
         print(str(exc), flush=True)
         return 1
     finally:

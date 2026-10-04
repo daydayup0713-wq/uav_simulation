@@ -15,3 +15,12 @@ class Px4Clock:
         if ros_ns < self.ros_ns:
             raise RuntimeError('clock regression: restart the lab')
         return self.px4_us + (int(ros_ns)-self.ros_ns)//1000
+
+    def sample_timestamp(self, ros_ns):
+        """A sensor observation may predate the latest PX4 clock anchor."""
+        if self.px4_us is None or abs(int(ros_ns)-self.ros_ns) > 1_000_000_000:
+            raise RuntimeError('sample time outside PX4 clock mapping window')
+        stamp = self.px4_us + (int(ros_ns)-self.ros_ns)//1000
+        if stamp <= 0:
+            raise RuntimeError('sample timestamp maps before PX4 startup')
+        return stamp

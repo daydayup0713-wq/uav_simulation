@@ -11,25 +11,13 @@ from scipy.spatial.transform import Rotation
 from uav_lab_tools.datasets import load_dataset, file_hash, check_replay_domain
 from .evaluation import evaluate
 from .registration import register, voxel_downsample, RegistrationError
+from .ingress import cloud_xyz, validated_scan, validate_imu
 
 INPUTS = {'/uav001/lidar/points': 'sensor_msgs/msg/PointCloud2',
           '/uav001/imu/data': 'sensor_msgs/msg/Imu'}
 TRUTH = '/uav001/ground_truth/odometry'
-
-
-def cloud_xyz(message):
-    fields = {f.name: f for f in message.fields}
-    if any(n not in fields or fields[n].datatype != 7 or fields[n].count != 1 for n in 'xyz'):
-        raise ValueError('expected FLOAT32 xyz point fields')
-    if message.row_step < message.width * message.point_step or len(message.data) != message.height * message.row_step:
-        raise ValueError('invalid point cloud layout')
-    dtype = np.dtype({'names': list('xyz'), 'formats': [('>' if message.is_bigendian else '<')+'f4']*3,
-                      'offsets': [fields[n].offset for n in 'xyz'], 'itemsize': message.point_step})
-    values = np.ndarray((message.height, message.width), dtype=dtype, buffer=bytes(message.data),
-                        strides=(message.row_step, message.point_step))
-    points = np.column_stack([values[n].ravel() for n in 'xyz']).astype(float)
-    # No-return lidar rays are unavailable measurements, not fabricated points.
-    return points[np.isfinite(points).all(axis=1)]
+GUARDED = {'/uav001/lidar/points': '/uav001/localization/input/points',
+           '/uav001/imu/data': '/uav001/localization/input/imu'}
 
 
 def stamp(message):
@@ -63,9 +51,11 @@ def extract(directory, output):
             p, q = message.pose.pose.position, message.pose.pose.orientation
             truth.append([t/1e9, p.x, p.y, p.z, q.x, q.y, q.z, q.w])
         else:
-            if topic.endswith('/data') and message.orientation_covariance[0] != -1:
-                raise ValueError('IMU orientation must be unavailable')
-            rows.append((t, topic, data))
+            if topic.endswith('/data'):
+                validate_imu(message)
+            else:
+                validated_scan(message)
+            rows.append((t, GUARDED[topic], data))
             counts[topic] += 1
             if topic.endswith('/points'):
                 scans.append((t/1e9, cloud_xyz(message)))
@@ -73,7 +63,7 @@ def extract(directory, output):
     writer.open(rosbag2_py.StorageOptions(uri=str(output/'algorithm-input'), storage_id='sqlite3'),
                 rosbag2_py.ConverterOptions('', ''))
     for topic, typename in INPUTS.items():
-        writer.create_topic(rosbag2_py.TopicMetadata(name=topic, type=typename, serialization_format='cdr'))
+        writer.create_topic(rosbag2_py.TopicMetadata(name=GUARDED[topic], type=typename, serialization_format='cdr'))
     for t, topic, data in sorted(rows, key=lambda r: r[0]):
         writer.write(topic, data, t)
     del writer
