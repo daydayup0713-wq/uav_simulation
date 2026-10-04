@@ -1,8 +1,40 @@
 # UAV Simulation Lab
 
-面向 PX4 学习、算法验证和巡检仿真的独立实验室。当前交付 **V0.1.0**：单架 x500、Gazebo Harmonic 空旷世界、ROS 2 Humble 飞控适配、CLI 和 RViz 轨迹。本机与[干净环境 CI](https://github.com/daydayup0713-wq/uav_simulation/actions/runs/36913384176)均通过三轮飞行及失控降落验收，见[验收记录](docs/validation/V0.1-local.md)。后续按[版本路线](docs/ROADMAP.md)接入传感器、SLAM、三维导航、任务、Web、AI 和数字孪生。
+面向 PX4 学习、算法验证和巡检仿真的独立实验室。V0.2.0 增加通用实验室、三维雷达、IMU、相机、标定 TF、独立真值和可验证的 rosbag 录制/回放。V0.1 的空旷飞行配置继续作为无 GPU 回归基线，原版[干净环境验收](docs/validation/V0.1-local.md)保留。后续按[版本路线](docs/ROADMAP.md)接入 Mid-360、SLAM、三维导航、任务、Web、AI 和数字孪生。
 
 系统关系和后续接口边界见[架构说明](docs/ARCHITECTURE.md)。
+
+## 传感器实验室
+
+```bash
+cd /home/pine/workspace/ai/UAV/uav_simulation
+/usr/bin/python3 scripts/doctor.py --runtime --sensors
+./scripts/start_lab.sh --profile sensors --rviz
+```
+
+等待 `LAB READY`，在另一终端运行：
+
+```bash
+./scripts/labctl sensors --duration 10
+./scripts/labctl demo --runs 1
+# 可在飞行期间从第三个终端录制：
+./scripts/labctl record --duration 30
+```
+
+录制完成会输出数据集路径（位于 `recordings/`），随后可检查和回放：
+
+```bash
+./scripts/labctl bag-check recordings/<数据集目录>
+./scripts/labctl replay recordings/<数据集目录> --domain 77
+# 回放时在另一终端观察，域需与回放一致：
+LAB_DOMAIN_ID=77 ./scripts/env.sh rviz2 -d configs/sensors.rviz
+```
+
+回放使用独立 ROS 域，拒绝与活动实验室共域，拒绝已有数据/飞控发布者，也拒绝包内出现白名单之外的话题。只播放已记录的 `/clock`，避免双时钟。记录中断或校验失败的数据集保留为 `complete: false`，命令返回非零。
+
+雷达 360×16 点、10Hz；相机 320×240 RGB、15Hz；IMU 200Hz（比力及角速度，姿态不可用）；独立真值 25Hz。安装参数和噪声见 [sensors.json](configs/sensors.json)，运行时生成模型、外参和桥接配置并归档。Gazebo 真值在 `sim_world` 中，PX4 自身估计在 `odom` 中，二者不能直接当成同一坐标系。学习步骤、话题和故障定位见[传感器实验](docs/experiments/02-sensors.md)。
+
+`--profile sensors --headless` 关闭窗口但仍需 Ogre2 渲染设备；`--profile flight --headless` 不需要相机或 GPU 雷达。相机和点云必须实际收到、验证通过才会就绪。NVIDIA 枚举与 CUDA 能力分别验收，本平台不以 `nvidia-smi` 成功代替渲染测试。
 
 ## 本机直接运行
 
@@ -99,6 +131,6 @@ Humble + Harmonic 使用 `ros-humble-ros-gzharmonic`，见[官方组合说明](h
 
 ## 当前范围
 
-V0.1 是使用 PX4 自身定位的飞行基础设施。通用实验室的室内几何、雷达、相机和独立真值评估属于 V0.2；SLAM 和无 GNSS 飞行按后续版本验收。当前 x500 是学习模型，未按真实机体尺寸、惯量、载荷和传感器校准。GPU 枚举可用不代表相机、雷达渲染或 CUDA 算法已验收。
+当前飞行仍使用 PX4 自身定位。雷达是通用同步三维扫描，不包含 Mid-360 扫描模式或逐点时间。相机为无畸变针孔模型，IMU 无偏置随机游走；没有真实传感器延迟校准。SLAM 和无 GNSS 飞行按后续版本验收。x500 加 0.05kg 学习载荷，未按真实机体校准。实际渲染验收不代表 CUDA 算法已验收。
 
 代码采用 Apache-2.0；外部源码保留各自许可证。

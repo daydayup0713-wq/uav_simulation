@@ -61,7 +61,7 @@ def prepare_sensors(root, run_dir):
                 element(a,'min_angle',-item[axis+'_fov_rad']/2); element(a,'max_angle',item[axis+'_fov_rad']/2)
             rang = element(lidar,'range')
             element(rang,'min',item['min_m']); element(rang,'max',item['max_m']); element(rang,'resolution',.01)
-            noise = element(lidar,'noise',type='gaussian'); element(noise,'mean',0); element(noise,'stddev',item['noise_stddev_m'])
+            noise = element(lidar,'noise'); element(noise,'type','gaussian'); element(noise,'mean',0); element(noise,'stddev',item['noise_stddev_m'])
         elif name == 'camera':
             camera = element(sensor,'camera')
             element(camera,'horizontal_fov',item['horizontal_fov_rad'])

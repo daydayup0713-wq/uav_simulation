@@ -11,7 +11,7 @@ from .sensor_contract import remove_orientation
 class Sensors(Node):
     def __init__(self):
         super().__init__('sensor_frames',namespace='uav001')
-        self.declare_parameter('use_sim_time',True)
+        self.set_parameters([rclpy.parameter.Parameter('use_sim_time',value=True)])
         calibration=json.loads(open(self.declare_parameter('calibration_file','').value).read())
         self.static=StaticTransformBroadcaster(self)
         transforms=[]
