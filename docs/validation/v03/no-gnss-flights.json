@@ -3,28 +3,28 @@
   "runs": [
     {
       "seconds": 10.0,
-      "samples": 47,
-      "maximum_error_m": 0.1118001581623013,
+      "samples": 43,
+      "maximum_error_m": 0.10587139539365997,
       "run": 1,
-      "elapsed_s": 51.321660747998976,
-      "landed": true,
-      "disarmed": true
-    },
-    {
-      "seconds": 10.0,
-      "samples": 46,
-      "maximum_error_m": 0.10785037341555151,
-      "run": 2,
-      "elapsed_s": 51.320988537998346,
+      "elapsed_s": 51.96156172100018,
       "landed": true,
       "disarmed": true
     },
     {
       "seconds": 10.0,
       "samples": 45,
-      "maximum_error_m": 0.10874168957815253,
+      "maximum_error_m": 0.1094134387536771,
+      "run": 2,
+      "elapsed_s": 51.47408934000123,
+      "landed": true,
+      "disarmed": true
+    },
+    {
+      "seconds": 10.0,
+      "samples": 45,
+      "maximum_error_m": 0.10595055239003637,
       "run": 3,
-      "elapsed_s": 51.316795541999454,
+      "elapsed_s": 51.377617431000544,
       "landed": true,
       "disarmed": true
     }

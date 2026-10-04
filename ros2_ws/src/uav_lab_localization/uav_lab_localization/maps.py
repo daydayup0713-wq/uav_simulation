@@ -55,14 +55,21 @@ def save_native_map(root, benchmark, destination):
 def load_map(directory, calibration):
     directory = Path(directory)
     metadata = json.loads((directory/'map.json').read_text())
-    if metadata.get('schema_version') != 1 or not metadata.get('complete') or metadata.get('frame') != 'map':
+    if not isinstance(metadata,dict) or type(metadata.get('schema_version')) is not int or metadata.get('schema_version') != 1 or metadata.get('complete') is not True or metadata.get('frame') != 'map':
         raise ValueError('unsupported or incomplete map')
+    if not isinstance(metadata.get('calibration'),dict) or not isinstance(metadata.get('files'),dict):
+        raise ValueError('malformed map calibration/checksum manifest')
+    if not all(isinstance(k,str) and isinstance(v,str) for k,v in metadata['files'].items()):
+        raise ValueError('map checksum paths and hashes must be strings')
     if metadata.get('calibration') != calibration:
         raise ValueError('map calibration mismatch')
     if 'points.npy' not in metadata.get('files', {}):
         raise ValueError('map points missing from manifest')
     check_files(directory, metadata['files'])
-    points = validate_cloud(np.load(directory/'points.npy', allow_pickle=False))
+    try:
+        points = validate_cloud(np.load(directory/'points.npy', allow_pickle=False))
+    except (TypeError, EOFError) as error:
+        raise ValueError('malformed map point array') from error
     return {'points': points, 'metadata': metadata, 'directory': str(directory.resolve())}
 
 
@@ -71,7 +78,7 @@ def relocalize(loaded, observed_lidar, initial_map_lidar, odom_lidar):
     result = register(voxel_downsample(observed_lidar, .15), loaded['points'], initial,
                       max_distance=.6, min_inlier_fraction=.75, max_rmse=.1)
     correction = result.transform @ np.linalg.inv(initial)
-    if np.linalg.norm(correction[:3, 3]) > .75 or Rotation.from_matrix(correction[:3, :3]).magnitude() > np.deg2rad(20):
+    if np.linalg.norm(result.transform[:3, 3]-initial[:3, 3]) > .75 or Rotation.from_matrix(correction[:3, :3]).magnitude() > np.deg2rad(20):
         raise RegistrationError('relocalization exceeds coarse-prior correction limits')
     return {'map_to_odom': result.transform @ np.linalg.inv(odom),
             'map_to_lidar': result.transform, 'inlier_fraction': result.inlier_fraction,

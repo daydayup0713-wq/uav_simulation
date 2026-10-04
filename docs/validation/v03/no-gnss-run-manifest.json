@@ -1,6 +1,6 @@
 {
-  "run_id": "20261004T165118Z-ac1dbe50",
-  "supervisor_pid": 107239,
+  "run_id": "20261004T171607Z-958c8746",
+  "supervisor_pid": 115611,
   "dependencies": {
     "platform": {
       "ubuntu": "22.04",
@@ -63,7 +63,7 @@
   },
   "environment": {
     "ROS_DOMAIN_ID": "42",
-    "GZ_PARTITION": "uav-lab-b6cdc41a6e33478c85c200214899894f",
+    "GZ_PARTITION": "uav-lab-ff404e3fdd594bf38b301955caaf2ac5",
     "RMW_IMPLEMENTATION": null
   },
   "headless": true,
@@ -255,6 +255,6 @@
     "px4_world": "NED",
     "px4_body": "FRD"
   },
-  "platform_commit": "17f29c5c2884a1075c7d2c830b1e424fa78eb3ce",
+  "platform_commit": "25fbeb06f88411323fc530122d04cd19bf6f071e",
   "platform_dirty": true
 }

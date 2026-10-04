@@ -38,6 +38,7 @@ class Bridge(Node):
         self.external = ExternalOdometryGate()
         self.external_sent = None
         self.fusion_flags, self.fusion_received = {}, 0.
+        self.fusion_was_ready = False
         self.nav_state = None
         self.px4_clock = Px4Clock()
         self.orientation = (0., 0., 0., 1.)
@@ -196,6 +197,10 @@ class Bridge(Node):
                 self.policy.fail('simulation clock regression')
             self.previous_sim = sim
             if self.external_enabled:
+                if self.external_ready(wall):
+                    self.fusion_was_ready = True
+                elif self.fusion_was_ready:
+                    self.external.failed = self.external.failed or 'required external EKF fusion lost/stale or GNSS fusion enabled; restart required'
                 if self.external.ready(wall) and self.external.sample['source_ns'] != self.external_sent and self.external.sample['source_ns'] <= sim:
                     try:
                         values = convert_external(self.external.sample, self.px4_clock, sim)

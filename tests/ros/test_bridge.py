@@ -19,6 +19,30 @@ def initialize_test_context():
     domain = int(os.environ['LAB_TEST_DOMAIN'])
     rclpy.init(domain_id=domain, args=['--ros-args', '-r', '__ns:=/bridge_contract_test'])
 
+
+@pytest.mark.parametrize('loss', ['cs_ev_pos','cs_ev_hgt','cs_ev_yaw','cs_gnss_pos','stale_flags'])
+def test_fusion_loss_stops_active_offboard_and_latches_after_recovery(loss):
+    initialize_test_context();bridge=Bridge()
+    try:
+        bridge.external_enabled=True
+        now=time.monotonic()
+        bridge.policy.update(now,position=(0.,0.,2.),yaw=0.,valid=True,armed=True,offboard=True,landed=False)
+        bridge.policy.state='HOLDING';bridge.policy.streaming=True;bridge.policy.setpoint=(0.,0.,2.)
+        bridge.external.observe_quality(True,now)
+        bridge.external.observe_sample({'source_ns':1},now)  # Future to the paused ROS clock; no new EV publication.
+        bridge.fusion_flags={k:k.startswith('cs_ev_') for k in ('cs_ev_pos','cs_ev_hgt','cs_ev_yaw','cs_gnss_pos','cs_gnss_vel','cs_gps_hgt','cs_gnss_yaw')}
+        bridge.fusion_received=now
+        bridge.pump();assert bridge.policy.streaming
+        if loss=='stale_flags': bridge.fusion_received=now-2
+        else: bridge.fusion_flags[loss]=not bridge.fusion_flags[loss]
+        bridge.pump()
+        assert bridge.policy.state=='FAILSAFE' and not bridge.policy.streaming
+        bridge.fusion_flags.update(cs_ev_pos=True,cs_ev_hgt=True,cs_ev_yaw=True,cs_gnss_pos=False)
+        bridge.fusion_received=time.monotonic();bridge.pump()
+        assert bridge.policy.state=='FAILSAFE' and not bridge.external_ready(time.monotonic())
+    finally:
+        bridge.destroy_node();rclpy.shutdown()
+
 def test_delayed_telemetry_callback_cannot_overtake_earlier_source_time(monkeypatch):
     import threading
     from rclpy.executors import MultiThreadedExecutor

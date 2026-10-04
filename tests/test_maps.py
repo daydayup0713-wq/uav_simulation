@@ -56,3 +56,22 @@ def test_archive_paths_cannot_escape_root(tmp_path):
     (path/'map.json').write_text(json.dumps(manifest))
     with pytest.raises(ValueError, match='path'):
         load_map(path, CALIBRATION)
+
+
+@pytest.mark.parametrize('manifest', [[], {'files':None}, {'files':['points.npy']}])
+def test_malformed_map_manifest_is_a_controlled_rejection(tmp_path, manifest):
+    path=tmp_path/'map'; path.mkdir()
+    if isinstance(manifest,dict):
+        manifest.update(schema_version=1, complete=True, frame='map', calibration=CALIBRATION)
+    (path/'map.json').write_text(json.dumps(manifest))
+    with pytest.raises(ValueError): load_map(path,CALIBRATION)
+
+
+def test_relocalization_acceptance_is_independent_of_map_origin():
+    from scipy.spatial.transform import Rotation
+    scan=corner(); offset=np.array([5.,0.,0.])
+    initial=np.eye(4);initial[:3,3]=offset
+    initial[:3,:3]=Rotation.from_euler('z',10,degrees=True).as_matrix()
+    result=relocalize({'points':scan+offset},scan,initial,np.eye(4))
+    assert np.allclose(result['map_to_lidar'][:3,3],offset,atol=.01)
+    assert result['rmse_m'] < .01

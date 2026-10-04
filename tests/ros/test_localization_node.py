@@ -9,6 +9,30 @@ from rclpy.qos import qos_profile_sensor_data
 from uav_lab_localization.localization_node import LocalizationNode
 
 
+def test_bad_map_service_rejects_and_keeps_diagnostics_alive(monkeypatch,tmp_path,isolated_ros_domain):
+    from diagnostic_msgs.msg import DiagnosticArray
+    from uav_lab_interfaces.srv import LoadMap
+    monkeypatch.delenv('LAB_RUN_DIR',raising=False)
+    (tmp_path/'map.json').write_text('[]')
+    rclpy.init(domain_id=isolated_ros_domain)
+    node=LocalizationNode();client=rclpy.create_node('bad_map_service_test')
+    diagnostics=[]
+    client.create_subscription(DiagnosticArray,'/uav001/localization/diagnostics',diagnostics.append,10)
+    service=client.create_client(LoadMap,'/uav001/localization/load_map')
+    try:
+        assert service.wait_for_service(timeout_sec=2)
+        node.flight_status={'armed':'False','landed':'True','fresh':'True'};node.flight_received=time.monotonic()
+        future=service.call_async(LoadMap.Request(directory=str(tmp_path)))
+        end=time.monotonic()+1
+        while time.monotonic()<end:
+            rclpy.spin_once(node,timeout_sec=.01);rclpy.spin_once(client,timeout_sec=.01)
+        assert future.done() and not future.result().success
+        assert diagnostics
+        assert node.loaded_map is None
+    finally:
+        client.destroy_node();node.destroy_node();rclpy.shutdown()
+
+
 def test_lio_ingress_drops_blank_scans_and_stays_closed_after_source_timeout(monkeypatch, isolated_ros_domain):
     from sensor_msgs.msg import PointCloud2, PointField
     monkeypatch.delenv('LAB_RUN_DIR', raising=False)

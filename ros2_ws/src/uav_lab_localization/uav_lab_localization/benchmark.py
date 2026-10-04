@@ -20,6 +20,11 @@ GUARDED = {'/uav001/lidar/points': '/uav001/localization/input/points',
            '/uav001/imu/data': '/uav001/localization/input/imu'}
 
 
+def benchmark_config(root, output, calibration):
+    from .configuration import prepare_slam
+    return prepare_slam(root, Path(output).resolve()/'configuration', calibration)
+
+
 def stamp(message):
     return message.header.stamp.sec * 10**9 + message.header.stamp.nanosec
 
@@ -105,7 +110,8 @@ def run_benchmark(root, directory, output, domain=77, learning=True):
     backend = json.loads(manifest_path.read_text())
     output.mkdir(parents=True)
     truth, scans = extract(directory, output)
-    config = root/'configs/slam'
+    calibration=json.loads((output/'input-manifest.json').read_text())['calibration']
+    config = benchmark_config(root, output, calibration)
     environment = dict(os.environ, ROS_DOMAIN_ID=str(domain), OMP_NUM_THREADS='2')
     start = time.monotonic()
     command = [str(root/'.deps/slam/install/lib/glim_ros/glim_rosbag'),

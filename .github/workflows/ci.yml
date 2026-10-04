@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 concurrency:
   group: flight-lab-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 jobs:
   policy:
     runs-on: ubuntu-22.04

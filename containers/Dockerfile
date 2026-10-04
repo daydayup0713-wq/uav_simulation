@@ -8,6 +8,7 @@ COPY dependencies/lock.json dependencies/
 COPY scripts/bootstrap.py scripts/build.sh scripts/
 RUN /usr/bin/python3 scripts/bootstrap.py --jobs 2 && ./scripts/build.sh
 COPY scripts/bootstrap_slam.py scripts/slam_config.py scripts/env.sh scripts/
+COPY ros2_ws/src/uav_lab_localization/uav_lab_localization/__init__.py ros2_ws/src/uav_lab_localization/uav_lab_localization/configuration.py ros2_ws/src/uav_lab_localization/uav_lab_localization/
 COPY configs/sensors.json configs/sensors.json
 COPY configs/slam/ configs/slam/
 COPY localization/native/ localization/native/

@@ -62,7 +62,12 @@ def register(source, target, initial=None, max_distance=0.6, max_iterations=35,
             raise RegistrationError('insufficient overlap/correspondences')
         p, q, n = transformed[keep], target[index[keep]], normals[index[keep]]
         residual = np.einsum('ij,ij->i', n, p-q)
-        jacobian = np.column_stack([n, np.cross(p, n)])
+        center = p.mean(axis=0)
+        centered_points = p-center
+        radius = max(.1, float(np.sqrt(np.mean(np.sum(centered_points**2,axis=1)))))
+        # Pose increments rotate around the observed geometry, not the arbitrary
+        # map origin. Scale rotational columns to compare dimensionless geometry.
+        jacobian = np.column_stack([n, np.cross(centered_points, n)/radius])
         information = jacobian.T @ jacobian / len(jacobian)
         values = np.linalg.eigvalsh(information)
         if values[0] < 1e-4 * values[-1]:
@@ -71,8 +76,8 @@ def register(source, target, initial=None, max_distance=0.6, max_iterations=35,
         delta = np.linalg.lstsq(jacobian * np.sqrt(weights[:, None]),
                                 -residual * np.sqrt(weights), rcond=None)[0]
         update = np.eye(4)
-        update[:3, :3] = Rotation.from_rotvec(delta[3:]).as_matrix()
-        update[:3, 3] = delta[:3]
+        update[:3, :3] = Rotation.from_rotvec(delta[3:]/radius).as_matrix()
+        update[:3, 3] = center+delta[:3]-update[:3, :3]@center
         transform = update @ transform
         if np.linalg.norm(delta) < 1e-6:
             break

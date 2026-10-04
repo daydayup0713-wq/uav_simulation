@@ -1,0 +1,70 @@
+[
+  {
+    "file": "px4/log/2026-10-04/17_16_15.ulg",
+    "sha256": "c45217c1044a031653fb418fa88c5a8246f43c499f5edcf9c8b3c586899fe25e",
+    "params": {
+      "EKF2_GPS_CTRL": 0,
+      "SIM_GPS_USED": 0,
+      "SENS_EN_GPSSIM": 0,
+      "EKF2_EV_CTRL": 11,
+      "EKF2_HGT_REF": 3,
+      "EKF2_BARO_CTRL": 0,
+      "EKF2_MAG_TYPE": 5,
+      "EKF2_EV_DELAY": 0.0
+    },
+    "gps_fix_types": [
+      0
+    ]
+  },
+  {
+    "file": "px4/log/2026-10-04/17_21_44.ulg",
+    "sha256": "6387da6a41d2cbf6df06119d6d248ddfee12cb433f11cf372e63e3d2c1c6ba78",
+    "params": {
+      "EKF2_GPS_CTRL": 0,
+      "SIM_GPS_USED": 0,
+      "SENS_EN_GPSSIM": 0,
+      "EKF2_EV_CTRL": 11,
+      "EKF2_HGT_REF": 3,
+      "EKF2_BARO_CTRL": 0,
+      "EKF2_MAG_TYPE": 5,
+      "EKF2_EV_DELAY": 0.0
+    },
+    "gps_fix_types": [
+      0
+    ]
+  },
+  {
+    "file": "px4/log/2026-10-04/17_22_39.ulg",
+    "sha256": "6add5467d89e7054bcdb369eceb2a443a40a34ee6db737f4aa7edd6d1dcf4380",
+    "params": {
+      "EKF2_GPS_CTRL": 0,
+      "SIM_GPS_USED": 0,
+      "SENS_EN_GPSSIM": 0,
+      "EKF2_EV_CTRL": 11,
+      "EKF2_HGT_REF": 3,
+      "EKF2_BARO_CTRL": 0,
+      "EKF2_MAG_TYPE": 5,
+      "EKF2_EV_DELAY": 0.0
+    },
+    "gps_fix_types": [
+      0
+    ]
+  },
+  {
+    "file": "px4/log/2026-10-04/17_26_00.ulg",
+    "sha256": "c73fdb5e6872dfd3df26777fdb7d13150626ea8ec20ad85cb6f0d7d963dec785",
+    "params": {
+      "EKF2_GPS_CTRL": 0,
+      "SIM_GPS_USED": 0,
+      "SENS_EN_GPSSIM": 0,
+      "EKF2_EV_CTRL": 11,
+      "EKF2_HGT_REF": 3,
+      "EKF2_BARO_CTRL": 0,
+      "EKF2_MAG_TYPE": 5,
+      "EKF2_EV_DELAY": 0.0
+    },
+    "gps_fix_types": [
+      0
+    ]
+  }
+]

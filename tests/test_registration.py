@@ -42,3 +42,12 @@ def test_non_finite_cloud_rejected():
     p[0, 0] = np.nan
     with pytest.raises(ValueError, match='finite'):
         register(p, corner())
+
+
+def test_observability_and_solution_are_invariant_to_map_origin():
+    reference=register(corner(),corner())
+    for offset in ([20,0,0],[100,-60,50]):
+        p=corner()+offset
+        result=register(p,p)
+        assert result.observable and result.rmse<.001
+        assert np.allclose(result.information_eigenvalues,reference.information_eigenvalues,rtol=1e-5,atol=1e-8)

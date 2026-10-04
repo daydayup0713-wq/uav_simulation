@@ -1,7 +1,7 @@
 {
   "passed": true,
   "failure": "lio_exit",
-  "elapsed_s": 8.05587287200251,
+  "elapsed_s": 7.896514137999475,
   "final": {
     "armed": false,
     "offboard": true,
@@ -10,140 +10,154 @@
   "failsafe_landing_observed": true,
   "events": [
     {
-      "time": 25384.352028312,
+      "time": 27313.422236018,
       "nav_state": 14,
       "armed": true,
       "offboard": true,
       "landed": null
     },
     {
-      "time": 25384.855740381,
+      "time": 27313.926431428,
+      "nav_state": 14,
+      "armed": true,
+      "offboard": true,
+      "landed": null
+    },
+    {
+      "time": 27314.440426389,
       "nav_state": 14,
       "armed": true,
       "offboard": true,
       "landed": false
     },
     {
-      "time": 25385.369550449,
+      "time": 27314.944278753,
       "nav_state": 14,
       "armed": true,
       "offboard": true,
       "landed": false
     },
     {
-      "time": 25385.873593633,
+      "time": 27315.448263026,
       "nav_state": 14,
       "armed": true,
       "offboard": true,
       "landed": false
     },
     {
-      "time": 25386.161560981,
+      "time": 27315.616520124,
       "nav_state": 14,
       "armed": true,
       "offboard": true,
       "landed": false
     },
     {
-      "time": 25386.173645728,
+      "time": 27315.652446174,
       "nav_state": 18,
       "armed": true,
       "offboard": false,
       "landed": false
     },
     {
-      "time": 25386.437650512,
+      "time": 27315.893067287,
       "nav_state": 18,
       "armed": true,
       "offboard": false,
       "landed": false
     },
     {
-      "time": 25386.941567585,
+      "time": 27316.052721624,
       "nav_state": 18,
       "armed": true,
       "offboard": false,
       "landed": false
     },
     {
-      "time": 25387.445460697,
+      "time": 27316.396408126,
       "nav_state": 18,
       "armed": true,
       "offboard": false,
       "landed": false
     },
     {
-      "time": 25387.949405693,
+      "time": 27316.900330216,
       "nav_state": 18,
       "armed": true,
       "offboard": false,
       "landed": false
     },
     {
-      "time": 25388.459343867,
+      "time": 27317.408961176,
       "nav_state": 18,
       "armed": true,
       "offboard": false,
       "landed": false
     },
     {
-      "time": 25388.963415442,
+      "time": 27317.917984913,
       "nav_state": 18,
       "armed": true,
       "offboard": false,
       "landed": false
     },
     {
-      "time": 25389.467110211,
+      "time": 27318.42191927,
       "nav_state": 18,
       "armed": true,
       "offboard": false,
       "landed": false
     },
     {
-      "time": 25389.971379084,
+      "time": 27318.925762583,
       "nav_state": 18,
       "armed": true,
       "offboard": false,
       "landed": false
     },
     {
-      "time": 25390.475449645,
+      "time": 27319.429921764,
       "nav_state": 18,
       "armed": true,
       "offboard": false,
       "landed": false
     },
     {
-      "time": 25390.97921484,
+      "time": 27319.934260808,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 27320.437644839,
       "nav_state": 18,
       "armed": true,
       "offboard": false,
       "landed": true
     },
     {
-      "time": 25391.483629501,
+      "time": 27320.949281384,
       "nav_state": 18,
       "armed": true,
       "offboard": false,
       "landed": true
     },
     {
-      "time": 25391.99170144,
+      "time": 27321.453096913,
       "nav_state": 18,
       "armed": true,
       "offboard": false,
       "landed": true
     },
     {
-      "time": 25392.495522075,
+      "time": 27321.957148208,
       "nav_state": 18,
       "armed": true,
       "offboard": false,
       "landed": true
     },
     {
-      "time": 25392.663705595,
+      "time": 27322.124877976,
       "nav_state": 14,
       "armed": false,
       "offboard": true,
