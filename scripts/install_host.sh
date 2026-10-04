@@ -27,7 +27,8 @@ echo 'deb [signed-by=/usr/share/keyrings/gazebo-archive-keyring.gpg] https://pac
   libeigen3-dev libxml2-dev libssl-dev libtinyxml2-dev libspdlog-dev libasio-dev libfoonathan-memory-dev \
   gz-harmonic ros-humble-ros-base ros-humble-ros-gzharmonic ros-humble-rviz2 \
   ros-humble-tf2-ros ros-humble-diagnostic-msgs ros-humble-nav-msgs ros-humble-geometry-msgs \
-  ros-humble-std-srvs ros-humble-rosidl-default-generators
+  ros-humble-std-srvs ros-humble-rosidl-default-generators ros-humble-sensor-msgs \
+  ros-humble-rosbag2 ros-humble-rosbag2-py ros-humble-rosbag2-storage-default-plugins
 /usr/bin/python3 -m pip install --user -r "$ROOT/dependencies/build-requirements.txt"
 [ "$INSTALL_SCOPE" != --system-only ] || exit 0
 /usr/bin/python3 "$ROOT/scripts/bootstrap.py" --jobs 2

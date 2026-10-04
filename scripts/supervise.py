@@ -12,6 +12,7 @@ import socket
 import subprocess
 import time
 import uuid
+from sensor_model import select_profile, prepare_sensors
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -124,6 +125,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--headless', action='store_true')
     p.add_argument('--rviz', action='store_true')
+    p.add_argument('--profile', choices=('flight', 'sensors'), default='flight')
     options = p.parse_args()
     runtime = ROOT / '.runtime'
     runtime.mkdir(exist_ok=True)
@@ -141,18 +143,30 @@ def main():
     (runtime / 'current-run').write_text(str(run_dir)+'\n')
     metadata = {'run_id': run_dir.name, 'supervisor_pid': os.getpid(), 'dependencies': json.loads((ROOT/'dependencies/lock.json').read_text()),
                 'environment': {k: env.get(k) for k in ('ROS_DOMAIN_ID','GZ_PARTITION','RMW_IMPLEMENTATION')},
-                'headless': options.headless,
+                'headless': options.headless, 'profile': options.profile,
                 'parameters': {'COM_RC_IN_MODE': 4, 'COM_OF_LOSS_T': 1, 'COM_OBL_RC_ACT': 4,
                                'COM_DL_LOSS_T': 300, 'NAV_DLL_ACT': 0, 'UXRCE_DDS_SYNCT': 0,
                                'UXRCE_DDS_PTCFG': 1,
                                'UXRCE_DDS_DOM_ID': int(env.get('ROS_DOMAIN_ID','42'))}}
     snapshots = run_dir/'configuration'
     snapshots.mkdir()
+    sensor = prepare_sensors(ROOT, run_dir) if options.profile == 'sensors' else None
+    world_path = sensor['world'] if sensor else select_profile(ROOT, options.profile)
+    if sensor:
+        env['GZ_SIM_RESOURCE_PATH'] = str(sensor['resource_path'])+':'+env['GZ_SIM_RESOURCE_PATH']
+        metadata['calibration'] = sensor['calibration']
     metadata['configuration_sha256'] = {}
-    for relative in ('simulation/worlds/lab.sdf', 'configs/px4-start.sh', 'configs/lab.rviz', 'dependencies/lock.json'):
+    files = ['simulation/worlds/lab.sdf', 'configs/px4-start.sh', 'configs/lab.rviz', 'dependencies/lock.json']
+    if sensor:
+        files += ['simulation/worlds/room.sdf', 'configs/sensors.json', 'configs/sensors.rviz', 'configs/recording-qos.yaml']
+    for relative in files:
         contents = (ROOT/relative).read_bytes()
-        (snapshots/Path(relative).name).write_bytes(contents)
+        # Generated world has the payload include; do not replace it with its template.
+        if relative != 'simulation/worlds/room.sdf':
+            (snapshots/Path(relative).name).write_bytes(contents)
         metadata['configuration_sha256'][relative] = hashlib.sha256(contents).hexdigest()
+    metadata['snapshot_sha256'] = {str(path.relative_to(snapshots)): hashlib.sha256(path.read_bytes()).hexdigest()
+                                   for path in snapshots.rglob('*') if path.is_file()}
     metadata['frames'] = {'world': 'ENU', 'body': 'FLU', 'tf': 'odom -> base_link',
                           'px4_world': 'NED', 'px4_body': 'FRD'}
     metadata['platform_commit'], metadata['platform_dirty'] = source_identity(ROOT, env)
@@ -165,7 +179,10 @@ def main():
         check_port(8888)
         agent_env = {**env, 'LD_LIBRARY_PATH': str(ROOT/'.deps/agent-install/lib')+':'+str(ROOT/'.deps/agent-install/lib64')}
         manager.start('agent', [ROOT/'.deps/agent-install/bin/MicroXRCEAgent', 'udp4', '-p', '8888'], env=agent_env)
-        manager.start('gazebo', ['gz', 'sim', '-r', '-s', ROOT/'simulation/worlds/lab.sdf'], env=env)
+        gz_command = ['gz', 'sim', '-r', '-s', world_path]
+        if sensor and options.headless:
+            gz_command.append('--headless-rendering')
+        manager.start('gazebo', gz_command, env=env)
         def world_ready():
             result = subprocess.run(['gz', 'service', '-i', '-s', '/world/lab/scene/info'], env=env,
                                     capture_output=True, text=True, timeout=3)
@@ -181,12 +198,23 @@ def main():
         build = ROOT/'.deps/px4/build/px4_sitl_default'
         manager.start('px4', [build/'bin/px4', '-d', build/'etc', '-w', run_dir/'px4', '-s', ROOT/'configs/px4-start.sh'], env=px4_env)
         manager.start('bridge', ['ros2', 'run', 'uav_lab_bridge', 'bridge'], env=env)
+        if sensor:
+            manager.start('sensor-bridge', ['ros2','run','ros_gz_bridge','parameter_bridge',
+                                           '--ros-args','-p','config_file:='+str(sensor['bridge'])], env=env)
+            manager.start('sensors', ['ros2','run','uav_lab_tools','sensors','--ros-args',
+                                     '-p','calibration_file:='+str(sensor['calibration_path'])], env=env)
         flight_readiness = FlightReadiness()
         def vehicle_ready():
             return flight_readiness.update(read_vehicle_status(env), time.monotonic())
         wait_for(manager, vehicle_ready, 'PX4 fresh landed telemetry and stable preflight checks', 60)
+        if sensor:
+            result = subprocess.run(['ros2','run','uav_lab_tools','datactl','sensors','--duration','3'],
+                                    env=env, capture_output=True, text=True, timeout=20)
+            (run_dir/'sensor-readiness.json').write_text(result.stdout)
+            if result.returncode:
+                raise RuntimeError('sensor data readiness failed: '+result.stdout.strip()+' '+result.stderr.strip())
         if options.rviz:
-            manager.start('rviz', ['rviz2','-d', ROOT/'configs/lab.rviz'], env=env)
+            manager.start('rviz', ['rviz2','-d', ROOT/'configs'/('sensors.rviz' if sensor else 'lab.rviz')], env=env)
         (run_dir/'ready').write_text('ready\n')
         print('LAB READY '+str(run_dir), flush=True)
         failure_started = None

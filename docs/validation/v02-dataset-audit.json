@@ -1,0 +1,81 @@
+{
+  "passed": true,
+  "streams": {
+    "/uav001/lidar/points": {
+      "count": 796,
+      "source_hz": 10.0,
+      "expected_hz": 10,
+      "first_ns": 412800000000,
+      "last_ns": 492300000000,
+      "regressions": 0,
+      "maximum_gap_s": 0.1,
+      "passed": true
+    },
+    "/uav001/imu/data": {
+      "count": 15908,
+      "source_hz": 200.0075441331791,
+      "expected_hz": 200,
+      "first_ns": 412808000000,
+      "last_ns": 492340000000,
+      "regressions": 0,
+      "maximum_gap_s": 0.008,
+      "passed": true
+    },
+    "/uav001/camera/image_raw": {
+      "count": 1205,
+      "source_hz": 15.151515151515152,
+      "expected_hz": 15,
+      "first_ns": 412832000000,
+      "last_ns": 492296000000,
+      "regressions": 0,
+      "maximum_gap_s": 0.068,
+      "passed": true
+    },
+    "/uav001/camera/camera_info": {
+      "count": 1205,
+      "source_hz": 15.151515151515152,
+      "expected_hz": 15,
+      "first_ns": 412832000000,
+      "last_ns": 492296000000,
+      "regressions": 0,
+      "maximum_gap_s": 0.068,
+      "passed": true
+    },
+    "/uav001/ground_truth/odometry": {
+      "count": 1988,
+      "source_hz": 25.0,
+      "expected_hz": 25,
+      "first_ns": 412840000000,
+      "last_ns": 492320000000,
+      "regressions": 0,
+      "maximum_gap_s": 0.04,
+      "passed": true
+    }
+  },
+  "missing": [],
+  "missing_transforms": [],
+  "errors": [],
+  "clock_samples": 19886,
+  "sim_duration_s": 79.54,
+  "lidar": {
+    "points_per_scan": 5760,
+    "finite_sample_fraction": 0.9312977099236641,
+    "sampled_z_extent_m": 6.100725173950195
+  },
+  "imu_mean_specific_force_m_s2": 9.815348912347783,
+  "topic_counts": {
+    "/clock": 19886,
+    "/tf": 354,
+    "/tf_static": 1,
+    "/uav001/camera/camera_info": 1205,
+    "/uav001/camera/image_raw": 1205,
+    "/uav001/diagnostics": 354,
+    "/uav001/ground_truth/odometry": 1988,
+    "/uav001/lidar/points": 796,
+    "/uav001/imu/data": 15908,
+    "/uav001/odometry": 354,
+    "/uav001/path": 354
+  },
+  "missing_recording_topics": [],
+  "dataset": "/home/pine/workspace/ai/UAV/uav_simulation/recordings/20261004T103659Z-5d426e73-104356-128d1b"
+}

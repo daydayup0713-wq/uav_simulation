@@ -1,0 +1,75 @@
+{
+  "passed": true,
+  "streams": {
+    "/uav001/lidar/points": {
+      "count": 792,
+      "source_hz": 10.0,
+      "expected_hz": 10,
+      "first_ns": 413200000000,
+      "last_ns": 492300000000,
+      "regressions": 0,
+      "maximum_gap_s": 0.1,
+      "maximum_allowed_gap_s": 0.5,
+      "passed": true
+    },
+    "/uav001/imu/data": {
+      "count": 15828,
+      "source_hz": 200.00758226760348,
+      "expected_hz": 200,
+      "first_ns": 413208000000,
+      "last_ns": 492340000000,
+      "regressions": 0,
+      "maximum_gap_s": 0.008,
+      "maximum_allowed_gap_s": 0.25,
+      "passed": true
+    },
+    "/uav001/camera/image_raw": {
+      "count": 1199,
+      "source_hz": 15.151515151515152,
+      "expected_hz": 15,
+      "first_ns": 413228000000,
+      "last_ns": 492296000000,
+      "regressions": 0,
+      "maximum_gap_s": 0.068,
+      "maximum_allowed_gap_s": 0.3333333333333333,
+      "passed": true
+    },
+    "/uav001/camera/camera_info": {
+      "count": 1199,
+      "source_hz": 15.151515151515152,
+      "expected_hz": 15,
+      "first_ns": 413228000000,
+      "last_ns": 492296000000,
+      "regressions": 0,
+      "maximum_gap_s": 0.068,
+      "maximum_allowed_gap_s": 0.3333333333333333,
+      "passed": true
+    },
+    "/uav001/ground_truth/odometry": {
+      "count": 1978,
+      "source_hz": 25.0,
+      "expected_hz": 25,
+      "first_ns": 413240000000,
+      "last_ns": 492320000000,
+      "regressions": 0,
+      "maximum_gap_s": 0.04,
+      "maximum_allowed_gap_s": 0.25,
+      "passed": true
+    }
+  },
+  "missing": [],
+  "missing_transforms": [],
+  "errors": [],
+  "clock_samples": 19787,
+  "sim_duration_s": 79.144,
+  "real_time_factor": 0.9574224029568321,
+  "lidar": {
+    "points_per_scan": 5760,
+    "finite_sample_fraction": 0.9312977099236641,
+    "sampled_z_extent_m": 6.100725173950195
+  },
+  "imu_mean_specific_force_m_s2": 9.815374006243491,
+  "domain": 77,
+  "player_exit_code": 0,
+  "dataset": "recordings/20261004T103659Z-5d426e73-104356-128d1b"
+}

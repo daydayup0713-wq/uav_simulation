@@ -45,7 +45,10 @@ class Operator:
         while (self.latest is None or time.monotonic()-self.latest_at > 1) and time.monotonic() < deadline:
             self.spin()
         if self.latest is None or time.monotonic()-self.latest_at > 1:
-            raise RuntimeError('bridge diagnostic stream unavailable')
+            raise RuntimeError('bridge diagnostic stream unavailable on /uav001/diagnostics; '
+                               'start ./scripts/start_lab.sh --rviz (or --headless) in another terminal '
+                               'and wait for LAB READY; if already started, check its output and use '
+                               'the same LAB_DOMAIN_ID in both terminals')
         return self.latest
 
     def service(self, name):

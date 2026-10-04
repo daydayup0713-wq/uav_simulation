@@ -49,7 +49,14 @@ def checks(runtime=False, sensors=False):
         for name, match in check_messages(ROOT).items():
             add(name+' schema', match, 'matching fields/constants/version' if match else 'schema mismatch or missing')
     code, out, err = command(['nvidia-smi','--query-gpu=name,memory.total','--format=csv,noheader'])
-    add('GPU/CUDA', code==0, out or err, required=sensors)
+    add('NVIDIA GPU inventory', code==0, out or err, required=False)
+    if sensors:
+        for package in ('ros-humble-sensor-msgs','ros-humble-rosbag2','ros-humble-rosbag2-py','ros-humble-rosbag2-storage-default-plugins'):
+            code,out,err=command(['dpkg-query','-W','-f=${db:Status-Status}',package])
+            add(package,code==0 and out=='installed',out or err)
+        plugin=Path('/usr/lib/x86_64-linux-gnu/gz-sim-8/plugins/libgz-sim8-sensors-system.so')
+        add('Harmonic rendering sensor plugin',plugin.exists(),str(plugin))
+        add('sensor runtime gate',True,'doctor checks prerequisites; start_lab --profile sensors checks actual image and 3D point cloud',required=False)
     return report
 
 def main():

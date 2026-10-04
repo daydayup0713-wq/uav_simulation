@@ -1,0 +1,10 @@
+{
+  "source_dataset": "20261004T103659Z-5d426e73-104356-128d1b",
+  "source_topic": "/uav001/camera/image_raw",
+  "stamp_sec": 430,
+  "stamp_nanosec": 56000000,
+  "frame_id": "camera_optical_frame",
+  "encoding": "rgb8",
+  "width": 320,
+  "height": 240
+}

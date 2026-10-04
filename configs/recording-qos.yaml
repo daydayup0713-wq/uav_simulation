@@ -1,0 +1,11 @@
+/uav001/lidar/points: {history: keep_last, depth: 20, reliability: best_effort, durability: volatile}
+/uav001/imu/data: {history: keep_last, depth: 1000, reliability: best_effort, durability: volatile}
+/uav001/camera/image_raw: {history: keep_last, depth: 20, reliability: best_effort, durability: volatile}
+/uav001/camera/camera_info: {history: keep_last, depth: 20, reliability: best_effort, durability: volatile}
+/uav001/ground_truth/odometry: {history: keep_last, depth: 100, reliability: best_effort, durability: volatile}
+/clock: {history: keep_last, depth: 1000, reliability: best_effort, durability: volatile}
+/tf: {history: keep_last, depth: 100, reliability: reliable, durability: volatile}
+/tf_static: {history: keep_last, depth: 10, reliability: reliable, durability: transient_local}
+/uav001/odometry: {history: keep_last, depth: 100, reliability: reliable, durability: volatile}
+/uav001/path: {history: keep_last, depth: 20, reliability: reliable, durability: volatile}
+/uav001/diagnostics: {history: keep_last, depth: 100, reliability: reliable, durability: volatile}

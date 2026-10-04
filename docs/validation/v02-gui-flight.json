@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "runs": [
+    {
+      "seconds": 10.0,
+      "samples": 45,
+      "maximum_error_m": 0.11986034269144948,
+      "run": 1,
+      "elapsed_s": 52.21015291799995,
+      "landed": true,
+      "disarmed": true
+    }
+  ]
+}

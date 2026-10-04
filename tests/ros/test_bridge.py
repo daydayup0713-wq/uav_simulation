@@ -19,6 +19,37 @@ def initialize_test_context():
     domain = int(os.environ['LAB_TEST_DOMAIN'])
     rclpy.init(domain_id=domain, args=['--ros-args', '-r', '__ns:=/bridge_contract_test'])
 
+def test_delayed_telemetry_callback_cannot_overtake_earlier_source_time(monkeypatch):
+    import threading
+    from rclpy.executors import MultiThreadedExecutor
+    from rclpy.qos import qos_profile_sensor_data
+    entered=threading.Event()
+    original=Bridge.position_callback
+    def delayed(self,msg):
+        if msg.timestamp==3_000_000:
+            entered.set();time.sleep(.25)
+        original(self,msg)
+    monkeypatch.setattr(Bridge,'position_callback',delayed)
+    initialize_test_context()
+    bridge=Bridge();publisher_node=rclpy.create_node('ordered_telemetry_test')
+    publisher=publisher_node.create_publisher(VehicleLocalPosition,'/fmu/out/vehicle_local_position_v1',qos_profile_sensor_data)
+    executor=MultiThreadedExecutor(num_threads=2);executor.add_node(bridge)
+    worker=threading.Thread(target=executor.spin,daemon=True);worker.start()
+    try:
+        end=time.monotonic()+2
+        while publisher.get_subscription_count()==0 and time.monotonic()<end:time.sleep(.02)
+        first=VehicleLocalPosition();first.timestamp=3_000_000;first.xy_valid=first.z_valid=True
+        publisher.publish(first);assert entered.wait(2)
+        second=VehicleLocalPosition();second.timestamp=3_010_000;second.xy_valid=second.z_valid=True
+        publisher.publish(second)
+        end=time.monotonic()+2
+        while bridge.px4_clock.px4_us!=3_010_000 and time.monotonic()<end:time.sleep(.02)
+        time.sleep(.3)
+        assert bridge.policy.state!='FAILSAFE'
+        assert bridge.px4_clock.px4_us==3_010_000
+    finally:
+        executor.shutdown();worker.join(2);publisher_node.destroy_node();bridge.destroy_node();rclpy.shutdown()
+
 def test_observation_serializes_real_ros_messages_before_and_after_telemetry():
     initialize_test_context()
     bridge = Bridge()

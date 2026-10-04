@@ -1,0 +1,208 @@
+{
+  "passed": true,
+  "head_commit": "02bd8048de4ef427cd7882e904138f5c91a46437",
+  "tested_merge_commit": "49bc3fe0d51f392b8ff73f768dd6dd1c91fda5df",
+  "merge_parents": [
+    "b823eba4bfe4ca6e855f33f65e903b55ac5cbfdc",
+    "02bd8048de4ef427cd7882e904138f5c91a46437"
+  ],
+  "run_id": 37199496965,
+  "url": "https://github.com/daydayup0713-wq/uav_simulation/actions/runs/37199496965",
+  "job_id": 111428075695,
+  "tests": {
+    "passed": 80,
+    "elapsed_s": 11.01
+  },
+  "flight_profile": "flight; no camera/GPU lidar",
+  "flight_acceptance": {
+    "passed": true,
+    "runs": [
+      {
+        "seconds": 10.0,
+        "samples": 44,
+        "maximum_error_m": 0.10970321238578778,
+        "run": 1,
+        "elapsed_s": 51.69487710300001,
+        "landed": true,
+        "disarmed": true
+      },
+      {
+        "seconds": 10.0,
+        "samples": 42,
+        "maximum_error_m": 0.11074062896263626,
+        "run": 2,
+        "elapsed_s": 51.996121328000015,
+        "landed": true,
+        "disarmed": true
+      },
+      {
+        "seconds": 10.0,
+        "samples": 43,
+        "maximum_error_m": 0.11930303764976725,
+        "run": 3,
+        "elapsed_s": 51.84471260299995,
+        "landed": true,
+        "disarmed": true
+      }
+    ]
+  },
+  "fault_acceptance": {
+    "passed": true,
+    "failure": "bridge_exit",
+    "elapsed_s": 7.559910056000035,
+    "final": {
+      "armed": false,
+      "offboard": true,
+      "landed": true
+    },
+    "failsafe_landing_observed": true,
+    "events": [
+      {
+        "time": 601.572542301,
+        "nav_state": 14,
+        "armed": true,
+        "offboard": true,
+        "landed": null
+      },
+      {
+        "time": 602.07636552,
+        "nav_state": 14,
+        "armed": true,
+        "offboard": true,
+        "landed": false
+      },
+      {
+        "time": 602.580309784,
+        "nav_state": 14,
+        "armed": true,
+        "offboard": true,
+        "landed": false
+      },
+      {
+        "time": 603.08440184,
+        "nav_state": 14,
+        "armed": true,
+        "offboard": true,
+        "landed": false
+      },
+      {
+        "time": 603.096361968,
+        "nav_state": 14,
+        "armed": true,
+        "offboard": true,
+        "landed": false
+      },
+      {
+        "time": 603.28460344,
+        "nav_state": 18,
+        "armed": true,
+        "offboard": false,
+        "landed": false
+      },
+      {
+        "time": 603.484664536,
+        "nav_state": 18,
+        "armed": true,
+        "offboard": false,
+        "landed": false
+      },
+      {
+        "time": 603.876408311,
+        "nav_state": 18,
+        "armed": true,
+        "offboard": false,
+        "landed": false
+      },
+      {
+        "time": 604.38038654,
+        "nav_state": 18,
+        "armed": true,
+        "offboard": false,
+        "landed": false
+      },
+      {
+        "time": 604.884455367,
+        "nav_state": 18,
+        "armed": true,
+        "offboard": false,
+        "landed": false
+      },
+      {
+        "time": 605.388432846,
+        "nav_state": 18,
+        "armed": true,
+        "offboard": false,
+        "landed": false
+      },
+      {
+        "time": 605.892389169,
+        "nav_state": 18,
+        "armed": true,
+        "offboard": false,
+        "landed": false
+      },
+      {
+        "time": 606.396295865,
+        "nav_state": 18,
+        "armed": true,
+        "offboard": false,
+        "landed": false
+      },
+      {
+        "time": 606.900369993,
+        "nav_state": 18,
+        "armed": true,
+        "offboard": false,
+        "landed": false
+      },
+      {
+        "time": 607.404416906,
+        "nav_state": 18,
+        "armed": true,
+        "offboard": false,
+        "landed": false
+      },
+      {
+        "time": 607.908444807,
+        "nav_state": 18,
+        "armed": true,
+        "offboard": false,
+        "landed": true
+      },
+      {
+        "time": 608.412384919,
+        "nav_state": 18,
+        "armed": true,
+        "offboard": false,
+        "landed": true
+      },
+      {
+        "time": 608.916306346,
+        "nav_state": 18,
+        "armed": true,
+        "offboard": false,
+        "landed": true
+      },
+      {
+        "time": 609.420386656,
+        "nav_state": 18,
+        "armed": true,
+        "offboard": false,
+        "landed": true
+      },
+      {
+        "time": 609.61248632,
+        "nav_state": 14,
+        "armed": false,
+        "offboard": true,
+        "landed": true
+      }
+    ]
+  },
+  "artifact": {
+    "id": 11302313484,
+    "name": "sitl-evidence",
+    "sha256": "b8d3cd891d042353ce2bcf630d05aed61bf25e0573bd7d893c408adc8620065f"
+  },
+  "provenance_note": "PR merge commit contains V0.1 base and reviewed V0.2 head; container source has no .git and receives LAB_REVISION. GPU rendering separately verified on native machine."
+}

@@ -8,7 +8,7 @@ import time
 
 import rclpy
 from rclpy.action import ActionServer, GoalResponse, CancelResponse
-from rclpy.callback_groups import ReentrantCallbackGroup
+from rclpy.callback_groups import ReentrantCallbackGroup, MutuallyExclusiveCallbackGroup
 from rclpy.clock import Clock, ClockType
 from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
@@ -47,6 +47,9 @@ class Bridge(Node):
             self.trace = (Path(run_dir) / 'events.jsonl').open('a', buffering=1)
         group = ReentrantCallbackGroup()
         self.group = group
+        # The executor must not start a newer sample while an earlier telemetry
+        # callback waits for CPU/the policy lock. Actions and control remain concurrent.
+        self.telemetry_group = MutuallyExclusiveCallbackGroup()
         self.control_pub = self.create_publisher(OffboardControlMode, '/fmu/in/offboard_control_mode', 10)
         self.setpoint_pub = self.create_publisher(TrajectorySetpoint, '/fmu/in/trajectory_setpoint', 10)
         self.command_pub = self.create_publisher(VehicleCommand, '/fmu/in/vehicle_command', 10)
@@ -58,7 +61,7 @@ class Bridge(Node):
                 ('vehicle_command_ack', VehicleCommandAck, self.ack_callback)]:
             version = getattr(msg, 'MESSAGE_VERSION', 0)
             topic = '/fmu/out/' + name + (f'_v{version}' if version else '')
-            self.create_subscription(msg, topic, callback, qos_profile_sensor_data, callback_group=group)
+            self.create_subscription(msg, topic, callback, qos_profile_sensor_data, callback_group=self.telemetry_group)
         self.odom_pub = self.create_publisher(Odometry, 'odometry', 10)
         self.path_pub = self.create_publisher(NavPath, 'path', 10)
         self.diag_pub = self.create_publisher(DiagnosticArray, 'diagnostics', 10)
@@ -94,6 +97,9 @@ class Bridge(Node):
             try:
                 self.px4_clock.observe(msg.timestamp, self.get_clock().now().nanoseconds)
             except RuntimeError as exc:
+                self.record('clock_rejected', previous_px4_us=self.px4_clock.px4_us,
+                            previous_ros_ns=self.px4_clock.ros_ns, received_px4_us=int(msg.timestamp),
+                            observed_ros_ns=self.get_clock().now().nanoseconds)
                 self.policy.fail(str(exc))
             self.policy.update(time.monotonic(), position=ned_to_enu((msg.x, msg.y, msg.z)), valid=bool(msg.xy_valid and msg.z_valid))
             self.velocity = ned_to_enu((msg.vx, msg.vy, msg.vz))
