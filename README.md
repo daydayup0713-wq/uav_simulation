@@ -16,6 +16,8 @@ cd /home/pine/workspace/ai/UAV/uav_simulation
 
 等待终端输出 `LAB READY`：遥测新鲜、已落地、未解锁，PX4 飞前检查连续通过 5 秒。Gazebo 显示飞行器，RViz 使用 `odom` 观察 `/uav001/path`。另一终端执行：
 
+`labctl` 是操作客户端，不会启动实验室。电脑重启或实验室退出后，需要重新执行 `start_lab.sh`，并保持启动终端运行；两个终端若设置了 `LAB_DOMAIN_ID`，其值必须相同。
+
 ```bash
 cd /home/pine/workspace/ai/UAV/uav_simulation
 ./scripts/labctl status
@@ -29,6 +31,8 @@ cd /home/pine/workspace/ai/UAV/uav_simulation
 ```bash
 ./scripts/env.sh rviz2 -d configs/lab.rviz
 ```
+
+RViz 顶部选择 `Move Camera`，在三维画面内按住左键拖动可旋转；按住中键或 `Shift + 左键` 拖动可平移，滚轮可缩放。配置显式加载相机工具，并将其设为默认工具。
 
 先降落，再在启动终端按 Ctrl+C，或执行 `./scripts/env.sh /usr/bin/python3 scripts/stop_lab.py`。停止脚本只操作本次监督进程；关闭整个实验室会同时停止物理仿真。测试飞控失控降落请使用下文的故障验收脚本。
 
