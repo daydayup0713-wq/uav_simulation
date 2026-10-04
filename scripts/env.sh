@@ -9,6 +9,14 @@ exec env -i HOME="$HOME" USER="${USER:-pine}" LANG=C.UTF-8 PATH=/usr/bin:/bin \
   /bin/bash --noprofile --norc -c '
     set -e
     source /opt/ros/humble/setup.bash
+    if [ -f "$LAB_ROOT/.deps/slam/install/local_setup.bash" ]; then
+      source "$LAB_ROOT/.deps/slam/install/local_setup.bash"
+    fi
+    if [ -d "$LAB_ROOT/.deps/slam/install/lib" ]; then
+      export LD_LIBRARY_PATH="$LAB_ROOT/.deps/slam/install/lib:${LD_LIBRARY_PATH:-}"
+      export CMAKE_PREFIX_PATH="$LAB_ROOT/.deps/slam/install:${CMAKE_PREFIX_PATH:-}"
+      export AMENT_PREFIX_PATH="$LAB_ROOT/.deps/slam/install:${AMENT_PREFIX_PATH:-}"
+    fi
     source "$LAB_ROOT/ros2_ws/install/setup.bash"
     export PYTHONUNBUFFERED=1
     if [ -f "$LAB_ROOT/.runtime/current-run" ]; then
