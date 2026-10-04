@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+case "${1:-}" in
+  sensors|record|bag-check|replay)
+    exec "$ROOT/scripts/env.sh" ros2 run uav_lab_tools datactl "$@" ;;
+esac
 exec "$ROOT/scripts/env.sh" ros2 run uav_lab_tools labctl "$@"
