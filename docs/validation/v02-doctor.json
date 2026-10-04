@@ -1,0 +1,221 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "name": "Ubuntu 22.04",
+      "ok": true,
+      "required": true,
+      "detail": "requires Ubuntu 22.04"
+    },
+    {
+      "name": "Python 3.10",
+      "ok": true,
+      "required": true,
+      "detail": "3.10.12"
+    },
+    {
+      "name": "ROS Humble",
+      "ok": true,
+      "required": true,
+      "detail": "/opt/ros/humble"
+    },
+    {
+      "name": "git",
+      "ok": true,
+      "required": true,
+      "detail": "/usr/bin/git"
+    },
+    {
+      "name": "cmake",
+      "ok": true,
+      "required": true,
+      "detail": "/usr/bin/cmake"
+    },
+    {
+      "name": "ninja",
+      "ok": true,
+      "required": true,
+      "detail": "/usr/bin/ninja"
+    },
+    {
+      "name": "colcon",
+      "ok": true,
+      "required": true,
+      "detail": "/usr/bin/colcon"
+    },
+    {
+      "name": "gz",
+      "ok": true,
+      "required": true,
+      "detail": "/usr/bin/gz"
+    },
+    {
+      "name": "Gazebo Harmonic",
+      "ok": true,
+      "required": true,
+      "detail": "8.15.0"
+    },
+    {
+      "name": "Harmonic ROS bridge",
+      "ok": true,
+      "required": true,
+      "detail": "installed"
+    },
+    {
+      "name": ".deps/px4/build/px4_sitl_default/bin/px4",
+      "ok": true,
+      "required": true,
+      "detail": "exists"
+    },
+    {
+      "name": ".deps/agent-install/bin/MicroXRCEAgent",
+      "ok": true,
+      "required": true,
+      "detail": "exists"
+    },
+    {
+      "name": "ros2_ws/install/setup.bash",
+      "ok": true,
+      "required": true,
+      "detail": "exists"
+    },
+    {
+      "name": "ros2_ws/install/uav_lab_tools/lib/uav_lab_tools/labctl",
+      "ok": true,
+      "required": true,
+      "detail": "exists"
+    },
+    {
+      "name": "px4 revision",
+      "ok": true,
+      "required": true,
+      "detail": "d6f12ad1c4f70ad3230afd7d86e971421e02fef4"
+    },
+    {
+      "name": "px4 clean",
+      "ok": true,
+      "required": true,
+      "detail": "clean"
+    },
+    {
+      "name": "px4_msgs revision",
+      "ok": true,
+      "required": true,
+      "detail": "86d8239e962f6939e05c3737784f60c02fa884db"
+    },
+    {
+      "name": "px4_msgs clean",
+      "ok": true,
+      "required": true,
+      "detail": "clean"
+    },
+    {
+      "name": "agent revision",
+      "ok": true,
+      "required": true,
+      "detail": "73622810d984349b80bbac0ef55fc0b694d62222"
+    },
+    {
+      "name": "agent clean",
+      "ok": true,
+      "required": true,
+      "detail": "clean"
+    },
+    {
+      "name": "private Agent build manifest",
+      "ok": true,
+      "required": true,
+      "detail": "matches lock"
+    },
+    {
+      "name": "VehicleLocalPosition schema",
+      "ok": true,
+      "required": true,
+      "detail": "matching fields/constants/version"
+    },
+    {
+      "name": "VehicleStatus schema",
+      "ok": true,
+      "required": true,
+      "detail": "matching fields/constants/version"
+    },
+    {
+      "name": "VehicleAttitude schema",
+      "ok": true,
+      "required": true,
+      "detail": "matching fields/constants/version"
+    },
+    {
+      "name": "VehicleLandDetected schema",
+      "ok": true,
+      "required": true,
+      "detail": "matching fields/constants/version"
+    },
+    {
+      "name": "VehicleCommandAck schema",
+      "ok": true,
+      "required": true,
+      "detail": "matching fields/constants/version"
+    },
+    {
+      "name": "VehicleCommand schema",
+      "ok": true,
+      "required": true,
+      "detail": "matching fields/constants/version"
+    },
+    {
+      "name": "OffboardControlMode schema",
+      "ok": true,
+      "required": true,
+      "detail": "matching fields/constants/version"
+    },
+    {
+      "name": "TrajectorySetpoint schema",
+      "ok": true,
+      "required": true,
+      "detail": "matching fields/constants/version"
+    },
+    {
+      "name": "NVIDIA GPU inventory",
+      "ok": true,
+      "required": false,
+      "detail": "NVIDIA GeForce RTX 3050 Laptop GPU, 4096 MiB"
+    },
+    {
+      "name": "ros-humble-sensor-msgs",
+      "ok": true,
+      "required": true,
+      "detail": "installed"
+    },
+    {
+      "name": "ros-humble-rosbag2",
+      "ok": true,
+      "required": true,
+      "detail": "installed"
+    },
+    {
+      "name": "ros-humble-rosbag2-py",
+      "ok": true,
+      "required": true,
+      "detail": "installed"
+    },
+    {
+      "name": "ros-humble-rosbag2-storage-default-plugins",
+      "ok": true,
+      "required": true,
+      "detail": "installed"
+    },
+    {
+      "name": "Harmonic rendering sensor plugin",
+      "ok": true,
+      "required": true,
+      "detail": "/usr/lib/x86_64-linux-gnu/gz-sim-8/plugins/libgz-sim8-sensors-system.so"
+    },
+    {
+      "name": "actual sensor rendering",
+      "ok": true,
+      "required": true,
+      "detail": "startup gates on real image and 3D point cloud; GPU enumeration alone is not acceptance"
+    }
+  ]
+}

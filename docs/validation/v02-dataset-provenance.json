@@ -1,0 +1,42 @@
+{
+  "run_id": "20261004T103659Z-5d426e73",
+  "requested_duration_s": 80.0,
+  "complete": true,
+  "record_topics": [
+    "/uav001/lidar/points",
+    "/uav001/imu/data",
+    "/uav001/camera/image_raw",
+    "/uav001/camera/camera_info",
+    "/uav001/ground_truth/odometry",
+    "/clock",
+    "/tf",
+    "/tf_static",
+    "/uav001/odometry",
+    "/uav001/path",
+    "/uav001/diagnostics"
+  ],
+  "configuration_sha256": {
+    "lab.rviz": "ea1863a5981193b0df87ed92aadcf2e6cec40140ec4f741f612279df75a1c17a",
+    "calibration.json": "010fbd4f01bf74db9b99cdf29b049aaaea56fe2551fd3f784549a6e304f84166",
+    "recording-qos.yaml": "61236136810ff9b07cdaed1e7d2f42876deaaac3111471197aeaeb34c7156b70",
+    "lock.json": "3a5e90712f17de48d639256fda376710b34191cda67c5fabef4922485b7a70db",
+    "sensors.rviz": "fabb2c06487d6538549c9863426d3314604bc748244a177174194fd84e4a399f",
+    "px4-start.sh": "64fbc28cf0c94adf18302560d2ce3a5388e3b511eb868833dcd0f1cdbc0cd836",
+    "sensor-bridge.yaml": "3d1f1202c4a3664d60daf91e99f6ab0e0a2a4af8142e6a6fc803cf5bc5fced32",
+    "lab.sdf": "14a9aaaafa141e6d6de6c665e1fffde5153fc3efc7416b2bc2052a4deb6c77ee",
+    "room.sdf": "7b8f40f6af6295a5ba2f9292554cdf3702834b2510ece1578abd694385fef5e6",
+    "sensors.json": "98c7110e8ba9a69fa24ba0f25d719624c3ef265a116d25156b2b626487c1d247",
+    "models/x500_sensors/model.config": "2ec391169ac326a002cdd785fb9fc1560255d585138d3b951e041a64a0840b9e",
+    "models/x500_sensors/model.sdf": "1e9a1363926fe71a0cd1f470de3ab196a925d15b9c6fbb0ba14a0ed512abe575"
+  },
+  "bag_sha256": {
+    "metadata.yaml": "527f26cac291aeb7bbc43259ba2833831d0a3f158a2657220a9b22d52fbfd331",
+    "bag_0.db3": "46c1b6c8b40e727d294821644de35bb844349c3cc46f3778947ef25f4c54e47a"
+  },
+  "dataset": "recordings/20261004T103659Z-5d426e73-104356-128d1b",
+  "render_vendor": "NVIDIA Corporation",
+  "render_device": "NVIDIA GeForce RTX 3050 Laptop GPU/PCIe/SSE2",
+  "render_engine": "Ogre2/OpenGL",
+  "code_commit": "32cb9903a934ba9ff14b04826b23b34cab4cbb95",
+  "native_run_id": "20261004T105308Z-58e07c96"
+}
