@@ -1,0 +1,247 @@
+{
+  "frame": "odom",
+  "sha256": "f28e113028a2040947205c0bf094d31562cc06578b060db3d7f7f08672ffdab5",
+  "source": "actual rendered lidar, source-time LIO registration; no ground truth",
+  "source_run": "20261007T083407Z-bd828940",
+  "dense_padding": "repeat existing final endpoint; mapper deduplicates endpoint voxels",
+  "files": [
+    {
+      "file": "navigation-observations/101.700000.npz",
+      "sha256": "4f6732c272e7f5c413b4ef5c3e19cc387949c5ce74cbafa39209b964f9a8c744",
+      "source_stamp": 101.7,
+      "endpoints": 8148
+    },
+    {
+      "file": "navigation-observations/106.700000.npz",
+      "sha256": "5ffd009e93c5742eda60308121a7e90a39354b6ed0d88ea2cf12a40dbb11a7b7",
+      "source_stamp": 106.7,
+      "endpoints": 8176
+    },
+    {
+      "file": "navigation-observations/111.700000.npz",
+      "sha256": "a1b6f253ec15b2c15c36daa4db3fb4e40cb7a8ed8696022b8c12258c136e6bb7",
+      "source_stamp": 111.7,
+      "endpoints": 9366
+    },
+    {
+      "file": "navigation-observations/116.900000.npz",
+      "sha256": "9d51c237b8ef4948bfe6b2e7debcff0fed0b1dc285d62d952f5549a0ef2bcb6b",
+      "source_stamp": 116.9,
+      "endpoints": 9347
+    },
+    {
+      "file": "navigation-observations/121.900000.npz",
+      "sha256": "0325fa434a30a2b83396e2f51f49c744b386be7630de2947d2d9162f6626c3c1",
+      "source_stamp": 121.9,
+      "endpoints": 9310
+    },
+    {
+      "file": "navigation-observations/126.900000.npz",
+      "sha256": "69d9a2193ce8f8988dedc16ac07b5c4355721ede74cfb4b8f1e24ef98e10ddd3",
+      "source_stamp": 126.9,
+      "endpoints": 9351
+    },
+    {
+      "file": "navigation-observations/131.900000.npz",
+      "sha256": "a987f31168b3f5bf241688b7bb90bdcedadadfb9b13a801216234a0e691eeb0b",
+      "source_stamp": 131.9,
+      "endpoints": 9344
+    },
+    {
+      "file": "navigation-observations/137.000000.npz",
+      "sha256": "c4f10737baf4ae3c11ad3d3f451c0685619b81ade2365025e4ffacd55890f02e",
+      "source_stamp": 137.0,
+      "endpoints": 9312
+    },
+    {
+      "file": "navigation-observations/142.000000.npz",
+      "sha256": "ae329311d6d887542c38afbbf7ff8f2f146d735cfc191d70a6e8daff89f2a997",
+      "source_stamp": 142.0,
+      "endpoints": 9315
+    },
+    {
+      "file": "navigation-observations/147.000000.npz",
+      "sha256": "6d8da0ea43c1a23be049ca9e1e9f4682be086459cc221357c94d859590cf8be2",
+      "source_stamp": 147.0,
+      "endpoints": 9330
+    },
+    {
+      "file": "navigation-observations/152.000000.npz",
+      "sha256": "4dd69cc0f985baf9bb32578eedb02d794693c0ead7b2360545f008dc2fe93dec",
+      "source_stamp": 152.0,
+      "endpoints": 9342
+    },
+    {
+      "file": "navigation-observations/157.000000.npz",
+      "sha256": "10e5c863f7a8c662a2a2e829676ff2e39cfb40563de1239a4b8f2cdbbbf84e73",
+      "source_stamp": 157.0,
+      "endpoints": 8214
+    },
+    {
+      "file": "navigation-observations/162.000000.npz",
+      "sha256": "a411314b6fc918b8d624d9b7423210168bcd8b6f2d4d4ff24491a11c27a6e25b",
+      "source_stamp": 162.0,
+      "endpoints": 8173
+    },
+    {
+      "file": "navigation-observations/167.000000.npz",
+      "sha256": "bdf0c50f56f152201d5f3d24d18fb33a9b9e9cf5638062ecc4e079b00d93025d",
+      "source_stamp": 167.0,
+      "endpoints": 9335
+    },
+    {
+      "file": "navigation-observations/21.300000.npz",
+      "sha256": "bd85642fbf29198331b0f8a50f0a30fbc7746683742dcde86b6fb1f9a50f4a58",
+      "source_stamp": 21.3,
+      "endpoints": 8183
+    },
+    {
+      "file": "navigation-observations/26.300000.npz",
+      "sha256": "aec8ae51a4c9b5d06c9cf737cea3004cc40689e99cd6ef439c1302943deda009",
+      "source_stamp": 26.3,
+      "endpoints": 8184
+    },
+    {
+      "file": "navigation-observations/31.500000.npz",
+      "sha256": "be367118f53858cefccbe4de193b46de28c8f9cf522a5f9bf3c509073edf923a",
+      "source_stamp": 31.5,
+      "endpoints": 8175
+    },
+    {
+      "file": "navigation-observations/36.500000.npz",
+      "sha256": "d9ed1f53fc9fba1edaccdc6f0281667340fb4fa104ede9479c30ff7e64e9aa35",
+      "source_stamp": 36.5,
+      "endpoints": 8182
+    },
+    {
+      "file": "navigation-observations/41.500000.npz",
+      "sha256": "9cb14feb395b3749a3e9aef0d1d1509046317d4fa49de98240f1f07825cc288a",
+      "source_stamp": 41.5,
+      "endpoints": 8185
+    },
+    {
+      "file": "navigation-observations/46.500000.npz",
+      "sha256": "c5d4ec04323867e034e1a6c3411eb74e9b8649de27618e5df005759128946df4",
+      "source_stamp": 46.5,
+      "endpoints": 8187
+    },
+    {
+      "file": "navigation-observations/51.500000.npz",
+      "sha256": "441747b5c32fa2d60784f971f1f5f8afad50c54a0a170b6b84b4d65de81b39fe",
+      "source_stamp": 51.5,
+      "endpoints": 9315
+    },
+    {
+      "file": "navigation-observations/56.500000.npz",
+      "sha256": "e1afad1ab108280229a3d5ba19970c6c7ab61d51f8d6e5e79b9c97fc69e01bf7",
+      "source_stamp": 56.5,
+      "endpoints": 9344
+    },
+    {
+      "file": "navigation-observations/61.600000.npz",
+      "sha256": "b81af9511871f497c7321441c16b20339757fd7e62c5f81f3cc9d10bf227b033",
+      "source_stamp": 61.6,
+      "endpoints": 9329
+    },
+    {
+      "file": "navigation-observations/66.500000.npz",
+      "sha256": "b9a9b1d75bec3c1c81be22596f9e25fcd73f7371906ab15ceb87be97422dceff",
+      "source_stamp": 66.5,
+      "endpoints": 9338
+    },
+    {
+      "file": "navigation-observations/71.500000.npz",
+      "sha256": "e1ebcaa46514e402422b49963a103e4c0d77b39d20dc84dcd5935663eaed0462",
+      "source_stamp": 71.5,
+      "endpoints": 9338
+    },
+    {
+      "file": "navigation-observations/76.500000.npz",
+      "sha256": "0f0daa1f52926ab29bb244f300f88e52e0f40548c4279f6292c4ad61114e7168",
+      "source_stamp": 76.5,
+      "endpoints": 9346
+    },
+    {
+      "file": "navigation-observations/81.700000.npz",
+      "sha256": "1f9bd42d2334ff45b4f694d1a209b91874b786b921fd8c3f99508d122acee078",
+      "source_stamp": 81.7,
+      "endpoints": 9327
+    },
+    {
+      "file": "navigation-observations/86.700000.npz",
+      "sha256": "70cd6658e6f4febd1e7463da955e794f5b58d36b915add0bb6beeb93501e5484",
+      "source_stamp": 86.7,
+      "endpoints": 9326
+    },
+    {
+      "file": "navigation-observations/91.700000.npz",
+      "sha256": "70da586be6ac42bf436c5c23bc757a8f504fd92f6f49bbcac9655306c6873790",
+      "source_stamp": 91.7,
+      "endpoints": 9328
+    },
+    {
+      "file": "navigation-observations/96.700000.npz",
+      "sha256": "4cc11a27dda8904d56f37422681b6ec1dfd23338e6628e2a336b1bb2463969fd",
+      "source_stamp": 96.7,
+      "endpoints": 9335
+    }
+  ],
+  "benchmark": {
+    "source": "actual rendered lidar, source-time LIO registration; no ground truth",
+    "input_sha256": "f28e113028a2040947205c0bf094d31562cc06578b060db3d7f7f08672ffdab5",
+    "configuration": {
+      "resolution_m": 0.2,
+      "lower": [
+        -6,
+        -6,
+        -1
+      ],
+      "upper": [
+        6,
+        6,
+        5
+      ],
+      "body_halfsize_m": [
+        0.4,
+        0.4,
+        0.3
+      ],
+      "clearance_m": 0.25
+    },
+    "occupied_cells": 4755,
+    "observed_free_cells": 86366,
+    "map_version": 60,
+    "runtime_s": 1.1493716320001113,
+    "plan": {
+      "success": true,
+      "reason": "PLANNED",
+      "points": [
+        [
+          0.0,
+          0.0,
+          2.0
+        ],
+        [
+          0.3000000000000007,
+          2.0999999999999996,
+          2.1
+        ],
+        [
+          2.5,
+          3.6,
+          2.0
+        ]
+      ],
+      "expanded": 305
+    },
+    "rejected_goal": {
+      "success": false,
+      "reason": "GOAL_BLOCKED_OR_UNOBSERVED",
+      "points": [],
+      "expanded": 0
+    },
+    "length_m": 4.788258577054375,
+    "all_segments_clear": true,
+    "passed": true
+  }
+}

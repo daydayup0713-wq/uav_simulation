@@ -1,8 +1,19 @@
 # UAV Simulation Lab
 
-面向 PX4 学习、算法验证和巡检仿真的独立实验室。V0.3 增加 CPU LIO、固定数据集评估、位姿图回环、地图保存和重定位，以及 PX4 无 GNSS 外部定位飞行。通用传感器实验室与无 GPU 飞行回归配置继续保留。后续按[版本路线](docs/ROADMAP.md)接入 Mid-360、三维导航、任务、Web、AI 和数字孪生。
+面向 PX4 学习、算法验证和巡检仿真的独立实验室。V0.4 增加观测空间内的三维地图、路径规划与自动绕障，保留CPU LIO、位姿图、重定位和无GNSS飞行。通用传感器实验室与无 GPU 飞行回归配置继续保留。后续按[版本路线](docs/ROADMAP.md)接入 Mid-360、任务、Web、AI 和数字孪生。
 
 系统关系和后续接口边界见[架构说明](docs/ARCHITECTURE.md)。
+
+## 三维导航实验
+
+```bash
+./scripts/start_lab.sh --profile navigation --rviz
+# 另一终端，等待 LAB READY：
+./scripts/labctl nav status
+./scripts/labctl nav demo --runs 3
+```
+
+导航专用通用雷达64×180、约179°垂直视场；目标需处于已观测空间。三维路径绕过实验室挡板，参考速度0.5m/s、加速度0.5m/s²。人工HOLD/LAND和数据失效会阻止续飞。操作、限制及故障定位见[导航实验](docs/experiments/04-navigation.md)，数值见[V0.4验收](docs/validation/V0.4-local.md)。
 
 ## 定位与地图实验
 
@@ -142,7 +153,7 @@ Humble + Harmonic 使用 `ros-humble-ros-gzharmonic`，见[官方组合说明](h
 | `px4/log/**/*.ulg` | PX4 飞行日志 |
 | `*.log`、`ros/` | 各组件输出及 ROS 日志 |
 
-构建副本、运行日志和数据均不进入 Git。V0.3 的126项回归、LIO/SLAM、无GNSS飞行及故障证据见[本版验收报告](docs/validation/V0.3-local.md)；V0.2 的传感器和录制回放证据见[历史报告](docs/validation/V0.2-local.md)；历次交付记录见[实施记录](docs/IMPLEMENTATION_STATUS.md)。
+构建副本、运行日志和数据均不进入 Git。V0.4三维导航与回归证据见[本版验收报告](docs/validation/V0.4-local.md)；V0.3 LIO/SLAM及无GNSS证据见[历史定位报告](docs/validation/V0.3-local.md)；V0.2 的传感器和录制回放证据见[历史报告](docs/validation/V0.2-local.md)；历次交付记录见[实施记录](docs/IMPLEMENTATION_STATUS.md)。
 
 ## 当前范围
 

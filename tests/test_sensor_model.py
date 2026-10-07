@@ -45,3 +45,14 @@ def test_profile_selection_keeps_cpu_world():
     assert m.select_profile(ROOT, 'flight') == ROOT/'simulation/worlds/lab.sdf'
     with pytest.raises(ValueError, match='profile'):
         m.select_profile(ROOT, '../../etc/passwd')
+
+def test_navigation_profile_has_archived_wide_lidar_and_physical_divider(tmp_path):
+    m=module()
+    assert 'profile' in __import__('inspect').signature(m.prepare_sensors).parameters, 'navigation sensor profile missing'
+    result=m.prepare_sensors(ROOT,tmp_path,profile='navigation')
+    lidar=ET.parse(result['model']).getroot().find(".//sensor[@name='lab_lidar']")
+    assert int(lidar.findtext('lidar/scan/vertical/samples'))==64
+    assert float(lidar.findtext('lidar/scan/vertical/max_angle'))==pytest.approx(math.pi/2-.01)
+    world=ET.parse(result['world']).getroot().find('world')
+    assert world.find("model[@name='navigation_divider']/link/collision/geometry/box/size") is not None
+    assert result['calibration']['lidar']['vertical_samples']==64

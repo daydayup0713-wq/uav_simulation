@@ -1,0 +1,159 @@
+{
+  "passed": true,
+  "failure": "navigation_exit",
+  "elapsed_s": 8.097134816000107,
+  "final": {
+    "armed": false,
+    "offboard": true,
+    "landed": true
+  },
+  "failsafe_landing_observed": true,
+  "events": [
+    {
+      "time": 9676.397520194,
+      "nav_state": 14,
+      "armed": true,
+      "offboard": true,
+      "landed": null
+    },
+    {
+      "time": 9676.939072973,
+      "nav_state": 14,
+      "armed": true,
+      "offboard": true,
+      "landed": false
+    },
+    {
+      "time": 9677.443198426,
+      "nav_state": 14,
+      "armed": true,
+      "offboard": true,
+      "landed": false
+    },
+    {
+      "time": 9677.946751801,
+      "nav_state": 14,
+      "armed": true,
+      "offboard": true,
+      "landed": false
+    },
+    {
+      "time": 9677.994819793,
+      "nav_state": 14,
+      "armed": true,
+      "offboard": true,
+      "landed": false
+    },
+    {
+      "time": 9678.15144697,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 9678.351445472,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 9678.774653477,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 9679.286191558,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 9679.809967945,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 9680.3366332,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 9680.840707182,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 9681.345063936,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 9681.848517582,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 9682.352955102,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": false
+    },
+    {
+      "time": 9682.86293223,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": true
+    },
+    {
+      "time": 9683.399397854,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": true
+    },
+    {
+      "time": 9683.915414939,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": true
+    },
+    {
+      "time": 9684.419915723,
+      "nav_state": 18,
+      "armed": true,
+      "offboard": false,
+      "landed": true
+    },
+    {
+      "time": 9684.563384417,
+      "nav_state": 14,
+      "armed": false,
+      "offboard": true,
+      "landed": true
+    }
+  ],
+  "recovery": {
+    "navigation_restarted_and_ready": true,
+    "arm_returncode": 1,
+    "arm_response": "{\"success\": false, \"reason\": \"fresh observed navigation map required\"}\n[ros2run]: Process exited with failure 1\n",
+    "passed": true
+  }
+}

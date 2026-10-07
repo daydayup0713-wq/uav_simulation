@@ -1,0 +1,59 @@
+{
+  "success": true,
+  "runs": [
+    {
+      "run": 1,
+      "blocked": {
+        "success": false,
+        "reason": "GOAL_BLOCKED_OR_UNOBSERVED",
+        "map_version": 236,
+        "points": []
+      },
+      "forward": {
+        "success": true,
+        "reason": "navigation target reached"
+      },
+      "return": {
+        "success": true,
+        "reason": "navigation target reached"
+      },
+      "landed_disarmed": true
+    },
+    {
+      "run": 2,
+      "blocked": {
+        "success": false,
+        "reason": "GOAL_BLOCKED_OR_UNOBSERVED",
+        "map_version": 630,
+        "points": []
+      },
+      "forward": {
+        "success": true,
+        "reason": "navigation target reached"
+      },
+      "return": {
+        "success": true,
+        "reason": "navigation target reached"
+      },
+      "landed_disarmed": true
+    },
+    {
+      "run": 3,
+      "blocked": {
+        "success": false,
+        "reason": "GOAL_BLOCKED_OR_UNOBSERVED",
+        "map_version": 1022,
+        "points": []
+      },
+      "forward": {
+        "success": true,
+        "reason": "navigation target reached"
+      },
+      "return": {
+        "success": true,
+        "reason": "navigation target reached"
+      },
+      "landed_disarmed": true
+    }
+  ]
+}

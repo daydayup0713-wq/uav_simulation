@@ -26,13 +26,18 @@ from .controller import FlightController
 from .coordinate import ned_to_enu, enu_to_ned, px4_to_ros_quaternion, yaw_to_ned
 from .clock import Px4Clock
 from .external_odometry import convert_external, ExternalOdometryGate
+from .navigation_gate import NavigationGate
 
 class Bridge(Node):
     def __init__(self):
         super().__init__('flight_bridge', namespace='uav001')
         self.declare_parameter('use_sim_time', True) if not self.has_parameter('use_sim_time') else self.set_parameters([rclpy.parameter.Parameter('use_sim_time', value=True)])
         self.lock = threading.RLock()
-        self.policy = FlightController()
+        self.declare_parameter('navigation_required', False)
+        self.navigation_enabled = bool(self.get_parameter('navigation_required').value)
+        self.navigation = NavigationGate()
+        self.operator_generation = 0
+        self.policy = FlightController(speed=.5, tolerance=.15, acceleration=.5) if self.navigation_enabled else FlightController()
         self.declare_parameter('external_odometry', False)
         self.external_enabled = bool(self.get_parameter('external_odometry').value)
         self.external = ExternalOdometryGate()
@@ -55,6 +60,8 @@ class Bridge(Node):
             self.trace = (Path(run_dir) / 'events.jsonl').open('a', buffering=1)
         group = ReentrantCallbackGroup()
         self.group = group
+        if self.navigation_enabled:
+            self.create_subscription(DiagnosticArray, 'navigation/diagnostics', self.navigation_callback, 10, callback_group=group)
         # The executor must not start a newer sample while an earlier telemetry
         # callback waits for CPU/the policy lock. Actions and control remain concurrent.
         self.telemetry_group = MutuallyExclusiveCallbackGroup()
@@ -106,6 +113,18 @@ class Bridge(Node):
                 'position': [p.x,p.y,p.z], 'quaternion': [q.x,q.y,q.z,q.w],
                 'body_velocity': [v.x,v.y,v.z], 'body_angular_velocity': [w.x,w.y,w.z],
                 'pose_covariance': list(msg.pose.covariance), 'twist_covariance': list(msg.twist.covariance)}, time.monotonic())
+
+    def navigation_callback(self, msg):
+        with self.lock:
+            for status in msg.status:
+                if status.name == 'uav001/navigation':
+                    values = {v.key: v.value for v in status.values}
+                    try:source = float(values['source_stamp'])
+                    except (ValueError, KeyError):source = math.nan
+                    self.navigation.observe(status.level == DiagnosticStatus.OK and values.get('ready') == 'True', source, values.get('frame'), time.monotonic())
+
+    def navigation_ready(self, now):
+        return not self.navigation_enabled or self.navigation.ready(now, self.get_clock().now().nanoseconds/1e9)
 
     def quality_callback(self, msg):
         with self.lock:
@@ -196,6 +215,8 @@ class Bridge(Node):
             if dt < 0:
                 self.policy.fail('simulation clock regression')
             self.previous_sim = sim
+            if self.navigation_enabled and self.policy.streaming and self.policy.state != 'LANDING' and not self.navigation_ready(wall):
+                self.policy.fail(self.navigation.failed or 'required navigation map unavailable')
             if self.external_enabled:
                 if self.external_ready(wall):
                     self.fusion_was_ready = True
@@ -298,7 +319,8 @@ class Bridge(Node):
             'landed': self.policy.t.landed, 'position': self.policy.t.position,
             'preflight': self.policy.t.preflight,
             'external_ready': self.external_ready(wall), 'fusion': self.fusion_flags, 'nav_state': self.nav_state,
-            'fresh': self.policy.fresh(wall)}.items()]
+            'fresh': self.policy.fresh(wall), 'navigation_ready': self.navigation_ready(wall),
+            'operator_generation': self.operator_generation}.items()]
         diag.status = [status]
         self.diag_pub.publish(diag)
 
@@ -308,7 +330,10 @@ class Bridge(Node):
                 with self.lock:
                     if operation == 'arm' and not self.external_ready(time.monotonic()):
                         raise ValueError('validated external localization and no GNSS fusion required')
+                    if operation == 'arm' and not self.navigation_ready(time.monotonic()):
+                        raise ValueError('fresh observed navigation map required')
                     token = getattr(self.policy, operation)(time.monotonic())
+                    if operation == 'hold':self.operator_generation += 1
                 if operation == 'hold':
                     response.success, response.message = True, 'hold commanded'
                     return response
@@ -331,6 +356,10 @@ class Bridge(Node):
             try:
                 self.policy.require_ready(time.monotonic())
                 if not self.external_ready(time.monotonic()):
+                    return GoalResponse.REJECT
+                if goal.operation != 2 and not self.navigation_ready(time.monotonic()):
+                    return GoalResponse.REJECT
+                if self.navigation_enabled and goal.operation == 1 and (not goal.navigation or goal.navigation_epoch != self.operator_generation):
                     return GoalResponse.REJECT
                 if not self.policy.t.armed or goal.operation not in (0, 1, 2):
                     return GoalResponse.REJECT
@@ -362,9 +391,14 @@ class Bridge(Node):
         try:
             p, q = request.target.pose.position, request.target.pose.orientation
             with self.lock:
+                if self.navigation_enabled and request.operation == 1 and (not request.navigation or request.navigation_epoch != self.operator_generation):
+                    raise ValueError('navigation interrupted by operator; stale leg rejected')
+                if request.operation != 2 and not self.navigation_ready(time.monotonic()):
+                    raise ValueError('required navigation map unavailable')
                 token = self.policy.fly(('TAKEOFF', 'GOTO', 'LAND')[request.operation], time.monotonic(),
                                         target=(p.x, p.y, p.z), yaw=2*math.atan2(q.z, q.w) if request.operation == 1 else None,
                                         height=request.height_m)
+                if request.operation == 2:self.operator_generation += 1
             while rclpy.ok():
                 with self.lock:
                     if handle.is_cancel_requested:
@@ -388,6 +422,10 @@ class Bridge(Node):
             result.success, result.reason = False, str(exc)
         handle.abort()
         return result
+
+    def destroy_node(self):
+        self.server.destroy()
+        return super().destroy_node()
 
 def main(args=None):
     rclpy.init(args=args)

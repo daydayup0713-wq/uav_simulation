@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>uav_lab_localization</name><version>0.3.1</version>
+  <name>uav_lab_localization</name><version>0.4.0</version>
   <description>CPU LIO, independent evaluation and SLAM laboratory</description>
   <maintainer email="maintainers@example.invalid">UAV Lab</maintainer><license>Apache-2.0</license>
   <buildtool_depend>ament_python</buildtool_depend>

@@ -1,0 +1,6 @@
+geometry_msgs/PoseStamped goal
+---
+bool success
+string reason
+nav_msgs/Path path
+uint64 map_version

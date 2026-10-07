@@ -19,10 +19,12 @@ class Telemetry:
     land_at: float = -math.inf
 
 class FlightController:
-    def __init__(self, speed=1., tolerance=.3, settle=2., warmup=2.):
+    def __init__(self, speed=1., tolerance=.3, settle=2., warmup=2., acceleration=None):
         self.t = Telemetry()
         self.speed, self.tolerance, self.settle, self.warmup = speed, tolerance, settle, warmup
         self.state = 'WAITING'
+        self.acceleration = acceleration
+        self.profile, self.profile_time = None, 0.
         self.reason = 'waiting for telemetry'
         self.setpoint = None
         self.target = None
@@ -163,6 +165,10 @@ class FlightController:
         self.takeoff_origin = None
         self.target = tuple(target)
         self.setpoint = self.t.position
+        if self.acceleration is not None:
+            from .trajectory import MotionProfile
+            self.profile = MotionProfile(self.setpoint, self.target, self.speed, self.acceleration)
+            self.profile_time = 0.
         self.yaw = self.t.yaw if yaw is None else yaw
         self.streaming = True
         self.state = 'MOVING'
@@ -221,7 +227,11 @@ class FlightController:
             self.fail('vehicle left armed Offboard state')
             return
         if self.state == 'MOVING':
-            self.setpoint = step_toward(self.setpoint, self.target, self.speed*min(max(sim_dt, 0), .1))
+            if self.acceleration is None:
+                self.setpoint = step_toward(self.setpoint, self.target, self.speed*min(max(sim_dt, 0), .1))
+            else:
+                self.profile_time += min(max(sim_dt, 0), .1)
+                self.setpoint = tuple(self.profile.sample(self.profile_time)[0])
             yaw_error = abs(math.atan2(math.sin(self.t.yaw-self.yaw), math.cos(self.t.yaw-self.yaw)))
             if math.dist(self.t.position, self.target) <= self.tolerance and yaw_error <= .15:
                 if self.within is None:

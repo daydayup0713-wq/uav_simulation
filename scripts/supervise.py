@@ -128,7 +128,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--headless', action='store_true')
     p.add_argument('--rviz', action='store_true')
-    p.add_argument('--profile', choices=('flight', 'sensors', 'localization', 'slam'), default='flight')
+    p.add_argument('--profile', choices=('flight', 'sensors', 'localization', 'slam', 'navigation'), default='flight')
     options = p.parse_args()
     runtime = ROOT / '.runtime'
     runtime.mkdir(exist_ok=True)
@@ -151,15 +151,15 @@ def main():
                                'COM_DL_LOSS_T': 300, 'NAV_DLL_ACT': 0, 'UXRCE_DDS_SYNCT': 0,
                                'UXRCE_DDS_PTCFG': 1,
                                'UXRCE_DDS_DOM_ID': int(env.get('ROS_DOMAIN_ID','42'))}}
-    if options.profile == 'slam':
+    if options.profile in ('slam', 'navigation'):
         metadata['parameters'].update(EKF2_GPS_CTRL=0, SIM_GPS_USED=0, SENS_EN_GPSSIM=0,
             EKF2_EV_CTRL=11, EKF2_HGT_REF=3, EKF2_BARO_CTRL=0, EKF2_MAG_TYPE=5, EKF2_EV_DELAY=0)
     snapshots = run_dir/'configuration'
     snapshots.mkdir()
-    localization = options.profile in ('localization', 'slam')
+    localization = options.profile in ('localization', 'slam', 'navigation')
     if localization and not (ROOT/'.deps/slam/install/build-manifest.json').is_file():
         raise RuntimeError('private CPU localization backend missing; run bootstrap_slam.py')
-    sensor = prepare_sensors(ROOT, run_dir) if options.profile != 'flight' else None
+    sensor = prepare_sensors(ROOT, run_dir, 'navigation' if options.profile == 'navigation' else 'sensors') if options.profile != 'flight' else None
     world_path = sensor['world'] if sensor else select_profile(ROOT, options.profile)
     if sensor:
         env['GZ_SIM_RESOURCE_PATH'] = str(sensor['resource_path'])+':'+env['GZ_SIM_RESOURCE_PATH']
@@ -168,6 +168,8 @@ def main():
     files = ['simulation/worlds/lab.sdf', 'configs/px4-start.sh', 'configs/lab.rviz', 'dependencies/lock.json']
     if sensor:
         files += ['simulation/worlds/room.sdf', 'configs/sensors.json', 'configs/sensors.rviz', 'configs/recording-qos.yaml']
+    if options.profile == 'navigation':
+            files += ['simulation/worlds/navigation.sdf', 'configs/navigation-sensors.json', 'configs/navigation.json']
     for relative in files:
         contents = (ROOT/relative).read_bytes()
         # Generated world has the payload include; do not replace it with its template.
@@ -207,15 +209,17 @@ def main():
         build = ROOT/'.deps/px4/build/px4_sitl_default'
         manager.start('px4', [build/'bin/px4', '-d', build/'etc', '-w', run_dir/'px4', '-s', ROOT/'configs/px4-start.sh'], env=px4_env)
         bridge_command = ['ros2', 'run', 'uav_lab_bridge', 'bridge']
-        if options.profile == 'slam':
+        if options.profile in ('slam', 'navigation'):
             bridge_command += ['--ros-args','-p','external_odometry:=true']
+        if options.profile == 'navigation':
+            bridge_command += ['-p','navigation_required:=true']
         manager.start('bridge', bridge_command, env=env)
         if sensor:
             manager.start('sensor-bridge', ['ros2','run','ros_gz_bridge','parameter_bridge',
                                            '--ros-args','-p','config_file:='+str(sensor['bridge'])], env=env)
             manager.start('sensors', ['ros2','run','uav_lab_tools','sensors','--ros-args',
                                      '-p','calibration_file:='+str(sensor['calibration_path'])], env=env)
-        flight_readiness = FlightReadiness(require_preflight=options.profile != 'slam')
+        flight_readiness = FlightReadiness(require_preflight=options.profile not in ('slam', 'navigation'))
         def vehicle_ready():
             return flight_readiness.update(read_vehicle_status(env), time.monotonic())
         if not localization:
@@ -239,13 +243,21 @@ def main():
                 return result.returncode == 0
             wait_for(manager, lio_ready, 'validated continuous LIO', 45)
             wait_for(manager, vehicle_ready, 'PX4 ready after localization initialization', 60)
+        if options.profile == 'navigation':
+            manager.start('navigation', ['ros2','run','uav_lab_navigation','navigation'], env=env)
+            def navigation_ready():
+                result = subprocess.run(['ros2','run','uav_lab_navigation','navctl','--timeout','2','status'],
+                                        env=env, capture_output=True, text=True, timeout=5)
+                (run_dir/'navigation-readiness.json').write_text(result.stdout)
+                return result.returncode == 0
+            wait_for(manager, navigation_ready, 'fresh sensor-time navigation map', 45)
         if options.rviz:
-            manager.start('rviz', ['rviz2','-d', ROOT/'configs'/('slam.rviz' if localization else 'sensors.rviz' if sensor else 'lab.rviz')], env=env)
+            manager.start('rviz', ['rviz2','-d', ROOT/'configs'/('navigation.rviz' if options.profile == 'navigation' else 'slam.rviz' if localization else 'sensors.rviz' if sensor else 'lab.rviz')], env=env)
         (run_dir/'ready').write_text('ready\n')
         print('LAB READY '+str(run_dir), flush=True)
         failure_started = None
         while True:
-            control_components = ('bridge','agent','clock','lio','localization')
+            control_components = ('bridge','agent','clock','lio','localization','navigation')
             broken = [name for name, process in manager.processes if name in control_components and process.poll() is not None]
             if broken and failure_started is None:
                 failure_started = time.monotonic()

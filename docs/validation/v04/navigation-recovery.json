@@ -1,0 +1,6 @@
+{
+  "navigation_restarted_and_ready": true,
+  "arm_returncode": 1,
+  "arm_response": "{\"success\": false, \"reason\": \"fresh observed navigation map required\"}\n[ros2run]: Process exited with failure 1\n",
+  "passed": true
+}

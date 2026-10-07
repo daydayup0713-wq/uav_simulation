@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "resolution_m": 0.2,
+  "lower": [
+    -6,
+    -6,
+    -1
+  ],
+  "upper": [
+    6,
+    6,
+    5
+  ],
+  "body_halfsize_m": [
+    0.4,
+    0.4,
+    0.3
+  ],
+  "clearance_m": 0.25,
+  "map_period_s": 0.3,
+  "source_timeout_s": 1.0,
+  "max_expansions": 50000,
+  "planning_timeout_s": 2.0,
+  "max_replans": 3,
+  "speed_m_s": 0.5,
+  "acceleration_m_s2": 0.5,
+  "goal_tolerance_m": 0.15
+}
