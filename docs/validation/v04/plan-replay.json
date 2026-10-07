@@ -1,0 +1,972 @@
+{
+  "source_run": "20261007T083407Z-bd828940",
+  "source_commit": "ff2eddbac62afcdaab1e0fc5e2a43ac91df8f10a",
+  "navigation_plans": 15,
+  "blocked_queries": 3,
+  "records": [
+    {
+      "event": "plan",
+      "wall_monotonic": 9493.466827816,
+      "success": false,
+      "reason": "GOAL_BLOCKED_OR_UNOBSERVED",
+      "points": [],
+      "expanded": 0,
+      "map_version": 236,
+      "map_artifact": "navigation-plans/509b1bb1f9ef4c06b9095c5624655c6f/map-v236.npz",
+      "map_sha256": "0e9b8b4faac4fd612220c085c546af571fa57f9f28a8e42934b03d3326ec1d3e",
+      "source_stamp": 55.8,
+      "configuration": {
+        "acceleration_m_s2": 0.5,
+        "body_halfsize_m": [
+          0.4,
+          0.4,
+          0.3
+        ],
+        "clearance_m": 0.25,
+        "goal_tolerance_m": 0.15,
+        "lower": [
+          -6,
+          -6,
+          -1
+        ],
+        "map_period_s": 0.3,
+        "max_expansions": 50000,
+        "max_replans": 3,
+        "planning_timeout_s": 2.0,
+        "resolution_m": 0.2,
+        "schema_version": 1,
+        "source_timeout_s": 1.0,
+        "speed_m_s": 0.5,
+        "upper": [
+          6,
+          6,
+          5
+        ]
+      },
+      "all_segments_clear": true
+    },
+    {
+      "event": "navigation_plan",
+      "wall_monotonic": 9493.823797079,
+      "map_version": 240,
+      "reason": "PLANNED",
+      "points": [
+        [
+          -0.0008553475490771234,
+          0.0015768762677907944,
+          2.176010847091675
+        ],
+        [
+          0.3000000000000007,
+          1.9000000000000004,
+          2.1
+        ],
+        [
+          2.5,
+          3.6,
+          2.0
+        ]
+      ],
+      "replans": 0,
+      "map_artifact": "navigation-plans/509b1bb1f9ef4c06b9095c5624655c6f/map-v240.npz",
+      "map_sha256": "3fc1b0ed6c373f7aca3ad732981c01c4c7a43edc644ed2d8c031c85289859efe",
+      "source_stamp": 56.5,
+      "configuration": {
+        "acceleration_m_s2": 0.5,
+        "body_halfsize_m": [
+          0.4,
+          0.4,
+          0.3
+        ],
+        "clearance_m": 0.25,
+        "goal_tolerance_m": 0.15,
+        "lower": [
+          -6,
+          -6,
+          -1
+        ],
+        "map_period_s": 0.3,
+        "max_expansions": 50000,
+        "max_replans": 3,
+        "planning_timeout_s": 2.0,
+        "resolution_m": 0.2,
+        "schema_version": 1,
+        "source_timeout_s": 1.0,
+        "speed_m_s": 0.5,
+        "upper": [
+          6,
+          6,
+          5
+        ]
+      },
+      "all_segments_clear": true
+    },
+    {
+      "event": "navigation_plan",
+      "wall_monotonic": 9501.63368953,
+      "map_version": 292,
+      "reason": "PLANNED",
+      "points": [
+        [
+          0.3042604625225067,
+          1.923622727394104,
+          2.0996358394622803
+        ],
+        [
+          1.9000000000000004,
+          3.3000000000000007,
+          2.1
+        ],
+        [
+          2.5,
+          3.6,
+          2.0
+        ]
+      ],
+      "replans": 1,
+      "map_artifact": "navigation-plans/509b1bb1f9ef4c06b9095c5624655c6f/map-v292.npz",
+      "map_sha256": "086d5e7c948dd8ecb1361b15cc6002c70c89d2617170fb19db31f2a8881bebdf",
+      "source_stamp": 64.2,
+      "configuration": {
+        "acceleration_m_s2": 0.5,
+        "body_halfsize_m": [
+          0.4,
+          0.4,
+          0.3
+        ],
+        "clearance_m": 0.25,
+        "goal_tolerance_m": 0.15,
+        "lower": [
+          -6,
+          -6,
+          -1
+        ],
+        "map_period_s": 0.3,
+        "max_expansions": 50000,
+        "max_replans": 3,
+        "planning_timeout_s": 2.0,
+        "resolution_m": 0.2,
+        "schema_version": 1,
+        "source_timeout_s": 1.0,
+        "speed_m_s": 0.5,
+        "upper": [
+          6,
+          6,
+          5
+        ]
+      },
+      "all_segments_clear": true
+    },
+    {
+      "event": "navigation_plan",
+      "wall_monotonic": 9501.829520161,
+      "map_version": 294,
+      "reason": "PLANNED",
+      "points": [
+        [
+          0.30243703722953796,
+          1.9110677242279053,
+          2.099498987197876
+        ],
+        [
+          1.5,
+          3.0999999999999996,
+          2.1
+        ],
+        [
+          2.5,
+          3.6,
+          2.0
+        ]
+      ],
+      "replans": 2,
+      "map_artifact": "navigation-plans/509b1bb1f9ef4c06b9095c5624655c6f/map-v294.npz",
+      "map_sha256": "80aac87f3b3ce54ca9a954498c752bc618ed8da28d4047c5ea018189787769a0",
+      "source_stamp": 64.5,
+      "configuration": {
+        "acceleration_m_s2": 0.5,
+        "body_halfsize_m": [
+          0.4,
+          0.4,
+          0.3
+        ],
+        "clearance_m": 0.25,
+        "goal_tolerance_m": 0.15,
+        "lower": [
+          -6,
+          -6,
+          -1
+        ],
+        "map_period_s": 0.3,
+        "max_expansions": 50000,
+        "max_replans": 3,
+        "planning_timeout_s": 2.0,
+        "resolution_m": 0.2,
+        "schema_version": 1,
+        "source_timeout_s": 1.0,
+        "speed_m_s": 0.5,
+        "upper": [
+          6,
+          6,
+          5
+        ]
+      },
+      "all_segments_clear": true
+    },
+    {
+      "event": "navigation_plan",
+      "wall_monotonic": 9502.566636832,
+      "map_version": 298,
+      "reason": "PLANNED",
+      "points": [
+        [
+          0.3002460300922394,
+          1.8947409391403198,
+          2.09920597076416
+        ],
+        [
+          1.1000000000000005,
+          2.9000000000000004,
+          2.1
+        ],
+        [
+          2.5,
+          3.6,
+          2.0
+        ]
+      ],
+      "replans": 3,
+      "map_artifact": "navigation-plans/509b1bb1f9ef4c06b9095c5624655c6f/map-v298.npz",
+      "map_sha256": "8a7a14d03d7bfd17efaf1cec15f29133c87cc39a1d97e7071643888cf5b15f81",
+      "source_stamp": 65.0,
+      "configuration": {
+        "acceleration_m_s2": 0.5,
+        "body_halfsize_m": [
+          0.4,
+          0.4,
+          0.3
+        ],
+        "clearance_m": 0.25,
+        "goal_tolerance_m": 0.15,
+        "lower": [
+          -6,
+          -6,
+          -1
+        ],
+        "map_period_s": 0.3,
+        "max_expansions": 50000,
+        "max_replans": 3,
+        "planning_timeout_s": 2.0,
+        "resolution_m": 0.2,
+        "schema_version": 1,
+        "source_timeout_s": 1.0,
+        "speed_m_s": 0.5,
+        "upper": [
+          6,
+          6,
+          5
+        ]
+      },
+      "all_segments_clear": true
+    },
+    {
+      "event": "navigation_plan",
+      "wall_monotonic": 9515.99150403,
+      "map_version": 384,
+      "reason": "PLANNED",
+      "points": [
+        [
+          2.5423741340637207,
+          3.619791030883789,
+          2.001441717147827
+        ],
+        [
+          0.3000000000000007,
+          2.0999999999999996,
+          2.1
+        ],
+        [
+          0.0,
+          0.0,
+          2.0
+        ]
+      ],
+      "replans": 0,
+      "map_artifact": "navigation-plans/509b1bb1f9ef4c06b9095c5624655c6f/map-v384.npz",
+      "map_sha256": "be78d13d00292f71ac5f408718731b69d15ea1b42b59c15a0fe818d1bbe3b811",
+      "source_stamp": 77.7,
+      "configuration": {
+        "acceleration_m_s2": 0.5,
+        "body_halfsize_m": [
+          0.4,
+          0.4,
+          0.3
+        ],
+        "clearance_m": 0.25,
+        "goal_tolerance_m": 0.15,
+        "lower": [
+          -6,
+          -6,
+          -1
+        ],
+        "map_period_s": 0.3,
+        "max_expansions": 50000,
+        "max_replans": 3,
+        "planning_timeout_s": 2.0,
+        "resolution_m": 0.2,
+        "schema_version": 1,
+        "source_timeout_s": 1.0,
+        "speed_m_s": 0.5,
+        "upper": [
+          6,
+          6,
+          5
+        ]
+      },
+      "all_segments_clear": true
+    },
+    {
+      "event": "plan",
+      "wall_monotonic": 9552.14997865,
+      "success": false,
+      "reason": "GOAL_BLOCKED_OR_UNOBSERVED",
+      "points": [],
+      "expanded": 0,
+      "map_version": 630,
+      "map_artifact": "navigation-plans/509b1bb1f9ef4c06b9095c5624655c6f/map-v630.npz",
+      "map_sha256": "744c3e3c927d8c282d19f9131ed8b710cd554347035a66543d8e6bca4739a7ee",
+      "source_stamp": 114.2,
+      "configuration": {
+        "acceleration_m_s2": 0.5,
+        "body_halfsize_m": [
+          0.4,
+          0.4,
+          0.3
+        ],
+        "clearance_m": 0.25,
+        "goal_tolerance_m": 0.15,
+        "lower": [
+          -6,
+          -6,
+          -1
+        ],
+        "map_period_s": 0.3,
+        "max_expansions": 50000,
+        "max_replans": 3,
+        "planning_timeout_s": 2.0,
+        "resolution_m": 0.2,
+        "schema_version": 1,
+        "source_timeout_s": 1.0,
+        "speed_m_s": 0.5,
+        "upper": [
+          6,
+          6,
+          5
+        ]
+      },
+      "all_segments_clear": true
+    },
+    {
+      "event": "navigation_plan",
+      "wall_monotonic": 9552.498752444,
+      "map_version": 630,
+      "reason": "PLANNED",
+      "points": [
+        [
+          0.001224211067892611,
+          0.0008858873625285923,
+          2.168677568435669
+        ],
+        [
+          0.3000000000000007,
+          1.9000000000000004,
+          2.1
+        ],
+        [
+          2.5,
+          3.6,
+          2.0
+        ]
+      ],
+      "replans": 0,
+      "map_artifact": "navigation-plans/509b1bb1f9ef4c06b9095c5624655c6f/map-v630.npz",
+      "map_sha256": "744c3e3c927d8c282d19f9131ed8b710cd554347035a66543d8e6bca4739a7ee",
+      "source_stamp": 114.2,
+      "configuration": {
+        "acceleration_m_s2": 0.5,
+        "body_halfsize_m": [
+          0.4,
+          0.4,
+          0.3
+        ],
+        "clearance_m": 0.25,
+        "goal_tolerance_m": 0.15,
+        "lower": [
+          -6,
+          -6,
+          -1
+        ],
+        "map_period_s": 0.3,
+        "max_expansions": 50000,
+        "max_replans": 3,
+        "planning_timeout_s": 2.0,
+        "resolution_m": 0.2,
+        "schema_version": 1,
+        "source_timeout_s": 1.0,
+        "speed_m_s": 0.5,
+        "upper": [
+          6,
+          6,
+          5
+        ]
+      },
+      "all_segments_clear": true
+    },
+    {
+      "event": "navigation_plan",
+      "wall_monotonic": 9560.387239823,
+      "map_version": 684,
+      "reason": "PLANNED",
+      "points": [
+        [
+          0.3026697635650635,
+          1.9251682758331299,
+          2.100046396255493
+        ],
+        [
+          1.9000000000000004,
+          3.3000000000000007,
+          2.1
+        ],
+        [
+          2.5,
+          3.6,
+          2.0
+        ]
+      ],
+      "replans": 1,
+      "map_artifact": "navigation-plans/509b1bb1f9ef4c06b9095c5624655c6f/map-v684.npz",
+      "map_sha256": "465a3902dece879f72933689fc850bf773aa2d6ec83b17270586c13586307658",
+      "source_stamp": 122.2,
+      "configuration": {
+        "acceleration_m_s2": 0.5,
+        "body_halfsize_m": [
+          0.4,
+          0.4,
+          0.3
+        ],
+        "clearance_m": 0.25,
+        "goal_tolerance_m": 0.15,
+        "lower": [
+          -6,
+          -6,
+          -1
+        ],
+        "map_period_s": 0.3,
+        "max_expansions": 50000,
+        "max_replans": 3,
+        "planning_timeout_s": 2.0,
+        "resolution_m": 0.2,
+        "schema_version": 1,
+        "source_timeout_s": 1.0,
+        "speed_m_s": 0.5,
+        "upper": [
+          6,
+          6,
+          5
+        ]
+      },
+      "all_segments_clear": true
+    },
+    {
+      "event": "navigation_plan",
+      "wall_monotonic": 9560.652363337,
+      "map_version": 686,
+      "reason": "PLANNED",
+      "points": [
+        [
+          0.30097582936286926,
+          1.9133529663085938,
+          2.100052833557129
+        ],
+        [
+          1.5,
+          3.0999999999999996,
+          2.1
+        ],
+        [
+          2.5,
+          3.6,
+          2.0
+        ]
+      ],
+      "replans": 2,
+      "map_artifact": "navigation-plans/509b1bb1f9ef4c06b9095c5624655c6f/map-v686.npz",
+      "map_sha256": "b37d0b3b4b9d21c6dc75956293857f4be9e83a35eaa7191e0ce92a8a2414a593",
+      "source_stamp": 122.4,
+      "configuration": {
+        "acceleration_m_s2": 0.5,
+        "body_halfsize_m": [
+          0.4,
+          0.4,
+          0.3
+        ],
+        "clearance_m": 0.25,
+        "goal_tolerance_m": 0.15,
+        "lower": [
+          -6,
+          -6,
+          -1
+        ],
+        "map_period_s": 0.3,
+        "max_expansions": 50000,
+        "max_replans": 3,
+        "planning_timeout_s": 2.0,
+        "resolution_m": 0.2,
+        "schema_version": 1,
+        "source_timeout_s": 1.0,
+        "speed_m_s": 0.5,
+        "upper": [
+          6,
+          6,
+          5
+        ]
+      },
+      "all_segments_clear": true
+    },
+    {
+      "event": "navigation_plan",
+      "wall_monotonic": 9561.320199181,
+      "map_version": 690,
+      "reason": "PLANNED",
+      "points": [
+        [
+          0.29987025260925293,
+          1.89386785030365,
+          2.100048780441284
+        ],
+        [
+          1.1000000000000005,
+          2.9000000000000004,
+          2.1
+        ],
+        [
+          2.5,
+          3.6,
+          2.0
+        ]
+      ],
+      "replans": 3,
+      "map_artifact": "navigation-plans/509b1bb1f9ef4c06b9095c5624655c6f/map-v690.npz",
+      "map_sha256": "8a5853ad34e0d66601ec6124693402a3629808fc3df59666b6d1305d7b8722ec",
+      "source_stamp": 123.0,
+      "configuration": {
+        "acceleration_m_s2": 0.5,
+        "body_halfsize_m": [
+          0.4,
+          0.4,
+          0.3
+        ],
+        "clearance_m": 0.25,
+        "goal_tolerance_m": 0.15,
+        "lower": [
+          -6,
+          -6,
+          -1
+        ],
+        "map_period_s": 0.3,
+        "max_expansions": 50000,
+        "max_replans": 3,
+        "planning_timeout_s": 2.0,
+        "resolution_m": 0.2,
+        "schema_version": 1,
+        "source_timeout_s": 1.0,
+        "speed_m_s": 0.5,
+        "upper": [
+          6,
+          6,
+          5
+        ]
+      },
+      "all_segments_clear": true
+    },
+    {
+      "event": "navigation_plan",
+      "wall_monotonic": 9574.821738003,
+      "map_version": 776,
+      "reason": "PLANNED",
+      "points": [
+        [
+          2.54675555229187,
+          3.619807720184326,
+          2.0017316341400146
+        ],
+        [
+          0.3000000000000007,
+          2.0999999999999996,
+          2.1
+        ],
+        [
+          0.0,
+          0.0,
+          2.0
+        ]
+      ],
+      "replans": 0,
+      "map_artifact": "navigation-plans/509b1bb1f9ef4c06b9095c5624655c6f/map-v776.npz",
+      "map_sha256": "3ecf3066f98491f5e1f82dc72964776cf6e32f13b696e6dec1f0da9e8194ea74",
+      "source_stamp": 135.8,
+      "configuration": {
+        "acceleration_m_s2": 0.5,
+        "body_halfsize_m": [
+          0.4,
+          0.4,
+          0.3
+        ],
+        "clearance_m": 0.25,
+        "goal_tolerance_m": 0.15,
+        "lower": [
+          -6,
+          -6,
+          -1
+        ],
+        "map_period_s": 0.3,
+        "max_expansions": 50000,
+        "max_replans": 3,
+        "planning_timeout_s": 2.0,
+        "resolution_m": 0.2,
+        "schema_version": 1,
+        "source_timeout_s": 1.0,
+        "speed_m_s": 0.5,
+        "upper": [
+          6,
+          6,
+          5
+        ]
+      },
+      "all_segments_clear": true
+    },
+    {
+      "event": "plan",
+      "wall_monotonic": 9610.900167442,
+      "success": false,
+      "reason": "GOAL_BLOCKED_OR_UNOBSERVED",
+      "points": [],
+      "expanded": 0,
+      "map_version": 1022,
+      "map_artifact": "navigation-plans/509b1bb1f9ef4c06b9095c5624655c6f/map-v1022.npz",
+      "map_sha256": "9c8e5afe1c9cb7e86bfffec3914fe1d31709738c7ddf636c4aae2c69f3005674",
+      "source_stamp": 172.0,
+      "configuration": {
+        "acceleration_m_s2": 0.5,
+        "body_halfsize_m": [
+          0.4,
+          0.4,
+          0.3
+        ],
+        "clearance_m": 0.25,
+        "goal_tolerance_m": 0.15,
+        "lower": [
+          -6,
+          -6,
+          -1
+        ],
+        "map_period_s": 0.3,
+        "max_expansions": 50000,
+        "max_replans": 3,
+        "planning_timeout_s": 2.0,
+        "resolution_m": 0.2,
+        "schema_version": 1,
+        "source_timeout_s": 1.0,
+        "speed_m_s": 0.5,
+        "upper": [
+          6,
+          6,
+          5
+        ]
+      },
+      "all_segments_clear": true
+    },
+    {
+      "event": "navigation_plan",
+      "wall_monotonic": 9611.213686287,
+      "map_version": 1022,
+      "reason": "PLANNED",
+      "points": [
+        [
+          0.0014308352256193757,
+          -0.0031772952061146498,
+          2.165607213973999
+        ],
+        [
+          0.3000000000000007,
+          1.9000000000000004,
+          2.1
+        ],
+        [
+          2.5,
+          3.6,
+          2.0
+        ]
+      ],
+      "replans": 0,
+      "map_artifact": "navigation-plans/509b1bb1f9ef4c06b9095c5624655c6f/map-v1022.npz",
+      "map_sha256": "9c8e5afe1c9cb7e86bfffec3914fe1d31709738c7ddf636c4aae2c69f3005674",
+      "source_stamp": 172.0,
+      "configuration": {
+        "acceleration_m_s2": 0.5,
+        "body_halfsize_m": [
+          0.4,
+          0.4,
+          0.3
+        ],
+        "clearance_m": 0.25,
+        "goal_tolerance_m": 0.15,
+        "lower": [
+          -6,
+          -6,
+          -1
+        ],
+        "map_period_s": 0.3,
+        "max_expansions": 50000,
+        "max_replans": 3,
+        "planning_timeout_s": 2.0,
+        "resolution_m": 0.2,
+        "schema_version": 1,
+        "source_timeout_s": 1.0,
+        "speed_m_s": 0.5,
+        "upper": [
+          6,
+          6,
+          5
+        ]
+      },
+      "all_segments_clear": true
+    },
+    {
+      "event": "navigation_plan",
+      "wall_monotonic": 9619.196309603,
+      "map_version": 1076,
+      "reason": "PLANNED",
+      "points": [
+        [
+          0.30421963334083557,
+          1.9203940629959106,
+          2.0999820232391357
+        ],
+        [
+          1.9000000000000004,
+          3.3000000000000007,
+          2.1
+        ],
+        [
+          2.5,
+          3.6,
+          2.0
+        ]
+      ],
+      "replans": 1,
+      "map_artifact": "navigation-plans/509b1bb1f9ef4c06b9095c5624655c6f/map-v1076.npz",
+      "map_sha256": "4e00702da5c3837ecdb74ee2a31b4846f37851b323bd38c9a6e0a6703f9df66d",
+      "source_stamp": 180.0,
+      "configuration": {
+        "acceleration_m_s2": 0.5,
+        "body_halfsize_m": [
+          0.4,
+          0.4,
+          0.3
+        ],
+        "clearance_m": 0.25,
+        "goal_tolerance_m": 0.15,
+        "lower": [
+          -6,
+          -6,
+          -1
+        ],
+        "map_period_s": 0.3,
+        "max_expansions": 50000,
+        "max_replans": 3,
+        "planning_timeout_s": 2.0,
+        "resolution_m": 0.2,
+        "schema_version": 1,
+        "source_timeout_s": 1.0,
+        "speed_m_s": 0.5,
+        "upper": [
+          6,
+          6,
+          5
+        ]
+      },
+      "all_segments_clear": true
+    },
+    {
+      "event": "navigation_plan",
+      "wall_monotonic": 9619.468765128,
+      "map_version": 1078,
+      "reason": "PLANNED",
+      "points": [
+        [
+          0.3028753101825714,
+          1.911722183227539,
+          2.1000618934631348
+        ],
+        [
+          1.5,
+          3.0999999999999996,
+          2.1
+        ],
+        [
+          2.5,
+          3.6,
+          2.0
+        ]
+      ],
+      "replans": 2,
+      "map_artifact": "navigation-plans/509b1bb1f9ef4c06b9095c5624655c6f/map-v1078.npz",
+      "map_sha256": "62f15c17800809cb43ad1da083e9b4f503fde72323ae3fe63d25350152192998",
+      "source_stamp": 180.4,
+      "configuration": {
+        "acceleration_m_s2": 0.5,
+        "body_halfsize_m": [
+          0.4,
+          0.4,
+          0.3
+        ],
+        "clearance_m": 0.25,
+        "goal_tolerance_m": 0.15,
+        "lower": [
+          -6,
+          -6,
+          -1
+        ],
+        "map_period_s": 0.3,
+        "max_expansions": 50000,
+        "max_replans": 3,
+        "planning_timeout_s": 2.0,
+        "resolution_m": 0.2,
+        "schema_version": 1,
+        "source_timeout_s": 1.0,
+        "speed_m_s": 0.5,
+        "upper": [
+          6,
+          6,
+          5
+        ]
+      },
+      "all_segments_clear": true
+    },
+    {
+      "event": "navigation_plan",
+      "wall_monotonic": 9620.03269225,
+      "map_version": 1082,
+      "reason": "PLANNED",
+      "points": [
+        [
+          0.30161550641059875,
+          1.8969721794128418,
+          2.1004233360290527
+        ],
+        [
+          1.1000000000000005,
+          2.9000000000000004,
+          2.1
+        ],
+        [
+          2.5,
+          3.6,
+          2.0
+        ]
+      ],
+      "replans": 3,
+      "map_artifact": "navigation-plans/509b1bb1f9ef4c06b9095c5624655c6f/map-v1082.npz",
+      "map_sha256": "6ecbb6baae7edbf6133a4aa1766631a598ffeaa95e67f1c53133a5bd36233cd8",
+      "source_stamp": 181.0,
+      "configuration": {
+        "acceleration_m_s2": 0.5,
+        "body_halfsize_m": [
+          0.4,
+          0.4,
+          0.3
+        ],
+        "clearance_m": 0.25,
+        "goal_tolerance_m": 0.15,
+        "lower": [
+          -6,
+          -6,
+          -1
+        ],
+        "map_period_s": 0.3,
+        "max_expansions": 50000,
+        "max_replans": 3,
+        "planning_timeout_s": 2.0,
+        "resolution_m": 0.2,
+        "schema_version": 1,
+        "source_timeout_s": 1.0,
+        "speed_m_s": 0.5,
+        "upper": [
+          6,
+          6,
+          5
+        ]
+      },
+      "all_segments_clear": true
+    },
+    {
+      "event": "navigation_plan",
+      "wall_monotonic": 9633.767729438,
+      "map_version": 1170,
+      "reason": "PLANNED",
+      "points": [
+        [
+          2.534754753112793,
+          3.6126317977905273,
+          2.001744270324707
+        ],
+        [
+          0.3000000000000007,
+          2.0999999999999996,
+          2.1
+        ],
+        [
+          0.0,
+          0.0,
+          2.0
+        ]
+      ],
+      "replans": 0,
+      "map_artifact": "navigation-plans/509b1bb1f9ef4c06b9095c5624655c6f/map-v1170.npz",
+      "map_sha256": "83960749026ecdcda1ba5a0bb0430802b1ae18950e2999715d9f18aba6328f73",
+      "source_stamp": 194.0,
+      "configuration": {
+        "acceleration_m_s2": 0.5,
+        "body_halfsize_m": [
+          0.4,
+          0.4,
+          0.3
+        ],
+        "clearance_m": 0.25,
+        "goal_tolerance_m": 0.15,
+        "lower": [
+          -6,
+          -6,
+          -1
+        ],
+        "map_period_s": 0.3,
+        "max_expansions": 50000,
+        "max_replans": 3,
+        "planning_timeout_s": 2.0,
+        "resolution_m": 0.2,
+        "schema_version": 1,
+        "source_timeout_s": 1.0,
+        "speed_m_s": 0.5,
+        "upper": [
+          6,
+          6,
+          5
+        ]
+      },
+      "all_segments_clear": true
+    }
+  ],
+  "passed": true
+}

@@ -51,3 +51,11 @@ Gazebo GUI 与 RViz 启动通过，RViz 报告 OpenGL 4.6。没有做界面截�
 一次独立全分支审查的5项问题全部失败复现→修复→全量回归，126项通过，无延后问题。当前模式的startup preflight与Offboard解锁资格分开处理；未禁用电池等飞控检查。默认flight/sensors继续保留既有行为。[实验操作](experiments/03-localization.md)、[实测及来源](validation/V0.3-local.md)、[审查修复](validation/V0.3-review.md)、[完整取舍与代价](validation/V0.3-decisions.md)。增量入口[PR#3](https://github.com/daydayup0713-wq/uav_simulation/pull/3)，基于V0.2分支。
 
 首次[干净CI](https://github.com/daydayup0713-wq/uav_simulation/actions/runs/37219484820)与最终功能修复提交87f7321的[CI](https://github.com/daydayup0713-wq/uav_simulation/actions/runs/37221251013)均已通过；后者为126项回归、标准飞行三轮、断桥降落及私有CPU回放/地图导出，数值和版本见[CI证据](validation/v03/clean-ci.json)。版本标签只在最终文档提交的门禁也通过后创建。通用同步雷达、局部粗位姿重定位、明确EKF噪声下限为当前范围；Mid-360、真实机标定、全局地点识别和三维避障另行验收。地图/录制/重建大文件保持忽略，Git只保存来源和数值证据。
+
+## V0.4.0 交付（2026-10-07）
+
+从v0.3.1建立feat/v0.4-navigation，8个ROS构建包，平台版本0.4.0。新增观测空间内三维占据网格、机体膨胀、26邻域A*、精确supercover碰撞、低速参考轨迹、Navigate/PlanPath、CLI及导航RViz场景。点云由源时间LIO注册至连续odom，真值与世界几何仅供独立评估。未知区域阻挡通行，HOLD/LAND世代、迟到ACK所有权和过期锁定保证不续飞。
+
+一次独立审查的6项Important全部失败复现、一次修复完成，无延后项。ff2eddb最终187项回归通过；原生连续3轮绕障/返回/落地通过，3次障碍内目标拒绝，独立最小机体净距0.6682m。15条执行计划和3拒绝查询的不可覆盖地图/哈希逐条回放通过，30帧实际雷达离线基准通过。导航退出后8.0971秒确认PX4失控降落、落地解除武装，即时恢复数据后仍拒绝重新解锁。
+
+完整[实验04](experiments/04-navigation.md)、[验收及来源](validation/V0.4-local.md)、[审查修复](validation/V0.4-review.md)、[执行取舍](validation/V0.4-decisions.md)。增量[PR #4](https://github.com/daydayup0713-wq/uav_simulation/pull/4)基于待审查的V0.3分支；最终提交CI门禁通过后创建v0.4.0，不自动合并旧PR。当前范围为静态已观测空间，动态障碍、自主探索、完整起降避障、实机标定另行验收。下一阶段V0.5为巡检点与任务执行、姿态/采集动作、暂停和恢复。

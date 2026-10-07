@@ -1,0 +1,266 @@
+{
+  "run_id": "20261007T083407Z-bd828940",
+  "supervisor_pid": 85027,
+  "dependencies": {
+    "platform": {
+      "ubuntu": "22.04",
+      "ros": "humble",
+      "gazebo": "8",
+      "bridge_package": "ros-humble-ros-gzharmonic"
+    },
+    "repositories": {
+      "px4": {
+        "url": "https://github.com/PX4/PX4-Autopilot.git",
+        "ref": "d6f12ad1c4f70ad3230afd7d86e971421e02fef4",
+        "local_cache": "/home/pine/PX4-Autopilot"
+      },
+      "px4_msgs": {
+        "url": "https://github.com/PX4/px4_msgs.git",
+        "ref": "86d8239e962f6939e05c3737784f60c02fa884db",
+        "local_cache": "/home/pine/ros2_ws/src/px4_msgs"
+      },
+      "agent": {
+        "url": "https://github.com/eProsima/Micro-XRCE-DDS-Agent.git",
+        "ref": "73622810d984349b80bbac0ef55fc0b694d62222",
+        "version": "2.4.3"
+      }
+    },
+    "localization": {
+      "repositories": {
+        "gtsam_points": {
+          "url": "https://github.com/koide3/gtsam_points.git",
+          "ref": "dff0518ae456537a2b0b1362213e32952574a98e",
+          "version": "1.1.0"
+        },
+        "glim": {
+          "url": "https://github.com/koide3/glim.git",
+          "ref": "65a5562c6b8906e60693c63cc0c95de885426352",
+          "version": "1.1.0"
+        },
+        "glim_ros2": {
+          "url": "https://github.com/koide3/glim_ros2.git",
+          "ref": "bb1d12a8a4ee24f8620da8bb30b585fb1a2b6846",
+          "version": "1.1.0"
+        }
+      },
+      "gtsam": {
+        "package": "ros-humble-gtsam",
+        "version": "4.2.0"
+      },
+      "build": {
+        "cuda": false,
+        "viewer": false,
+        "march_native": false,
+        "threads": 2
+      }
+    },
+    "agent_transitives": {
+      "_fastcdr_tag": "757d5e422253568c487ad97c22e44680fc1ddbaf",
+      "_fastdds_tag": "834b0718e7e28825d98f9b5ed45fc76941cd14bd",
+      "_foonathan_memory_tag": "0f0775770fd1c506fa9c5ad566bd6ba59659db66",
+      "_spdlog_tag": "eb3220622e73a4889eee355ffa37972b3cac3df5"
+    }
+  },
+  "environment": {
+    "ROS_DOMAIN_ID": "42",
+    "GZ_PARTITION": "uav-lab-090f8bbe3cb34456b6467e08fa63ba4f",
+    "RMW_IMPLEMENTATION": null
+  },
+  "headless": true,
+  "profile": "navigation",
+  "parameters": {
+    "COM_RC_IN_MODE": 4,
+    "COM_OF_LOSS_T": 1,
+    "COM_OBL_RC_ACT": 4,
+    "COM_DL_LOSS_T": 300,
+    "NAV_DLL_ACT": 0,
+    "UXRCE_DDS_SYNCT": 0,
+    "UXRCE_DDS_PTCFG": 1,
+    "UXRCE_DDS_DOM_ID": 42,
+    "EKF2_GPS_CTRL": 0,
+    "SIM_GPS_USED": 0,
+    "SENS_EN_GPSSIM": 0,
+    "EKF2_EV_CTRL": 11,
+    "EKF2_HGT_REF": 3,
+    "EKF2_BARO_CTRL": 0,
+    "EKF2_MAG_TYPE": 5,
+    "EKF2_EV_DELAY": 0
+  },
+  "calibration": {
+    "schema_version": 1,
+    "model_to_base_link": [
+      0,
+      0,
+      0.24
+    ],
+    "payload_mass_kg": 0.05,
+    "lidar": {
+      "frame": "lidar_link",
+      "xyz": [
+        0,
+        0,
+        0.16
+      ],
+      "rpy": [
+        0,
+        0,
+        0
+      ],
+      "hz": 10,
+      "horizontal_samples": 180,
+      "vertical_samples": 64,
+      "horizontal_fov_rad": 6.283185307179586,
+      "vertical_fov_rad": 3.121592653589793,
+      "min_m": 0.15,
+      "max_m": 20,
+      "noise_stddev_m": 0.01
+    },
+    "imu": {
+      "frame": "imu_link",
+      "xyz": [
+        0,
+        0,
+        0
+      ],
+      "rpy": [
+        0,
+        0,
+        0
+      ],
+      "hz": 200,
+      "gyro_stddev": 0.0002,
+      "accel_stddev": 0.01
+    },
+    "camera": {
+      "frame": "camera_link",
+      "optical_frame": "camera_optical_frame",
+      "xyz": [
+        0.2,
+        0,
+        0.06
+      ],
+      "rpy": [
+        0,
+        0,
+        0
+      ],
+      "optical_rpy": [
+        -1.5707963267948966,
+        0,
+        -1.5707963267948966
+      ],
+      "hz": 15,
+      "width": 320,
+      "height": 240,
+      "horizontal_fov_rad": 1.5707963267948966,
+      "near_m": 0.1,
+      "far_m": 25
+    },
+    "truth": {
+      "hz": 25,
+      "frame": "sim_world",
+      "child_frame": "truth_base_link"
+    },
+    "transforms": [
+      {
+        "parent": "base_link",
+        "child": "lidar_link",
+        "xyz": [
+          0,
+          0,
+          0.16
+        ],
+        "xyzw": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      {
+        "parent": "base_link",
+        "child": "imu_link",
+        "xyz": [
+          0,
+          0,
+          0
+        ],
+        "xyzw": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      {
+        "parent": "base_link",
+        "child": "camera_link",
+        "xyz": [
+          0.2,
+          0,
+          0.06
+        ],
+        "xyzw": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      {
+        "parent": "camera_link",
+        "child": "camera_optical_frame",
+        "xyz": [
+          0,
+          0,
+          0
+        ],
+        "xyzw": [
+          -0.5,
+          0.4999999999999999,
+          -0.5,
+          0.5000000000000001
+        ]
+      }
+    ]
+  },
+  "configuration_sha256": {
+    "simulation/worlds/lab.sdf": "14a9aaaafa141e6d6de6c665e1fffde5153fc3efc7416b2bc2052a4deb6c77ee",
+    "configs/px4-start.sh": "64fbc28cf0c94adf18302560d2ce3a5388e3b511eb868833dcd0f1cdbc0cd836",
+    "configs/lab.rviz": "ea1863a5981193b0df87ed92aadcf2e6cec40140ec4f741f612279df75a1c17a",
+    "dependencies/lock.json": "d39378866abef13146fc139d9b6dcbd943c46088558e7a59d6d990754039dc8d",
+    "simulation/worlds/room.sdf": "f4a30473e3cb4b8dfd47b6e971257cf4ddcecebbe7bd2252f1b50ebe41f79923",
+    "configs/sensors.json": "98c7110e8ba9a69fa24ba0f25d719624c3ef265a116d25156b2b626487c1d247",
+    "configs/sensors.rviz": "fabb2c06487d6538549c9863426d3314604bc748244a177174194fd84e4a399f",
+    "configs/recording-qos.yaml": "61236136810ff9b07cdaed1e7d2f42876deaaac3111471197aeaeb34c7156b70",
+    "simulation/worlds/navigation.sdf": "2bebd220bc3ac5ab7d83e4ccd222c50add99b989e09e737fdef595a60d8e728b",
+    "configs/navigation-sensors.json": "7a6edb85885bfea92563d030c5f049a8e4ff64169d9ad9690e3f5331b29aa81d",
+    "configs/navigation.json": "9bcb452a8b62329ebc983bd523c146b86ef518a1f1d194eb2f87e9a6a193f5b1"
+  },
+  "snapshot_sha256": {
+    "lab.rviz": "ea1863a5981193b0df87ed92aadcf2e6cec40140ec4f741f612279df75a1c17a",
+    "calibration.json": "a8f2d178186c228bd6a5ad4702d5789510e86f9e982822eaa506a069338a55c2",
+    "recording-qos.yaml": "61236136810ff9b07cdaed1e7d2f42876deaaac3111471197aeaeb34c7156b70",
+    "lock.json": "d39378866abef13146fc139d9b6dcbd943c46088558e7a59d6d990754039dc8d",
+    "sensors.rviz": "fabb2c06487d6538549c9863426d3314604bc748244a177174194fd84e4a399f",
+    "px4-start.sh": "64fbc28cf0c94adf18302560d2ce3a5388e3b511eb868833dcd0f1cdbc0cd836",
+    "sensor-bridge.yaml": "3d1f1202c4a3664d60daf91e99f6ab0e0a2a4af8142e6a6fc803cf5bc5fced32",
+    "navigation-sensors.json": "7a6edb85885bfea92563d030c5f049a8e4ff64169d9ad9690e3f5331b29aa81d",
+    "lab.sdf": "14a9aaaafa141e6d6de6c665e1fffde5153fc3efc7416b2bc2052a4deb6c77ee",
+    "navigation.sdf": "2bebd220bc3ac5ab7d83e4ccd222c50add99b989e09e737fdef595a60d8e728b",
+    "room.sdf": "5d4452f83ce20c139443a8c2f35fe7e706471cb4bc462c427652d9761d011cb3",
+    "navigation.json": "9bcb452a8b62329ebc983bd523c146b86ef518a1f1d194eb2f87e9a6a193f5b1",
+    "sensors.json": "98c7110e8ba9a69fa24ba0f25d719624c3ef265a116d25156b2b626487c1d247",
+    "models/x500_sensors/model.config": "2ec391169ac326a002cdd785fb9fc1560255d585138d3b951e041a64a0840b9e",
+    "models/x500_sensors/model.sdf": "4341e059b46391c2c87aaf9a7349742f8c763374979a8dfbb863e976ec5042e5"
+  },
+  "frames": {
+    "world": "ENU",
+    "body": "FLU",
+    "tf": "odom -> base_link",
+    "px4_world": "NED",
+    "px4_body": "FRD"
+  },
+  "platform_commit": "ff2eddbac62afcdaab1e0fc5e2a43ac91df8f10a",
+  "platform_dirty": true
+}

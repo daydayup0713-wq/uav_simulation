@@ -1,0 +1,58 @@
+{
+  "source": "ideal analytical rays, no rendered precision claim",
+  "input_sha256": "722d55d1e191b8f2f988ef66008af4652148f597a86e5bdfb92352a2022e438d",
+  "configuration": {
+    "resolution_m": 0.2,
+    "lower": [
+      -6,
+      -6,
+      -1
+    ],
+    "upper": [
+      6,
+      6,
+      5
+    ],
+    "body_halfsize_m": [
+      0.4,
+      0.4,
+      0.3
+    ],
+    "clearance_m": 0.25
+  },
+  "occupied_cells": 11585,
+  "observed_free_cells": 68739,
+  "map_version": 36,
+  "runtime_s": 0.5511087189997852,
+  "plan": {
+    "success": true,
+    "reason": "PLANNED",
+    "points": [
+      [
+        0.0,
+        0.0,
+        2.0
+      ],
+      [
+        0.3000000000000007,
+        2.0999999999999996,
+        2.1
+      ],
+      [
+        2.5,
+        3.6,
+        2.0
+      ]
+    ],
+    "expanded": 305
+  },
+  "rejected_goal": {
+    "success": false,
+    "reason": "GOAL_BLOCKED_OR_UNOBSERVED",
+    "points": [],
+    "expanded": 0
+  },
+  "length_m": 4.788258577054375,
+  "all_segments_clear": true,
+  "passed": true
+}

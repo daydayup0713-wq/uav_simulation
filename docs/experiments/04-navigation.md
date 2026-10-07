@@ -22,7 +22,7 @@ cd /home/pine/workspace/ai/UAV/uav_simulation
 
 在RViz观察占据体素、计划路径和实际轨迹。机体包络(.4,.4,.3)m加.25m裕度，按.2m网格向外取整；未知空间也阻止通行。目标在障碍或未观测区，返回明确原因；搜索预算耗尽单独返回。V0.4仅验证静态、已观测空间，尚无自主探索或动态障碍预测。
 
-每次运行保存配置、依赖、状态/动作、源时间、地图版本、实际ULog、注册扫描及体素快照于.runtime运行目录。若导航或定位过期，控制链失效锁定并停止Offboard，PX4按配置降落；恢复数据不会续飞，需重启实验。查看navigation.jsonl中的source_failure、navigation_plan、replan和navigation_result定位失败。
+每次运行保存配置、依赖、状态/动作、源时间、地图版本、实际ULog、注册扫描及体素快照于.runtime运行目录。每条计划另保存不可覆盖的navigation-plans/会话/map-v版本.npz，navigation.jsonl记录文件及SHA256，支持核验当时的碰撞地图。若导航或定位过期，控制链失效锁定并停止Offboard，PX4按配置降落；恢复数据不会续飞，需重启实验。查看source_failure、navigation_plan、replan和navigation_result定位失败。当前避障覆盖空中导航段，起降沿用已有飞控逻辑。
 
 CPU固定观察基准可独立执行：
 
