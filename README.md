@@ -142,7 +142,7 @@ Humble + Harmonic 使用 `ros-humble-ros-gzharmonic`，见[官方组合说明](h
 | `px4/log/**/*.ulg` | PX4 飞行日志 |
 | `*.log`、`ros/` | 各组件输出及 ROS 日志 |
 
-构建副本、运行日志和数据均不进入 Git。V0.2 的80项回归、真实传感器、飞行、录制回放及空间几何证据见[本版验收报告](docs/validation/V0.2-local.md)；历次交付记录见[实施记录](docs/IMPLEMENTATION_STATUS.md)。
+构建副本、运行日志和数据均不进入 Git。V0.3 的126项回归、LIO/SLAM、无GNSS飞行及故障证据见[本版验收报告](docs/validation/V0.3-local.md)；V0.2 的传感器和录制回放证据见[历史报告](docs/validation/V0.2-local.md)；历次交付记录见[实施记录](docs/IMPLEMENTATION_STATUS.md)。
 
 ## 当前范围
 
