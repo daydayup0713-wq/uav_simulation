@@ -1,9 +1,55 @@
 {
-  "platform": {"ubuntu": "22.04", "ros": "humble", "gazebo": "8", "bridge_package": "ros-humble-ros-gzharmonic"},
+  "platform": {
+    "ubuntu": "22.04",
+    "ros": "humble",
+    "gazebo": "8",
+    "bridge_package": "ros-humble-ros-gzharmonic"
+  },
   "repositories": {
-    "px4": {"url": "https://github.com/PX4/PX4-Autopilot.git", "ref": "d6f12ad1c4f70ad3230afd7d86e971421e02fef4", "local_cache": "/home/pine/PX4-Autopilot"},
-    "px4_msgs": {"url": "https://github.com/PX4/px4_msgs.git", "ref": "86d8239e962f6939e05c3737784f60c02fa884db", "local_cache": "/home/pine/ros2_ws/src/px4_msgs"},
-    "agent": {"url": "https://github.com/eProsima/Micro-XRCE-DDS-Agent.git", "ref": "73622810d984349b80bbac0ef55fc0b694d62222", "version": "2.4.3"}
+    "px4": {
+      "url": "https://github.com/PX4/PX4-Autopilot.git",
+      "ref": "d6f12ad1c4f70ad3230afd7d86e971421e02fef4",
+      "local_cache": "/home/pine/PX4-Autopilot"
+    },
+    "px4_msgs": {
+      "url": "https://github.com/PX4/px4_msgs.git",
+      "ref": "86d8239e962f6939e05c3737784f60c02fa884db",
+      "local_cache": "/home/pine/ros2_ws/src/px4_msgs"
+    },
+    "agent": {
+      "url": "https://github.com/eProsima/Micro-XRCE-DDS-Agent.git",
+      "ref": "73622810d984349b80bbac0ef55fc0b694d62222",
+      "version": "2.4.3"
+    }
+  },
+  "localization": {
+    "repositories": {
+      "gtsam_points": {
+        "url": "https://github.com/koide3/gtsam_points.git",
+        "ref": "dff0518ae456537a2b0b1362213e32952574a98e",
+        "version": "1.1.0"
+      },
+      "glim": {
+        "url": "https://github.com/koide3/glim.git",
+        "ref": "65a5562c6b8906e60693c63cc0c95de885426352",
+        "version": "1.1.0"
+      },
+      "glim_ros2": {
+        "url": "https://github.com/koide3/glim_ros2.git",
+        "ref": "bb1d12a8a4ee24f8620da8bb30b585fb1a2b6846",
+        "version": "1.1.0"
+      }
+    },
+    "gtsam": {
+      "package": "ros-humble-gtsam",
+      "version": "4.2.0"
+    },
+    "build": {
+      "cuda": false,
+      "viewer": false,
+      "march_native": false,
+      "threads": 2
+    }
   },
   "agent_transitives": {
     "_fastcdr_tag": "757d5e422253568c487ad97c22e44680fc1ddbaf",

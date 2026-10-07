@@ -58,3 +58,13 @@ ACK 拒绝、5 秒内无 ACK/状态确认、遥测失效、离开 armed Offboard
 CLI 输出 JSON；成功退出 0，指令失败/超时/取消退出 1，参数格式错误退出 2。`status` 在无新鲜诊断、遥测过期或 FAILSAFE 时退出非零。
 
 Ctrl+C 中断 TAKEOFF/GOTO 时保留 ROS 上下文，有界等待目标响应并请求取消；无法确认取消时明确输出 unconfirmed。中断 LAND 不发送取消，确认已接受才提示降落继续。
+
+## V0.3 定位与地图
+
+`/uav001/localization/odometry`：连续lio_odom中的ENU/FLU六自由度位姿，child_frame=lio_base_link。线速度规范化为机体坐标；当前GLIM不输出角速度，角速度字段未在EV_CTRL=11配置中融合。本版IMU位于机体原点且同向，因此lio_base_link与IMU系重合；改变IMU安装位姿需另行完成机体输出适配。观测协方差为明确的EKF噪声下限，不是算法边缘协方差。
+
+`localization/path`为连续里程计轨迹，`localization/map`为全局优化点云；后者不是三维占据/避障地图。`localization/diagnostics`的READY表示来源新鲜、位姿数值有效且连续性检查通过，不表示实时配准置信度或已知真实误差。真实误差由独立评估器离线量化。
+
+入口只允许校验后的点云/IMU进入`localization/input/*`，独立真值不进入算法。LoadMap和Relocalize服务只接受新鲜地面未解锁状态，失败保留原地图变换。重定位仅改变map→lio_odom；一次地面坐标适配提供map→odom，已存在的控制目标不重算、不跳变。
+
+`slam`运行配置才允许唯一飞控适配发布VehicleOdometry。首次完整外部融合就绪后，外部位置/高度/航向、GNSS未融合标志及诊断持续受检，任何失效锁定失败；恢复数据不会恢复心跳或续飞。默认flight/sensors不启用外部定位。

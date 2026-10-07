@@ -1,0 +1,73 @@
+{
+  "samples": 182,
+  "first_sim_s": 275.732,
+  "last_sim_s": 448.796,
+  "flags": {
+    "cs_ev_pos": [
+      true
+    ],
+    "cs_ev_hgt": [
+      true
+    ],
+    "cs_ev_yaw": [
+      true
+    ],
+    "cs_gnss_pos": [
+      false
+    ],
+    "cs_gnss_vel": [
+      false
+    ],
+    "cs_gps_hgt": [
+      false
+    ],
+    "cs_gnss_yaw": [
+      false
+    ]
+  },
+  "event_file_sha256": "1465705703ef2b89925c30b1b78e5629c6bd2c5b5e4c300631bdae89299747e5",
+  "relocalization": [
+    {
+      "event": "relocalized",
+      "map_to_odom": [
+        [
+          0.9999999840826047,
+          -0.00014856439633625758,
+          9.880997081820531e-05,
+          0.0003194240530819654
+        ],
+        [
+          0.00014858141169610178,
+          0.9999999741322925,
+          -0.00017221782067680425,
+          -0.0009823816959082308
+        ],
+        [
+          -9.878438282565072e-05,
+          0.0001722324992604989,
+          0.9999999802888057,
+          -0.01125420940513977
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "rmse_m": 0.049315155966103356,
+      "inlier_fraction": 1.0
+    }
+  ],
+  "post_fault_arm": {
+    "exit_code": 1,
+    "success": false,
+    "reason": "service unavailable: arm",
+    "phase": "after the60s supervisor observation window; does not by itself prove the adapter latch"
+  },
+  "prior_native_in_window_arm_rejection": {
+    "run": "20261004T165118Z-ac1dbe50",
+    "exit_code": 1,
+    "reason": "validated external localization and no GNSS fusion required"
+  }
+}

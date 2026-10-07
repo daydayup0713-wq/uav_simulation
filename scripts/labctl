@@ -2,6 +2,9 @@
 set -euo pipefail
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 case "${1:-}" in
+  slam)
+    shift
+    exec "$ROOT/scripts/env.sh" ros2 run uav_lab_localization slamctl "$@" ;;
   sensors|record|bag-check|replay)
     exec "$ROOT/scripts/env.sh" ros2 run uav_lab_tools datactl "$@" ;;
 esac

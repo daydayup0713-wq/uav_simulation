@@ -1,0 +1,34 @@
+{
+  "glim_ros": {
+    "enable_local_mapping": true,
+    "enable_global_mapping": true,
+    "keep_raw_points": false,
+    "imu_time_offset": 0.0,
+    "points_time_offset": 0.0,
+    "acc_scale": 1.0,
+    "imu_frame_id": "lio_base_link",
+    "lidar_frame_id": "lio_lidar",
+    "base_frame_id": "lio_base_link",
+    "odom_frame_id": "lio_odom",
+    "map_frame_id": "lio_map",
+    "publish_imu2lidar": false,
+    "tf_time_offset": 0.0,
+    "extension_modules": [
+      "librviz_viewer.so"
+    ],
+    "imu_topic": "/uav001/localization/input/imu",
+    "points_topic": "/uav001/localization/input/points",
+    "image_topic": "/uav001/localization/unused_image",
+    "imu_qos": {
+      "profile": "sensor_data",
+      "depth": 1000
+    },
+    "points_qos": {
+      "profile": "sensor_data"
+    },
+    "image_qos": {
+      "profile": "sensor_data"
+    },
+    "ang_scale": 1.0
+  }
+}

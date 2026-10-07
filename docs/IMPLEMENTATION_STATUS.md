@@ -41,3 +41,13 @@ Gazebo GUI 与 RViz 启动通过，RViz 报告 OpenGL 4.6。没有做界面截�
 [最终干净CI](https://github.com/daydayup0713-wq/uav_simulation/actions/runs/37199496965)通过固定依赖构建、六包构建、80项回归、三轮飞行与失控降落。完整验收、来源及限制见 [V0.2报告](validation/V0.2-local.md)、[审查修复](validation/V0.2-review.md)。交付入口 [PR #2](https://github.com/daydayup0713-wq/uav_simulation/pull/2) 基于仍待审查的V0.1分支；标签v0.2.0保留本次交付。
 
 执行取舍：实机物理/传感器逼真度仍需未来实测标定，否则不能据此推算实机性能；Mid-360逐点时间、SLAM、无GNSS飞行和避障按后续阶段交付，任意航点尚可能碰撞；本版发布使用实际干净CI作为门禁，不能凭旧版CI或本机结果推断可复现安装。
+
+## V0.3.0 / V0.3.1 交付（2026-10-07 收尾）
+
+在V0.2标签245e8fa上建设feat/v0.3-slam，依赖提交ca55a6a、固定输入基准17f29c5、实时/地图/无GNSS25fbeb0，审查修复87f7321。平台六包版本0.3.1，与固定px4_msgs一起构建7包。私有GLIM v1.1 CPU替代对本机GTSAM4.2/Boost1.74不兼容的较新版本，源码固定且未修改。
+
+本机通过固定输入ICP学习/LIO比较、独立真值六自由度误差评估、实时LIO、3个实际原生非相邻回环约束、地图归档/加载/新扫描粗位姿重定位。审查修复后连续无GNSS三轮通过，悬停最大误差0.106/0.109/0.106m；位置ATE RMSE0.058m、姿态RMSE0.264°、覆盖100%。四个实际ULog确认GPS输入fix0和EV位置/高度/航向融合，原生LIO退出后独立观测7.90s失控降落/解除武装。
+
+一次独立全分支审查的5项问题全部失败复现→修复→全量回归，126项通过，无延后问题。当前模式的startup preflight与Offboard解锁资格分开处理；未禁用电池等飞控检查。默认flight/sensors继续保留既有行为。[实验操作](experiments/03-localization.md)、[实测及来源](validation/V0.3-local.md)、[审查修复](validation/V0.3-review.md)、[完整取舍与代价](validation/V0.3-decisions.md)。增量入口[PR#3](https://github.com/daydayup0713-wq/uav_simulation/pull/3)，基于V0.2分支。
+
+首次[干净CI](https://github.com/daydayup0713-wq/uav_simulation/actions/runs/37219484820)与最终功能修复提交87f7321的[CI](https://github.com/daydayup0713-wq/uav_simulation/actions/runs/37221251013)均已通过；后者为126项回归、标准飞行三轮、断桥降落及私有CPU回放/地图导出，数值和版本见[CI证据](validation/v03/clean-ci.json)。版本标签只在最终文档提交的门禁也通过后创建。通用同步雷达、局部粗位姿重定位、明确EKF噪声下限为当前范围；Mid-360、真实机标定、全局地点识别和三维避障另行验收。地图/录制/重建大文件保持忽略，Git只保存来源和数值证据。

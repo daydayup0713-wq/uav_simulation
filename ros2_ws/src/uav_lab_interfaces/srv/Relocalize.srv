@@ -1,0 +1,7 @@
+geometry_msgs/PoseStamped initial_body_pose
+---
+bool success
+string reason
+geometry_msgs/TransformStamped map_to_odom
+float64 inlier_fraction
+float64 rmse_m

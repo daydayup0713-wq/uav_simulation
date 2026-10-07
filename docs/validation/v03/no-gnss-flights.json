@@ -1,0 +1,32 @@
+{
+  "passed": true,
+  "runs": [
+    {
+      "seconds": 10.0,
+      "samples": 43,
+      "maximum_error_m": 0.10587139539365997,
+      "run": 1,
+      "elapsed_s": 51.96156172100018,
+      "landed": true,
+      "disarmed": true
+    },
+    {
+      "seconds": 10.0,
+      "samples": 45,
+      "maximum_error_m": 0.1094134387536771,
+      "run": 2,
+      "elapsed_s": 51.47408934000123,
+      "landed": true,
+      "disarmed": true
+    },
+    {
+      "seconds": 10.0,
+      "samples": 45,
+      "maximum_error_m": 0.10595055239003637,
+      "run": 3,
+      "elapsed_s": 51.377617431000544,
+      "landed": true,
+      "disarmed": true
+    }
+  ]
+}

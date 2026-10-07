@@ -1,10 +1,10 @@
 #!/usr/bin/python3
-"""Check the eight PX4 boundary schemas, including MESSAGE_VERSION constants."""
+"""Check all PX4 boundary schemas, including MESSAGE_VERSION constants."""
 from pathlib import Path
 
 MESSAGES = ('VehicleLocalPosition', 'VehicleStatus', 'VehicleAttitude',
             'VehicleLandDetected', 'VehicleCommandAck', 'VehicleCommand',
-            'OffboardControlMode', 'TrajectorySetpoint')
+            'OffboardControlMode', 'TrajectorySetpoint', 'VehicleOdometry', 'EstimatorStatusFlags')
 
 def declarations(path):
     return [' '.join(text.split()) for line in Path(path).read_text().splitlines()

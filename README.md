@@ -1,8 +1,23 @@
 # UAV Simulation Lab
 
-面向 PX4 学习、算法验证和巡检仿真的独立实验室。V0.2.0 增加通用实验室、三维雷达、IMU、相机、标定 TF、独立真值和可验证的 rosbag 录制/回放。V0.1 的空旷飞行配置继续作为无 GPU 回归基线，原版[干净环境验收](docs/validation/V0.1-local.md)保留。后续按[版本路线](docs/ROADMAP.md)接入 Mid-360、SLAM、三维导航、任务、Web、AI 和数字孪生。
+面向 PX4 学习、算法验证和巡检仿真的独立实验室。V0.3 增加 CPU LIO、固定数据集评估、位姿图回环、地图保存和重定位，以及 PX4 无 GNSS 外部定位飞行。通用传感器实验室与无 GPU 飞行回归配置继续保留。后续按[版本路线](docs/ROADMAP.md)接入 Mid-360、三维导航、任务、Web、AI 和数字孪生。
 
 系统关系和后续接口边界见[架构说明](docs/ARCHITECTURE.md)。
+
+## 定位与地图实验
+
+```bash
+./scripts/env.sh /usr/bin/python3 scripts/bootstrap_slam.py --jobs 2
+./scripts/build.sh
+./scripts/start_lab.sh --profile slam --rviz
+# 另一终端，等待 LAB READY：
+./scripts/labctl slam status
+./scripts/labctl demo --runs 3
+```
+
+`slam` 配置关闭 GNSS 输入/融合，飞控适配只接收通过质量检查的连续 LIO。`localization` 配置保留 GNSS，供比较定位输出。私有 GLIM 后端只使用 CPU 两线程；雷达/相机仍需 Gazebo 渲染。新主机的系统依赖由安装脚本提供，本机已具备 GTSAM4.2、Boost 和 TBB。
+
+离线基准、ICP 学习、地图保存/加载、带粗位姿的重定位和故障实验见[定位实验](docs/experiments/03-localization.md)，算法版本及选择依据见[算法说明](docs/algorithms-v03.md)，实测结果见[V0.3 验收](docs/validation/V0.3-local.md)。
 
 ## 传感器实验室
 
@@ -127,10 +142,10 @@ Humble + Harmonic 使用 `ros-humble-ros-gzharmonic`，见[官方组合说明](h
 | `px4/log/**/*.ulg` | PX4 飞行日志 |
 | `*.log`、`ros/` | 各组件输出及 ROS 日志 |
 
-构建副本、运行日志和数据均不进入 Git。V0.2 的80项回归、真实传感器、飞行、录制回放及空间几何证据见[本版验收报告](docs/validation/V0.2-local.md)；历次交付记录见[实施记录](docs/IMPLEMENTATION_STATUS.md)。
+构建副本、运行日志和数据均不进入 Git。V0.3 的126项回归、LIO/SLAM、无GNSS飞行及故障证据见[本版验收报告](docs/validation/V0.3-local.md)；V0.2 的传感器和录制回放证据见[历史报告](docs/validation/V0.2-local.md)；历次交付记录见[实施记录](docs/IMPLEMENTATION_STATUS.md)。
 
 ## 当前范围
 
-当前飞行仍使用 PX4 自身定位。雷达是通用同步三维扫描，不包含 Mid-360 扫描模式或逐点时间。相机为无畸变针孔模型，IMU 无偏置随机游走；没有真实传感器延迟校准。SLAM 和无 GNSS 飞行按后续版本验收。x500 加 0.05kg 学习载荷，未按真实机体校准。实际渲染验收不代表 CUDA 算法已验收。
+默认 flight/sensors 配置使用 PX4 原定位；slam 配置使用外部 LIO 融合。雷达为通用同步扫描，不含 Mid-360 扫描模式或逐点时间。地图重定位需要已知区域的粗位姿，尚无全局地点识别；GLIM 不提供本版边缘协方差，融合使用明确的观测噪声下限。当前没有避障，任意航点可能碰撞。相机为无畸变针孔模型，IMU 无偏置随机游走；尚未做实机物理、传感器和时延标定。
 
 代码采用 Apache-2.0；外部源码保留各自许可证。
