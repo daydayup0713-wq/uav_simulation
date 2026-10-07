@@ -85,6 +85,9 @@ class Navigator:
                 except RuntimeError as landing_error:raise RuntimeError(str(error)+'; landing request failed: '+str(landing_error)) from error
                 raise
             final=self.operator.status()
+            deadline=time.monotonic()+5
+            while (final.get('armed')!='False' or final.get('landed')!='True') and time.monotonic()<deadline:
+                self.operator.spin(.1);final=self.operator.status()
             if final.get('armed')!='False' or final.get('landed')!='True':raise RuntimeError('landing/disarm not confirmed')
             results.append({'run':index+1,'blocked':blocked,'forward':forward,'return':backward,'landed_disarmed':True})
         return {'success':True,'runs':results}

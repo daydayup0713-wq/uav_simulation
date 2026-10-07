@@ -3,6 +3,7 @@
 import argparse
 import json
 import time
+import signal
 from pathlib import Path
 import numpy as np
 
@@ -32,9 +33,11 @@ def main():
     node.create_subscription(Odometry,'/uav001/ground_truth/odometry',truth,qos_profile_sensor_data)
     node.create_subscription(DiagnosticArray,'/uav001/diagnostics',state,10)
     node.create_subscription(NavPath,'/uav001/navigation/path',route,10)
+    stopping=[False]
+    signal.signal(signal.SIGTERM,lambda *_:stopping.__setitem__(0,True))
     try:
         end=time.monotonic()+args.duration
-        while time.monotonic()<end:rclpy.spin_once(node,timeout_sec=.05)
+        while not stopping[0] and time.monotonic()<end:rclpy.spin_once(node,timeout_sec=.05)
     finally:node.destroy_node();rclpy.shutdown()
     airborne=[s for s in samples if s['position'][2]>1. and s['phase'] in ('MOVING','HOLDING')]
     net=[clearance(s['position'],[1.3,-1,0],[1.7,1,4],[.4,.4,.3]) for s in airborne]
