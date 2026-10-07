@@ -4,6 +4,8 @@ uint8 LAND=2
 uint8 operation
 float64 height_m
 geometry_msgs/PoseStamped target
+bool navigation
+uint64 navigation_epoch
 ---
 bool success
 string reason

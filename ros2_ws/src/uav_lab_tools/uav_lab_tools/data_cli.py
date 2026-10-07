@@ -29,8 +29,8 @@ def runtime_manifest(root, ready=False):
     run=Path((runtime/'current-run').read_text().strip())
     if run.parent!=runtime:raise ValueError('invalid current run path')
     manifest=json.loads((run/'manifest.json').read_text())
-    if manifest.get('profile') not in ('sensors','localization','slam'):
-        raise ValueError('start a sensors, localization or slam lab profile first')
+    if manifest.get('profile') not in ('sensors','localization','slam','navigation'):
+        raise ValueError('start a sensors, localization, slam or navigation lab profile first')
     if ready and not (run/'ready').exists():raise ValueError('sensor lab is not ready')
     if int(manifest['environment']['ROS_DOMAIN_ID'])!=int(os.environ.get('ROS_DOMAIN_ID','42')):
         raise ValueError('operator ROS domain differs from active lab')

@@ -19,7 +19,7 @@
       0
     ],
     "hz": 10,
-    "horizontal_samples": 360,
+    "horizontal_samples": 180,
     "vertical_samples": 64,
     "horizontal_fov_rad": 6.283185307179586,
     "vertical_fov_rad": 3.121592653589793,

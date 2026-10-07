@@ -115,7 +115,7 @@ class VoxelMap:
         free_mask = np.zeros(self.score.size,dtype=bool)
         for start in range(0,len(delta),256):
             rays = delta[start:start+256]
-            steps = np.maximum(1,np.ceil(np.linalg.norm(rays,axis=1)/(self.resolution*.25)).astype(int))
+            steps = np.maximum(1,np.ceil(np.linalg.norm(rays,axis=1)/(self.resolution*.5)).astype(int))
             times = np.arange(steps.max()+1)[None,:]/steps[:,None]
             valid = times<=1
             points = (origin+rays[:,None,:]*times[:,:,None])[valid]
