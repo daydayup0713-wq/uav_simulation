@@ -68,3 +68,15 @@ Ctrl+C 中断 TAKEOFF/GOTO 时保留 ROS 上下文，有界等待目标响应并
 入口只允许校验后的点云/IMU进入`localization/input/*`，独立真值不进入算法。LoadMap和Relocalize服务只接受新鲜地面未解锁状态，失败保留原地图变换。重定位仅改变map→lio_odom；一次地面坐标适配提供map→odom，已存在的控制目标不重算、不跳变。
 
 `slam`运行配置才允许唯一飞控适配发布VehicleOdometry。首次完整外部融合就绪后，外部位置/高度/航向、GNSS未融合标志及诊断持续受检，任何失效锁定失败；恢复数据不会恢复心跳或续飞。默认flight/sensors不启用外部定位。
+
+## V0.4 三维导航
+
+`/uav001/navigation/plan`（PlanPath）：PoseStamped goal，frame=odom；返回success/reason、Path和map_version。仅规划，不移动。
+
+`/uav001/navigation/navigate`（Navigate Action）：同一目标，反馈phase/current_pose/replans，结果success/reason。重复请求拒绝，最多3次障碍更新重规划；取消悬停，人工HOLD/LAND停止，LAND继续完成。未观察/占据起终点、NO_PATH、SEARCH_BUDGET_EXCEEDED和控制拒绝明确区分。
+
+`navigation/occupied`为odom中占据体素中心PointCloud2；`navigation/path`为已验证的Path，两者transient-local。`navigation/diagnostics`含ready、source_stamp、source_age、map_version、frame及失败原因。源时间和单调通信看门狗分别检查，失败锁定。
+
+`localization/control_alignment`是冻结lio_odom←odom TransformStamped，仅为估计后的坐标适配；不增加TF父节点、不输入SLAM。实时地图用源时间插值位姿和归档安装外参注册。
+
+ExecuteFlight新增navigation（默认False）及navigation_epoch（默认0）。navigation配置要求GOTO具有导航标记并匹配人工打断世代；接收和执行均检查。旧profile忽略标记。所有FMU写入仍只有飞控适配器，标记不是安全认证或跨租户访问机制。

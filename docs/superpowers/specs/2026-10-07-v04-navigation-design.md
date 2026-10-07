@@ -10,7 +10,7 @@
 
 仅使用经过V0.3入口校验的点云、连续LIO位姿、定位质量以及冻结的lio_odom←odom适配变换。加入独立transient-local TransformStamped话题`/uav001/localization/control_alignment`，不增加TF父节点。点云按源时间插值位姿并应用录制外参后进入连续odom网格。地图不使用SLAM展示地图或Gazebo真值；回环/重定位不改变障碍网格或已下发目标。
 
-导航专用通用雷达64垂直束、约179°垂直视场、360水平束、10Hz；其完整标定单独归档。原flight/sensors/localization/slam配置和现有16束30°雷达保持原样。默认只验收静态实验室；传感器未看到的目标明确拒绝，不自动探索未知空间。
+导航专用通用雷达64垂直束、约179°垂直视场、180水平束、10Hz；其完整标定单独归档。原flight/sensors/localization/slam配置和现有16束30°雷达保持原样。默认只验收静态实验室；传感器未看到的目标明确拒绝，不自动探索未知空间。
 
 ## 占据与碰撞
 

@@ -35,6 +35,8 @@ jobs:
           docker run --rm --shm-size=1g -v "$PWD/ci-evidence:/opt/uav_lab/.runtime" uav-lab bash scripts/ci_acceptance.sh
       - name: CPU LIO fixed observation replay and native map export
         run: docker run --rm --shm-size=1g -v "$PWD/ci-evidence:/opt/uav_lab/.runtime" uav-lab bash scripts/ci_localization.sh
+      - name: CPU observed-space 3D navigation benchmark
+        run: docker run --rm --shm-size=1g -v "$PWD/ci-evidence:/opt/uav_lab/.runtime" uav-lab bash scripts/ci_navigation.sh
       - uses: actions/upload-artifact@v4
         if: always()
         with:

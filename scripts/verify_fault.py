@@ -12,7 +12,8 @@ def component_identity(component, command):
     tokens = command.split(b'\0')
     package, executable = {'bridge': ('uav_lab_bridge','bridge'),
                            'lio': ('glim_ros','glim_rosnode'),
-                           'localization': ('uav_lab_localization','localization')}[component]
+                           'localization': ('uav_lab_localization','localization'),
+                           'navigation': ('uav_lab_navigation','navigation')}[component]
     return any(tokens[i:i+3] == [b'run', package.encode(), executable.encode()] and
                i > 0 and Path(tokens[i-1].decode()).name == 'ros2' for i in range(len(tokens)))
 
@@ -23,7 +24,7 @@ def landing_completed(status, fresh, landing_observed):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--component', choices=('bridge','lio','localization'), default='bridge')
+    parser.add_argument('--component', choices=('bridge','lio','localization','navigation'), default='bridge')
     options = parser.parse_args()
     import rclpy
     from rclpy.qos import qos_profile_sensor_data
