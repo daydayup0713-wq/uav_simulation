@@ -112,7 +112,7 @@ class VoxelMap:
             values = np.ones(len(delta)); values[moving] = (edge[moving]-origin[axis])/delta[moving,axis]
             fractions = np.minimum(fractions,values)
         delta *= np.clip(fractions,0,1)[:,None]
-        free_indices = []
+        free_mask = np.zeros(self.score.size,dtype=bool)
         for start in range(0,len(delta),256):
             rays = delta[start:start+256]
             steps = np.maximum(1,np.ceil(np.linalg.norm(rays,axis=1)/(self.resolution*.25)).astype(int))
@@ -120,9 +120,9 @@ class VoxelMap:
             valid = times<=1
             points = (origin+rays[:,None,:]*times[:,:,None])[valid]
             points = points[self.inside(points)]
-            if len(points): free_indices.append(np.ravel_multi_index(self.index(points).T,self.shape))
-        free = np.unique(np.concatenate(free_indices)) if free_indices else np.array([],dtype=int)
-        free = np.setdiff1d(free,hits,assume_unique=True)
+            if len(points): free_mask[np.ravel_multi_index(self.index(points).T,self.shape)] = True
+        free_mask[hits] = False
+        free = np.flatnonzero(free_mask)
         scores, seen = self.score.ravel(), self.seen.ravel()
         scores[free] = np.maximum(-4,scores[free].astype(int)-1)
         scores[hits] = np.minimum(4,scores[hits].astype(int)+2)

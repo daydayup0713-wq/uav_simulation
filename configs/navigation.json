@@ -1,9 +1,21 @@
 {
   "schema_version": 1,
   "resolution_m": 0.2,
-  "lower": [-6,-6,-1],
-  "upper": [6,6,5],
-  "body_halfsize_m": [0.4,0.4,0.15],
+  "lower": [
+    -6,
+    -6,
+    -1
+  ],
+  "upper": [
+    6,
+    6,
+    5
+  ],
+  "body_halfsize_m": [
+    0.4,
+    0.4,
+    0.3
+  ],
   "clearance_m": 0.25,
   "map_period_s": 0.3,
   "source_timeout_s": 1.0,

@@ -16,7 +16,7 @@ def benchmark(directory,output,configuration=None):
     if metadata.get('frame')!='odom' or digest!=metadata.get('sha256'):
         raise ValueError('observation frame/checksum mismatch')
     config=configuration or {'resolution_m':.2,'lower':[-6,-6,-1],'upper':[6,6,5],
-        'body_halfsize_m':[.4,.4,.15],'clearance_m':.25}
+        'body_halfsize_m':[.4,.4,.3],'clearance_m':.25}
     grid=VoxelMap(config['resolution_m'],config['lower'],config['upper'])
     begun=time.monotonic()
     with np.load(raw,allow_pickle=False) as data:

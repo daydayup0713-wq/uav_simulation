@@ -10,9 +10,9 @@ def quaternion_from_rpy(rpy):
     return [sr*cp*cy-cr*sp*sy, cr*sp*cy+sr*cp*sy, cr*cp*sy-sr*sp*cy, cr*cp*cy+sr*sp*sy]
 
 def select_profile(root, name):
-    if name not in ('flight', 'sensors'):
+    if name not in ('flight', 'sensors', 'navigation'):
         raise ValueError('unknown lab profile: '+name)
-    return Path(root)/'simulation/worlds'/('lab.sdf' if name == 'flight' else 'room.sdf')
+    return Path(root)/'simulation/worlds'/({'flight':'lab.sdf','sensors':'room.sdf','navigation':'navigation.sdf'}[name])
 
 def element(parent, tag, value=None, **attributes):
     child = ET.SubElement(parent, tag, attributes)
@@ -24,9 +24,10 @@ def write_xml(tree, path):
     ET.indent(tree)
     ET.ElementTree(tree).write(path, encoding='utf-8', xml_declaration=True)
 
-def prepare_sensors(root, run_dir):
+def prepare_sensors(root, run_dir, profile='sensors'):
     root, run_dir = Path(root), Path(run_dir)
-    c = json.loads((root/'configs/sensors.json').read_text())
+    if profile not in ('sensors','navigation'): raise ValueError('unknown sensor profile')
+    c = json.loads((root/'configs'/('navigation-sensors.json' if profile=='navigation' else 'sensors.json')).read_text())
     directory = run_dir/'configuration'
     directory.mkdir(exist_ok=True, parents=True)
     model_dir = directory/'models/x500_sensors'
@@ -84,7 +85,7 @@ def prepare_sensors(root, run_dir):
     model_path = model_dir/'model.sdf'
     write_xml(sdf,model_path)
     (model_dir/'model.config').write_text('<model><name>x500_sensors</name><version>0.2.0</version><sdf version="1.9">model.sdf</sdf></model>\n')
-    world = ET.parse(select_profile(root,'sensors')).getroot()
+    world = ET.parse(select_profile(root,profile)).getroot()
     world.find('world/include/uri').text = 'model://x500_sensors'
     world_path = directory/'room.sdf'; write_xml(world,world_path)
     bridges = [('/uav001/lidar/points','sensor_msgs/msg/PointCloud2','gz.msgs.PointCloudPacked'),

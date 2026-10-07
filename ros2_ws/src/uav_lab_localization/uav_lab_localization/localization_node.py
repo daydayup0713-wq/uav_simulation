@@ -53,6 +53,7 @@ class LocalizationNode(Node):
         self.create_subscription(Odometry, '/uav001/odometry', self.control_pose, 10)
         self.create_subscription(TFMessage, '/uav001/localization/raw_tf', self.transforms, 20)
         map_qos = QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL)
+        self.control_alignment_pub = self.create_publisher(TransformStamped, 'localization/control_alignment', map_qos)
         self.map_pub = self.create_publisher(PointCloud2, 'localization/map', map_qos)
         self.create_subscription(PointCloud2, '/glim_ros/map', self.map_cloud, map_qos)
         extrinsic = TransformStamped()
@@ -229,6 +230,10 @@ class LocalizationNode(Node):
         return transform
 
     def tick(self):
+        if self.lio_to_control is not None:
+            alignment = self.map_transform(self.lio_to_control, 'odom')
+            alignment.header.frame_id = 'lio_odom'
+            self.control_alignment_pub.publish(alignment)
         report = self.quality.check(self.get_clock().now().nanoseconds/1e9, time.monotonic())
         array = DiagnosticArray()
         array.header.stamp = self.get_clock().now().to_msg()
