@@ -50,6 +50,7 @@ class CollisionMap:
     lower: np.ndarray
     free: np.ndarray
     version: int
+    source_stamp: float = None
 
     def index(self, point):
         return tuple(np.floor((vector(point)-self.lower)/self.resolution).astype(int))
@@ -146,7 +147,7 @@ class VoxelMap:
         blocked = maximum_filter(self.score>=0,size=tuple(2*radii+1),mode='constant',cval=1)
         free = ~blocked
         free.setflags(write=False)
-        return CollisionMap(self.resolution,self.lower.copy(),free,self.version)
+        return CollisionMap(self.resolution,self.lower.copy(),free,self.version,getattr(self,'source_stamp',None))
 
     def occupied_points(self):
         return self.lower+(np.argwhere(self.score>0)+.5)*self.resolution

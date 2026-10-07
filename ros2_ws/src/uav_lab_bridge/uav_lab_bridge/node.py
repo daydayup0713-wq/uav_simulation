@@ -423,6 +423,10 @@ class Bridge(Node):
         handle.abort()
         return result
 
+    def destroy_node(self):
+        self.server.destroy()
+        return super().destroy_node()
+
 def main(args=None):
     rclpy.init(args=args)
     node = Bridge()

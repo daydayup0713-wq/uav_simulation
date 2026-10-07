@@ -51,19 +51,30 @@ class Navigator:
         finally:self.node.destroy_client(client)
 
     def goto(self,target):
-        action=ActionClient(self.node,Navigate,'/uav001/navigation/navigate');handle=None
+        action=ActionClient(self.node,Navigate,'/uav001/navigation/navigate');handle=None;submitted=None
         try:
             if not action.wait_for_server(timeout_sec=5):raise RuntimeError('navigation action unavailable')
-            handle=self.operator.wait(action.send_goal_async(Navigate.Goal(goal=pose(target))))
+            submitted=action.send_goal_async(Navigate.Goal(goal=pose(target)))
+            handle=self.operator.wait(submitted)
             if not handle.accepted:raise RuntimeError('navigation request rejected')
             result=self.operator.wait(handle.get_result_async()).result
             return {'success':result.success,'reason':result.reason}
         except (RuntimeError,KeyboardInterrupt):
-            if handle and handle.accepted:
-                self.operator.wait(handle.cancel_goal_async(),3.)
-                self.operator.wait(handle.get_result_async(),5.)
+            try:
+                if handle is None and submitted is not None:handle=self.operator.wait(submitted,5.)
+                if handle and handle.accepted:
+                    self.operator.wait(handle.cancel_goal_async(),3.)
+                    self.operator.wait(handle.get_result_async(),5.)
+            except (RuntimeError,KeyboardInterrupt):
+                # Uncertain ownership must invalidate pending acceptance too.
+                try:self.operator.service('navigation/abort')
+                except RuntimeError:pass
+                try:self.operator.service('hold')
+                except RuntimeError:pass
             raise
         finally:action.destroy()
+
+    def destroy(self):self.operator.action.destroy()
 
     def demo(self,runs):
         results=[]
@@ -101,7 +112,7 @@ def main(args=None):
     demo=sub.add_parser('demo');demo.add_argument('--runs',type=int,default=3)
     f=sub.add_parser('fixture');f.add_argument('output',type=Path)
     b=sub.add_parser('benchmark');b.add_argument('input',type=Path);b.add_argument('output',type=Path)
-    options=p.parse_args(args);node=None
+    options=p.parse_args(args);node=None;nav=None
     try:
         if not math.isfinite(options.timeout) or options.timeout<=0:raise ValueError('positive finite timeout required')
         if options.command=='fixture':result=write_fixture(options.output)
@@ -118,5 +129,6 @@ def main(args=None):
     except (ValueError,RuntimeError,KeyboardInterrupt,OSError) as error:
         print(json.dumps({'success':False,'reason':str(error)}));return 1
     finally:
+        if nav:nav.destroy()
         if node:node.destroy_node()
         if rclpy.ok():rclpy.shutdown()

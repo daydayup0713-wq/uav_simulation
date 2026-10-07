@@ -6,6 +6,30 @@ from pathlib import Path
 import signal
 import time
 import argparse
+import subprocess
+
+
+def verify_navigation_recovery(root,run):
+    """Restore real map delivery inside the owned failsafe observation window."""
+    with (run/'navigation-recovery.log').open('w') as log:
+        process=subprocess.Popen(['ros2','run','uav_lab_navigation','navigation'],stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
+        try:
+            ready=False;deadline=time.monotonic()+12
+            while time.monotonic()<deadline and process.poll() is None:
+                state=subprocess.run([str(root/'scripts/labctl'),'nav','--timeout','2','status'],capture_output=True,text=True,timeout=5)
+                if state.returncode==0:ready=True;break
+            arm=subprocess.run([str(root/'scripts/labctl'),'arm'],capture_output=True,text=True,timeout=20)
+            rejection=arm.returncode!=0 and any(text in arm.stdout for text in ('failsafe','fresh observed navigation map'))
+            report={'navigation_restarted_and_ready':ready,'arm_returncode':arm.returncode,'arm_response':arm.stdout,
+                'passed':ready and rejection}
+            if arm.returncode==0:subprocess.run([str(root/'scripts/labctl'),'land'],capture_output=True,timeout=75)
+            (run/'navigation-recovery.json').write_text(json.dumps(report,indent=2)+'\n')
+            return report
+        finally:
+            try:os.killpg(process.pid,signal.SIGTERM)
+            except ProcessLookupError:pass
+            try:process.wait(timeout=3)
+            except subprocess.TimeoutExpired:os.killpg(process.pid,signal.SIGKILL);process.wait(timeout=3)
 
 
 def component_identity(component, command):
@@ -25,7 +49,9 @@ def landing_completed(status, fresh, landing_observed):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--component', choices=('bridge','lio','localization','navigation'), default='bridge')
+    parser.add_argument('--recover',action='store_true')
     options = parser.parse_args()
+    if options.recover and options.component!='navigation':parser.error('--recover requires navigation component')
     import rclpy
     from rclpy.qos import qos_profile_sensor_data
     from px4_msgs.msg import VehicleStatus, VehicleLandDetected
@@ -73,9 +99,12 @@ def main():
             if landing_completed(status, fresh, observed['landing_while_armed']):
                 report = {'passed': True, 'failure': options.component+'_exit', 'elapsed_s': time.monotonic()-started,
                           'final': status, 'failsafe_landing_observed': True, 'events': events}
+                if options.recover:
+                    report['recovery']=verify_navigation_recovery(root,run)
+                    report['passed']=report['recovery']['passed']
                 (run/'fault-acceptance.json').write_text(json.dumps(report, indent=2)+'\n')
                 print(json.dumps({k:v for k,v in report.items() if k!='events'}), flush=True)
-                return 0
+                return 0 if report['passed'] else 1
         (run/'fault-acceptance.json').write_text(json.dumps({'passed': False, 'failure': options.component+'_exit',
             'final': status, 'observed': observed, 'events': events}, indent=2)+'\n')
         raise RuntimeError('PX4 failsafe landing/disarm not independently confirmed within 50s')

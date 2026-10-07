@@ -1,12 +1,15 @@
 """Source-time registered obstacle map in continuous odom; no ground-truth input."""
 import json
+import hashlib
 from collections import deque
 from concurrent.futures import ThreadPoolExecutor,ProcessPoolExecutor,TimeoutError as WorkerTimeout
+from concurrent.futures.process import BrokenProcessPool
 import multiprocessing
 import os
 from pathlib import Path
 import threading
 import time
+import uuid
 import numpy as np
 from scipy.spatial.transform import Rotation
 import rclpy
@@ -47,10 +50,11 @@ class NavigationNode(Node):
         self.quality_ready=False;self.failure='';self.was_ready=False
         self.current=None;self.current_at=0.;self.flight_status={};self.flight_at=0.
         self.map_lock=threading.RLock();self.data_lock=threading.RLock()
-        self.motion_lock=threading.RLock();self.busy=False;self.leg_timeout_s=75.
+        self.motion_lock=threading.RLock();self.busy=False;self.accepted_epoch=None;self.leg_timeout_s=75.;self.acceptance_timeout_s=5.
         self.map_group=MutuallyExclusiveCallbackGroup();self.action_group=ReentrantCallbackGroup()
         self.trace=(run/'navigation.jsonl').open('a',buffering=1) if run else None
         self.run=run;self.saved_at=0.;self.storage=ThreadPoolExecutor(max_workers=1);self.save_future=None
+        self.session_id=uuid.uuid4().hex;self.archive_lock=threading.Lock()
         self.planning_worker=ProcessPoolExecutor(max_workers=1,mp_context=multiprocessing.get_context('spawn'))
         self.planning_lock=threading.Lock()
         qos=QoSProfile(depth=1,durability=DurabilityPolicy.TRANSIENT_LOCAL)
@@ -64,6 +68,8 @@ class NavigationNode(Node):
         self.create_subscription(Odometry,'odometry',self.on_flight_pose,10)
         self.create_subscription(DiagnosticArray,'diagnostics',self.on_flight_status,10)
         self.create_service(PlanPath,'navigation/plan',self.plan_service,callback_group=self.action_group)
+        from std_srvs.srv import Trigger
+        self.create_service(Trigger,'navigation/abort',self.abort_service,callback_group=self.action_group)
         self.flight_client=ActionClient(self,ExecuteFlight,'execute_flight',callback_group=self.action_group)
         self.server=ActionServer(self,Navigate,'navigation/navigate',execute_callback=self.navigate,
             goal_callback=self.navigation_goal,cancel_callback=lambda handle:CancelResponse.ACCEPT,callback_group=self.action_group)
@@ -132,7 +138,7 @@ class NavigationNode(Node):
                 self.grid.integrate(origin,registered)
                 self.grid.observe_body(body[:3,3],self.config['body_halfsize_m'])
                 occupied=self.grid.occupied_points()
-            self.map_stamp=source;self.map_at=time.monotonic()
+                self.grid.source_stamp=source;self.map_stamp=source;self.map_at=time.monotonic()
             self.publish_occupied(occupied,msg.header.stamp)
             self.record('map',stamp=source,version=self.grid.version,occupied_cells=len(occupied),compute_s=time.monotonic()-begun,
                 source_age=self.get_clock().now().nanoseconds/1e9-source)
@@ -150,6 +156,22 @@ class NavigationNode(Node):
         raw=self.run/'navigation-observations';raw.mkdir(exist_ok=True)
         if len(list(raw.glob('*.npz')))<30:
             np.savez_compressed(raw/f'{saved["source_stamp"]:.6f}.npz',origin=saved['origin'],endpoints=endpoints,body=body,source_stamp=saved['source_stamp'])
+
+    def archive_plan(self,collision):
+        if not self.run:return {}
+        with self.archive_lock:
+            try:
+                directory=self.run/'navigation-plans'/self.session_id;directory.mkdir(parents=True,exist_ok=True)
+                path=directory/f'map-v{collision.version}.npz'
+                try:
+                    with path.open('xb') as handle:
+                        np.savez_compressed(handle,free=collision.free,lower=collision.lower,resolution=collision.resolution,
+                            map_version=collision.version,source_stamp=collision.source_stamp,envelope=self.envelope,
+                            configuration=json.dumps(self.config,sort_keys=True))
+                except FileExistsError:pass
+                return {'map_artifact':str(path.relative_to(self.run)),'map_sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
+            except OSError as error:
+                self.failure='plan map archive failed; restart lab';raise ValueError(self.failure) from error
 
     def report(self,now=None):
         now=time.monotonic() if now is None else now
@@ -191,8 +213,8 @@ class NavigationNode(Node):
         try:
             pending=self.planning_worker.submit(plan,collision,[start.x,start.y,start.z],[p.x,p.y,p.z],self.config['max_expansions'],self.config['planning_timeout_s'])
             result=pending.result(timeout=self.config['planning_timeout_s']+3.)
-        except WorkerTimeout as error:
-            self.failure='planning worker timeout; restart lab';raise ValueError(self.failure) from error
+        except (WorkerTimeout,BrokenProcessPool,RuntimeError) as error:
+            self.failure='planning worker failed: '+str(error)+'; restart lab';raise ValueError(self.failure) from error
         finally:self.planning_lock.release()
         return collision,result
 
@@ -202,7 +224,7 @@ class NavigationNode(Node):
             response.success,response.reason,response.map_version=result.success,result.reason,collision.version
             response.path=self.as_path(result.points)
             if result.success:self.path_pub.publish(response.path)
-            self.record('plan',success=result.success,reason=result.reason,points=result.points,expanded=result.expanded,map_version=collision.version)
+            self.record('plan',success=result.success,reason=result.reason,points=result.points,expanded=result.expanded,map_version=collision.version,**self.archive_plan(collision))
         except ValueError as error:response.success,response.reason=False,str(error)
         return response
 
@@ -220,7 +242,7 @@ class NavigationNode(Node):
                 p,q=request.goal.pose.position,request.goal.pose.orientation
                 if request.goal.header.frame_id!='odom' or not np.isfinite([p.x,p.y,p.z,q.x,q.y,q.z,q.w]).all():return GoalResponse.REJECT
                 if abs(q.x)>1e-6 or abs(q.y)>1e-6 or abs(q.z*q.z+q.w*q.w-1)>.001 or not .5<=p.z<=4.5:return GoalResponse.REJECT
-                self.busy=True
+                self.accepted_epoch=int(self.flight_status.get('operator_generation','-1'));self.busy=True
                 return GoalResponse.ACCEPT
             except (ValueError,RuntimeError):return GoalResponse.REJECT
 
@@ -245,10 +267,28 @@ class NavigationNode(Node):
         # Cancellation acknowledgment precedes actual hold. Wait for the adapter result.
         self.future_result(leg.get_result_async(),3.)
 
+    def submit_leg(self,request):
+        pending=self.flight_client.send_goal_async(request)
+        try:return self.future_result(pending,self.acceptance_timeout_s)
+        except RuntimeError:
+            self.failure='flight acceptance uncertain; restart lab'
+            def cancel_late(future):
+                try:
+                    leg=future.result()
+                    if leg and leg.accepted:leg.cancel_goal_async()
+                except Exception as error:self.record('late_cancel_failure',reason=str(error))
+            pending.add_done_callback(cancel_late)
+            raise
+
+    def abort_service(self,request,response):
+        self.failure='operator navigation abort; restart lab'
+        response.success,response.message=True,self.failure
+        return response
+
     def navigate(self,handle):
         outcome=Navigate.Result();leg=None;replans=0
         try:
-            epoch=int(self.flight_status.get('operator_generation','-1'));self.check_motion(epoch)
+            epoch=self.accepted_epoch;self.check_motion(epoch)
             if not self.flight_client.wait_for_server(timeout_sec=3):raise RuntimeError('flight adapter unavailable')
             while rclpy.ok():
                 if handle.is_cancel_requested:
@@ -258,7 +298,7 @@ class NavigationNode(Node):
                 self.check_motion(epoch)
                 if not result.success:raise RuntimeError(result.reason)
                 self.path_pub.publish(self.as_path(result.points))
-                self.record('navigation_plan',map_version=collision.version,reason=result.reason,points=result.points,replans=replans)
+                self.record('navigation_plan',map_version=collision.version,reason=result.reason,points=result.points,replans=replans,**self.archive_plan(collision))
                 changed=False
                 for target in result.points[1:]:
                     self.check_motion(epoch)
@@ -270,7 +310,7 @@ class NavigationNode(Node):
                     request=ExecuteFlight.Goal();request.operation=1;request.navigation=True;request.navigation_epoch=epoch
                     request.target.header.frame_id='odom';request.target.pose.position.x,request.target.pose.position.y,request.target.pose.position.z=map(float,target)
                     request.target.pose.orientation=handle.request.goal.pose.orientation
-                    leg=self.future_result(self.flight_client.send_goal_async(request))
+                    leg=self.submit_leg(request)
                     if not leg.accepted:leg=None;raise RuntimeError('flight leg rejected')
                     result_future=leg.get_result_async();deadline=time.monotonic()+self.leg_timeout_s;checked=latest.version
                     while not result_future.done():
@@ -301,13 +341,15 @@ class NavigationNode(Node):
         except (ValueError,RuntimeError) as error:
             if leg:
                 try:self.stop_leg(leg)
-                except RuntimeError as stop_error:self.record('cancel_failure',reason=str(stop_error))
+                except RuntimeError as stop_error:
+                    self.failure='flight cancellation uncertain; restart lab';self.record('cancel_failure',reason=str(stop_error))
             outcome.success,outcome.reason=False,str(error);self.record('navigation_result',success=False,reason=str(error),replans=replans)
             handle.abort();return outcome
         finally:
             with self.motion_lock:self.busy=False
 
     def destroy_node(self):
+        self.server.destroy();self.flight_client.destroy()
         self.planning_worker.shutdown(wait=True,cancel_futures=True)
         self.storage.shutdown(wait=True)
         if self.trace:self.trace.close()
