@@ -15,6 +15,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--profile', choices=['flight', 'navigation'], default='flight')
     parser.add_argument('--runs', type=int, default=1)
+    parser.add_argument('--web',action='store_true')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     if not 1 <= args.runs <= 3:
@@ -34,9 +35,14 @@ def main():
     with (args.output / 'supervisor.log').open('w') as log, (args.output / 'observer.log').open('w') as observation:
         try:
             supervisor = subprocess.Popen([str(root / 'scripts/start_lab.sh'), '--profile', args.profile,
-                                            '--continuous', '--headless'], cwd=root, stdout=log, stderr=subprocess.STDOUT)
+                                            '--continuous', '--headless', *(['--web'] if args.web else [])], cwd=root, stdout=log, stderr=subprocess.STDOUT)
             deadline = time.monotonic() + 150
             while time.monotonic() < deadline:
+                try:
+                    candidate=Path((root/'.runtime/current-run').read_text().strip())
+                    if candidate.parent==root/'.runtime' and json.loads((candidate/'manifest.json').read_text())['supervisor_pid']==supervisor.pid:
+                        run=candidate
+                except (OSError,KeyError,ValueError):pass
                 if supervisor.poll() is not None:
                     raise RuntimeError('supervisor exited during startup')
                 if owned_run_ready(root / '.runtime', supervisor.pid):
@@ -88,7 +94,7 @@ def main():
                     reason += '; supervisor teardown deadline expired'
                     passed = False
     report = {'passed': passed, 'reason': reason, 'run_id': run.name if run else None,
-              'profile': args.profile, 'runs': args.runs, 'commands': commands}
+              'profile': args.profile, 'runs': args.runs, 'web':args.web, 'commands': commands}
     (args.output / 'acceptance.json').write_text(json.dumps(report, indent=2) + '\n')
     print(json.dumps({'passed': passed, 'reason': reason, 'run_id': report['run_id']}))
     return 0 if passed else 1

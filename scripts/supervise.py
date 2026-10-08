@@ -16,6 +16,7 @@ from sensor_model import select_profile, prepare_sensors
 from slam_config import prepare_slam
 
 ROOT = Path(__file__).resolve().parents[1]
+WEB_COMPONENTS=('web-observatory','web-ui')
 
 def isolated_environment(base, run_dir):
     return {**base, 'GZ_PARTITION': 'uav-lab-'+uuid.uuid4().hex,
@@ -68,6 +69,12 @@ def check_port(port):
             sock.bind(('0.0.0.0', port))
         except OSError as exc:
             raise RuntimeError(f'UDP port {port} unavailable: {exc}') from exc
+
+def check_web_port(port):
+    with socket.socket(socket.AF_INET,socket.SOCK_STREAM) as sock:
+        sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
+        try:sock.bind(('127.0.0.1',port))
+        except OSError as exc:raise RuntimeError(f'Web TCP port {port} unavailable: {exc}') from exc
 
 class ManagedProcesses:
     def __init__(self, directory):
@@ -128,6 +135,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--headless', action='store_true')
     p.add_argument('--rviz', action='store_true')
+    p.add_argument('--web',action='store_true',help='start independent local observation UI on http://127.0.0.1:8080')
     p.add_argument('--continuous', action='store_true', help='execute navigation as collision-checked C2 trajectories')
     p.add_argument('--profile', choices=('flight', 'sensors', 'localization', 'slam', 'navigation'), default='flight')
     p.add_argument('--sensor-profile',choices=('livox','livox-rtk','mechanical'))
@@ -152,7 +160,7 @@ def main():
     metadata = {'run_id': run_dir.name, 'supervisor_pid': os.getpid(), 'dependencies': json.loads((ROOT/'dependencies/lock.json').read_text()),
                 'environment': {k: env.get(k) for k in ('ROS_DOMAIN_ID','GZ_PARTITION','RMW_IMPLEMENTATION')},
                 'headless': options.headless, 'profile': options.profile, 'sensor_profile':options.sensor_profile,
-                'scene':options.scene, 'continuous_trajectory': options.continuous,
+                'scene':options.scene, 'web':options.web, 'continuous_trajectory': options.continuous,
                 'parameters': {'COM_RC_IN_MODE': 4, 'COM_OF_LOSS_T': 1, 'COM_OBL_RC_ACT': 4,
                                'COM_DL_LOSS_T': 300, 'NAV_DLL_ACT': 0, 'UXRCE_DDS_SYNCT': 0,
                                'UXRCE_DDS_PTCFG': 1,
@@ -201,11 +209,17 @@ def main():
                           'px4_world': 'NED', 'px4_body': 'FRD'}
     metadata['platform_commit'], metadata['platform_dirty'] = source_identity(ROOT, env)
     (run_dir / 'manifest.json').write_text(json.dumps(metadata, indent=2)+'\n')
-    def stop(*_):
+    def stop(signum, _frame):
+        (run_dir/'stop-request.json').write_text(json.dumps({'signal':signal.Signals(signum).name,
+            'supervisor_pid':os.getpid(),'wall_time':time.time()},indent=2)+'\n')
         raise KeyboardInterrupt
     signal.signal(signal.SIGTERM, stop)
     signal.signal(signal.SIGINT, stop)
     try:
+        if options.web:
+            if not (ROOT/'web/dist/index.html').is_file():raise RuntimeError('Web build missing; run npm --prefix web run build')
+            for port in (8080,8765):
+                check_web_port(port)
         check_port(8888)
         agent_env = {**env, 'LD_LIBRARY_PATH': str(ROOT/'.deps/agent-install/lib')+':'+str(ROOT/'.deps/agent-install/lib64')}
         manager.start('agent', [ROOT/'.deps/agent-install/bin/MicroXRCEAgent', 'udp4', '-p', '8888'], env=agent_env)
@@ -278,6 +292,17 @@ def main():
             wait_for(manager, navigation_ready, 'fresh sensor-time navigation map', 45)
         if options.rviz:
             manager.start('rviz', ['rviz2','-d', ROOT/'configs'/('navigation.rviz' if options.profile == 'navigation' else 'slam.rviz' if localization else 'sensors.rviz' if sensor else 'lab.rviz')], env=env)
+        if options.web:
+            manager.start('web-observatory',['ros2','run','uav_lab_experiments','observatory'],env=env)
+            manager.start('web-ui',['/usr/bin/python3','-m','http.server','8080','--bind','127.0.0.1',
+                                    '--directory',ROOT/'web/dist'],env=env)
+            def web_ready():
+                if not (run_dir/'web-observatory-ready').exists():return False
+                import urllib.request
+                try:
+                    with urllib.request.urlopen('http://127.0.0.1:8080',timeout=1) as response:return response.status==200
+                except OSError:return False
+            wait_for(manager,web_ready,'independent Web observatory',10)
         (run_dir/'ready').write_text('ready\n')
         print('LAB READY '+str(run_dir), flush=True)
         failure_started = None
@@ -289,7 +314,11 @@ def main():
                 (run_dir/'failed-processes.json').write_text(json.dumps({name: {'pid': process.pid, 'returncode': process.poll()} for name, process in manager.processes if name in broken}, indent=2)+'\n')
                 (run_dir/'failure.txt').write_text('control link exited: '+','.join(broken)+'; preserving physics/PX4 for failsafe landing\n')
                 print('control link failed; keeping physics/PX4 alive for 60s failsafe window', flush=True)
-            manager.check(ignore=control_components if failure_started is not None else ())
+            web_broken=[name for name,process in manager.processes if name in WEB_COMPONENTS and process.poll() is not None]
+            if web_broken and not (run_dir/'web-failure.json').exists():
+                (run_dir/'web-failure.json').write_text(json.dumps({'failed':web_broken,'flight_continues':True})+'\n')
+                print('Web observation unavailable; flight components continue',flush=True)
+            manager.check(ignore=WEB_COMPONENTS+(control_components if failure_started is not None else ()))
             if failure_started is not None and time.monotonic()-failure_started > 60:
                 raise RuntimeError('control link failed; failsafe observation window complete')
             time.sleep(.5)
