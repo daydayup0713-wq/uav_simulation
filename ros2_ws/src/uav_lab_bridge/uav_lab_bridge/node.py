@@ -22,6 +22,7 @@ from px4_msgs.msg import (VehicleLocalPosition, VehicleStatus, VehicleAttitude,
                           VehicleLandDetected, VehicleCommandAck, VehicleCommand,
                           OffboardControlMode, TrajectorySetpoint, VehicleOdometry, EstimatorStatusFlags)
 from uav_lab_interfaces.action import ExecuteFlight
+from uav_lab_interfaces.srv import SelectBackends
 from .controller import FlightController
 from .coordinate import ned_to_enu, enu_to_ned, px4_to_ros_quaternion, yaw_to_ned
 from .clock import Px4Clock
@@ -92,11 +93,35 @@ class Bridge(Node):
         self.tf = TransformBroadcaster(self)
         for name in ('arm', 'disarm', 'hold'):
             self.create_service(Trigger, name, self.service_callback(name), callback_group=group)
+        self.create_service(SelectBackends, 'experiments/select_backends', self.select_backend_callback,
+                            callback_group=group)
         self.server = ActionServer(self, ExecuteFlight, 'execute_flight',
                                    execute_callback=self.execute, goal_callback=self.goal,
                                    cancel_callback=self.cancel, callback_group=group)
         self.timer = self.create_timer(.05, self.pump, callback_group=group,
                                       clock=Clock(clock_type=ClockType.STEADY_TIME))
+
+    def select_backend_callback(self, request, response):
+        from uav_lab_experiments.registry import Registry, GroundState, select_backends
+        try:
+            with self.lock:
+                now = time.monotonic()
+                # Both the selection and arm service hold the same policy lock.
+                if not self.policy.fresh(now):
+                    raise ValueError('selection requires fresh ground telemetry')
+                root = Path(os.environ['LAB_ROOT'])
+                registry = Registry(root / 'configs/backends.json', root / '.runtime/backend-evidence')
+                select_backends(registry, root / '.runtime/next-experiment.json',
+                                request.localization, request.planning, request.input_group,
+                                GroundState(self.policy.t.armed, self.policy.t.landed,
+                                            self.policy.active is None and not self.policy.streaming,
+                                            self.policy.t.status_at), now)
+                self.record('backend_selection', localization=request.localization,
+                            planning=request.planning, input_group=request.input_group)
+                response.success, response.reason = True, 'saved for next run; restart lab required'
+        except (ValueError, KeyError, OSError) as exc:
+            response.success, response.reason = False, str(exc)
+        return response
 
     def record(self, event, **values):
         if self.trace:

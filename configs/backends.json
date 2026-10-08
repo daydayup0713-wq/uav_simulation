@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "groups": {
+    "synchronous_lidar_imu": ["synchronous_pointcloud", "imu_6axis"],
+    "livox_visual_inertial": ["timed_livox_pointcloud", "imu_6axis", "monocular_calibrated"],
+    "livox_visual_inertial_rtk": ["timed_livox_pointcloud", "imu_6axis", "monocular_calibrated", "gnss_rtk"],
+    "mechanical_inertial": ["timed_ring_pointcloud", "imu_attitude"],
+    "monocular_inertial": ["monocular_calibrated", "imu_6axis"]
+  },
+  "backends": [
+    {"id": "glim", "role": "localization", "source_ref": "65a5562c6b8906e60693c63cc0c95de885426352", "groups": ["synchronous_lidar_imu", "livox_visual_inertial", "mechanical_inertial"], "capabilities": {"odometry": true, "loop_closure": true, "relocalization": false, "global_optimization": true, "visual_fusion": false}},
+    {"id": "fast_lio2", "role": "localization", "source_ref": null, "groups": ["livox_visual_inertial", "livox_visual_inertial_rtk", "mechanical_inertial"], "capabilities": {"odometry": true, "loop_closure": false, "relocalization": false, "global_optimization": false}},
+    {"id": "fast_livo2", "role": "localization", "source_ref": null, "groups": ["livox_visual_inertial", "livox_visual_inertial_rtk"], "capabilities": {"odometry": true, "loop_closure": false, "relocalization": false, "global_optimization": false, "visual_fusion": true}},
+    {"id": "fast_livo2_rtk", "role": "localization", "source_ref": null, "groups": ["livox_visual_inertial_rtk"], "capabilities": {"odometry": true, "loop_closure": false, "relocalization": false, "global_optimization": "offline_rtk", "visual_fusion": true}},
+    {"id": "orb_slam3", "role": "localization", "source_ref": null, "groups": ["monocular_inertial", "livox_visual_inertial", "livox_visual_inertial_rtk"], "capabilities": {"odometry": true, "loop_closure": true, "relocalization": true, "global_optimization": true, "visual_fusion": true}},
+    {"id": "lio_sam", "role": "localization", "source_ref": null, "groups": ["mechanical_inertial"], "capabilities": {"odometry": true, "loop_closure": true, "relocalization": false, "global_optimization": true}},
+    {"id": "vins_fusion", "role": "localization", "source_ref": null, "groups": ["monocular_inertial", "livox_visual_inertial", "livox_visual_inertial_rtk"], "capabilities": {"odometry": true, "loop_closure": true, "relocalization": true, "global_optimization": true, "visual_fusion": true}},
+    {"id": "astar", "role": "planning", "source_ref": "e295a54cd52e665edf8c06436d9fb195f462dc28", "groups": ["synchronous_lidar_imu", "livox_visual_inertial", "livox_visual_inertial_rtk", "mechanical_inertial"], "capabilities": {"observed_space_only": true, "continuous_trajectory": true, "online_replan": true}},
+    {"id": "ego", "role": "planning", "source_ref": null, "groups": ["livox_visual_inertial", "livox_visual_inertial_rtk", "mechanical_inertial"], "capabilities": {"continuous_trajectory": true, "online_replan": true, "single_drone": true}},
+    {"id": "fast_planner", "role": "planning", "source_ref": null, "groups": ["livox_visual_inertial", "livox_visual_inertial_rtk", "mechanical_inertial"], "capabilities": {"continuous_trajectory": true, "online_replan": true}},
+    {"id": "gcopter", "role": "planning", "source_ref": null, "groups": ["livox_visual_inertial", "livox_visual_inertial_rtk", "mechanical_inertial"], "capabilities": {"continuous_trajectory": true, "online_replan": true, "requires_safe_corridor": true}}
+  ]
+}
