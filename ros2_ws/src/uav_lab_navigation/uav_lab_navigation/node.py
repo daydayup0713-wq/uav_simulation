@@ -126,6 +126,11 @@ class NavigationNode(Node):
     def map_cycle(self):
         begun=time.monotonic()
         if self.failure:return
+        # DDS may discover sensor publishers before /clock. A zero simulated
+        # clock is uninitialized; wait without integrating or declaring ready.
+        # Once a map exists, ordinary freshness checks must still fail closed.
+        if self.map_stamp is None and not self.was_ready and self.get_clock().now().nanoseconds == 0:
+            return
         with self.data_lock:
             if self.alignment is None or not self.quality_ready:return
             for msg in reversed(self.pending_clouds):
