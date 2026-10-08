@@ -24,10 +24,15 @@ def write_xml(tree, path):
     ET.indent(tree)
     ET.ElementTree(tree).write(path, encoding='utf-8', xml_declaration=True)
 
-def prepare_sensors(root, run_dir, profile='sensors'):
+def prepare_sensors(root, run_dir, profile='sensors', sensor_profile=None, scene=None):
     root, run_dir = Path(root), Path(run_dir)
     if profile not in ('sensors','navigation'): raise ValueError('unknown sensor profile')
-    c = json.loads((root/'configs'/('navigation-sensors.json' if profile=='navigation' else 'sensors.json')).read_text())
+    if sensor_profile is not None and sensor_profile not in ('livox','livox-rtk','mechanical'):
+        raise ValueError('unknown timed sensor profile')
+    if scene is not None and sensor_profile is None:
+        raise ValueError('experiment scene requires a timed sensor profile')
+    filename = 'sensors-'+sensor_profile+'.json' if sensor_profile else 'navigation-sensors.json' if profile=='navigation' else 'sensors.json'
+    c = json.loads((root/'configs'/filename).read_text())
     directory = run_dir/'configuration'
     directory.mkdir(exist_ok=True, parents=True)
     model_dir = directory/'models/x500_sensors'
@@ -49,6 +54,8 @@ def prepare_sensors(root, run_dir, profile='sensors'):
         item = c[name]
         transforms.append({'parent':'base_link','child':item['frame'],'xyz':item['xyz'],
                            'xyzw':quaternion_from_rpy(item['rpy'])})
+        if name=='lidar' and sensor_profile:
+            continue
         sensor = element(link,'sensor',name='lab_'+name,type='gpu_lidar' if name=='lidar' else name)
         element(sensor,'pose',item['xyz']+item['rpy'])
         element(sensor,'update_rate',item['hz']); element(sensor,'always_on','true')
@@ -79,13 +86,25 @@ def prepare_sensors(root, run_dir, profile='sensors'):
     transforms.append({'parent':c['camera']['frame'],'child':c['camera']['optical_frame'], 'xyz':[0,0,0], 'xyzw':quaternion_from_rpy(c['camera']['optical_rpy'])})
     truth = element(model,'plugin',filename='gz-sim-odometry-publisher-system',name='gz::sim::systems::OdometryPublisher')
     for key,value in {'dimensions':3,'odom_frame':c['truth']['frame'],'robot_base_frame':c['truth']['child_frame'],
-                      'odom_publish_frequency':c['truth']['hz'],'odom_topic':'/uav001/ground_truth/odometry',
+                      'odom_publish_frequency':200 if sensor_profile else c['truth']['hz'],
+                      'odom_topic':'/_lab/sensor_physics/odometry' if sensor_profile else '/uav001/ground_truth/odometry',
                       'tf_topic':'/uav001/sim/truth_tf','xyz_offset':c['model_to_base_link']}.items():
         element(truth,key,value)
     model_path = model_dir/'model.sdf'
     write_xml(sdf,model_path)
     (model_dir/'model.config').write_text('<model><name>x500_sensors</name><version>0.2.0</version><sdf version="1.9">model.sdf</sdf></model>\n')
-    world = ET.parse(select_profile(root,profile)).getroot()
+    scenario = None
+    if sensor_profile:
+        from experiment_scenarios import generate_scene
+        scenario = generate_scene(root, directory/'scene', scene or 'circle-eight')
+        c['scene'] = scenario['route']['scene']
+        c['geometry_file'] = 'scene/sensor-geometry.json'
+        c['route_file'] = 'scene/route.json'
+        if 'gnss' in c:
+            c['gnss']['events'] = scenario['route']['gnss_events']
+            item=c['gnss']; transforms.append({'parent':'base_link','child':item['frame'],'xyz':item['xyz'],
+                                                'xyzw':quaternion_from_rpy(item['rpy'])})
+    world = ET.parse(scenario['world'] if scenario else select_profile(root,profile)).getroot()
     world.find('world/include/uri').text = 'model://x500_sensors'
     world_path = directory/'room.sdf'; write_xml(world,world_path)
     bridges = [('/uav001/lidar/points','sensor_msgs/msg/PointCloud2','gz.msgs.PointCloudPacked'),
@@ -93,6 +112,9 @@ def prepare_sensors(root, run_dir, profile='sensors'):
                ('/uav001/camera/image_raw','sensor_msgs/msg/Image','gz.msgs.Image'),
                ('/uav001/camera/camera_info','sensor_msgs/msg/CameraInfo','gz.msgs.CameraInfo'),
                ('/uav001/ground_truth/odometry','nav_msgs/msg/Odometry','gz.msgs.Odometry')]
+    if sensor_profile:
+        bridges = [v for v in bridges if v[0] not in ('/uav001/lidar/points','/uav001/ground_truth/odometry')]
+        bridges.append(('/_lab/sensor_physics/odometry','nav_msgs/msg/Odometry','gz.msgs.Odometry'))
     # JSON is a YAML subset understood by ros_gz_bridge.
     bridge_path = directory/'sensor-bridge.yaml'
     bridge_path.write_text(json.dumps([{'ros_topic_name':topic,'gz_topic_name':topic,'ros_type_name':ros,'gz_type_name':gz,

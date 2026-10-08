@@ -130,7 +130,11 @@ def main():
     p.add_argument('--rviz', action='store_true')
     p.add_argument('--continuous', action='store_true', help='execute navigation as collision-checked C2 trajectories')
     p.add_argument('--profile', choices=('flight', 'sensors', 'localization', 'slam', 'navigation'), default='flight')
+    p.add_argument('--sensor-profile',choices=('livox','livox-rtk','mechanical'))
+    p.add_argument('--scene',choices=('circle-eight','helix','multi-room','corridor','dense','outdoor-rtk'))
     options = p.parse_args()
+    if (options.scene and not options.sensor_profile) or (options.sensor_profile and options.profile!='sensors'):
+        p.error('timed sensor scenes currently require --profile sensors; backend contracts gate later closed loop')
     runtime = ROOT / '.runtime'
     runtime.mkdir(exist_ok=True)
     lock = (runtime / 'lab.lock').open('w')
@@ -147,7 +151,8 @@ def main():
     (runtime / 'current-run').write_text(str(run_dir)+'\n')
     metadata = {'run_id': run_dir.name, 'supervisor_pid': os.getpid(), 'dependencies': json.loads((ROOT/'dependencies/lock.json').read_text()),
                 'environment': {k: env.get(k) for k in ('ROS_DOMAIN_ID','GZ_PARTITION','RMW_IMPLEMENTATION')},
-                'headless': options.headless, 'profile': options.profile, 'continuous_trajectory': options.continuous,
+                'headless': options.headless, 'profile': options.profile, 'sensor_profile':options.sensor_profile,
+                'scene':options.scene, 'continuous_trajectory': options.continuous,
                 'parameters': {'COM_RC_IN_MODE': 4, 'COM_OF_LOSS_T': 1, 'COM_OBL_RC_ACT': 4,
                                'COM_DL_LOSS_T': 300, 'NAV_DLL_ACT': 0, 'UXRCE_DDS_SYNCT': 0,
                                'UXRCE_DDS_PTCFG': 1,
@@ -157,10 +162,21 @@ def main():
             EKF2_EV_CTRL=11, EKF2_HGT_REF=3, EKF2_BARO_CTRL=0, EKF2_MAG_TYPE=5, EKF2_EV_DELAY=0)
     snapshots = run_dir/'configuration'
     snapshots.mkdir()
+    # Keep larger image payloads on bounded local SHM. UDP discovery remains
+    # restricted to loopback by the archived profile, even though ROS's generic
+    # localhost flag is disabled to avoid its transport override.
+    env.pop('FASTRTPS_DEFAULT_PROFILES_FILE',None)
+    env['ROS_LOCALHOST_ONLY']='1'
+    if options.sensor_profile:
+        dds=snapshots/'fastdds-local.xml'
+        dds.write_bytes((ROOT/'configs/fastdds-local.xml').read_bytes())
+        env.update(FASTRTPS_DEFAULT_PROFILES_FILE=str(dds),ROS_LOCALHOST_ONLY='0')
+        metadata['dds_profile']='configuration/fastdds-local.xml'
     localization = options.profile in ('localization', 'slam', 'navigation')
     if localization and not (ROOT/'.deps/slam/install/build-manifest.json').is_file():
         raise RuntimeError('private CPU localization backend missing; run bootstrap_slam.py')
-    sensor = prepare_sensors(ROOT, run_dir, 'navigation' if options.profile == 'navigation' else 'sensors') if options.profile != 'flight' else None
+    sensor = prepare_sensors(ROOT, run_dir, 'navigation' if options.profile == 'navigation' else 'sensors',
+                             sensor_profile=options.sensor_profile,scene=options.scene) if options.profile != 'flight' else None
     world_path = sensor['world'] if sensor else select_profile(ROOT, options.profile)
     if sensor:
         env['GZ_SIM_RESOURCE_PATH'] = str(sensor['resource_path'])+':'+env['GZ_SIM_RESOURCE_PATH']
@@ -169,6 +185,8 @@ def main():
     files = ['simulation/worlds/lab.sdf', 'configs/px4-start.sh', 'configs/lab.rviz', 'dependencies/lock.json']
     if sensor:
         files += ['simulation/worlds/room.sdf', 'configs/sensors.json', 'configs/sensors.rviz', 'configs/recording-qos.yaml']
+    if options.sensor_profile:
+        files += ['configs/sensors-'+options.sensor_profile+'.json','scripts/experiment_scenarios.py','configs/fastdds-local.xml']
     if options.profile == 'navigation':
             files += ['simulation/worlds/navigation.sdf', 'configs/navigation-sensors.json', 'configs/navigation.json']
     for relative in files:
@@ -220,6 +238,9 @@ def main():
                                            '--ros-args','-p','config_file:='+str(sensor['bridge'])], env=env)
             manager.start('sensors', ['ros2','run','uav_lab_tools','sensors','--ros-args',
                                      '-p','calibration_file:='+str(sensor['calibration_path'])], env=env)
+            if options.sensor_profile:
+                manager.start('timed-sensors',['ros2','run','uav_lab_experiments','timed_sensors','--ros-args',
+                                              '-p','calibration_file:='+str(sensor['calibration_path'])],env=env)
         flight_readiness = FlightReadiness(require_preflight=options.profile not in ('slam', 'navigation'))
         def vehicle_ready():
             return flight_readiness.update(read_vehicle_status(env), time.monotonic())

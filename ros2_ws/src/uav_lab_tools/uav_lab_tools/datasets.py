@@ -2,10 +2,11 @@
 import hashlib
 import json
 from pathlib import Path
-from .sensor_contract import RECORD_TOPICS, SENSOR_TOPICS, stamp_ns
+from .sensor_contract import RECORD_TOPICS, SENSOR_TOPICS, stamp_ns, sensor_topics, record_topics
 from .sensor_audit import SensorAudit
 
 TOPIC_TYPES={t:v[0] for t,v in SENSOR_TOPICS.items()}
+TOPIC_TYPES.update({'/uav001/gnss/fix':'sensor_msgs/msg/NavSatFix','/uav001/sensors/timed_diagnostics':'diagnostic_msgs/msg/DiagnosticArray'})
 TOPIC_TYPES.update({'/clock':'rosgraph_msgs/msg/Clock','/tf':'tf2_msgs/msg/TFMessage',
                     '/tf_static':'tf2_msgs/msg/TFMessage','/uav001/odometry':'nav_msgs/msg/Odometry',
                     '/uav001/path':'nav_msgs/msg/Path','/uav001/diagnostics':'diagnostic_msgs/msg/DiagnosticArray'})
@@ -60,13 +61,13 @@ def inspect_bag(directory, allow_incomplete=False):
         topic,data,received_ns=reader.read_next();counts[topic]+=1
         if first_receive is None:first_receive=received_ns
         last_receive=received_ns
-        if topic not in SENSOR_TOPICS and topic not in ('/clock','/tf_static'):continue
+        if topic not in sensor_topics(metadata['calibration']) and topic not in ('/clock','/tf_static'):continue
         msg=deserialize_message(data,classes[topic])
         if topic=='/clock':clock=stamp_ns(msg.clock);audit.observe_clock(clock)
         elif topic=='/tf_static':audit.observe_static(msg)
         else:audit.observe(topic,msg,clock)
     report=audit.report()
-    missing=[t for t in RECORD_TOPICS if not counts.get(t)]
+    missing=[t for t in record_topics(metadata['calibration']) if not counts.get(t)]
     report.update(topic_counts=counts,missing_recording_topics=missing,dataset=str(directory))
     report['bag_duration_s']=(last_receive-first_receive)/1e9 if first_receive is not None else 0
     report['passed']=report['passed'] and not missing

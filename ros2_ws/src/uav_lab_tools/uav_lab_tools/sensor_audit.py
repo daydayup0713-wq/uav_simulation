@@ -2,7 +2,8 @@
 import math
 import struct
 import time
-from .sensor_contract import SENSOR_TOPICS, stamp_ns
+import numpy as np
+from .sensor_contract import SENSOR_TOPICS, stamp_ns, sensor_topics
 
 class StreamStats:
     def __init__(self, hz):
@@ -32,7 +33,8 @@ class StreamStats:
 class SensorAudit:
     def __init__(self, calibration):
         self.calibration=calibration
-        self.stats={topic:StreamStats(calibration[section]['hz']) for topic,(_,section,_) in SENSOR_TOPICS.items()}
+        self.topics=sensor_topics(calibration)
+        self.stats={topic:StreamStats(calibration[section]['hz']) for topic,(_,section,_) in self.topics.items()}
         self.errors=set(); self.transforms=set()
         self.clock_first=None; self.clock_last=None; self.clock_count=0
         self.wall_first=time.monotonic()
@@ -65,7 +67,7 @@ class SensorAudit:
 
     def observe(self, topic, msg, clock_ns=None):
         if topic not in self.stats: return
-        _,section,frame_key=SENSOR_TOPICS[topic]
+        _,section,frame_key=self.topics[topic]
         c=self.calibration[section]
         ns=stamp_ns(msg.header.stamp)
         self.stats[topic].observe(ns)
@@ -79,8 +81,18 @@ class SensorAudit:
             elif section=='imu':
                 values=[getattr(v,axis) for v in (msg.angular_velocity,msg.linear_acceleration) for axis in 'xyz']
                 if not all(math.isfinite(v) for v in values): self.error('nonfinite IMU measurement')
-                if msg.orientation_covariance[0]!=-1: self.error('IMU ideal orientation exposed to algorithm')
+                if c.get('attitude_stddev_rad'):
+                    q=msg.orientation
+                    norm=sum(v*v for v in (q.x,q.y,q.z,q.w))
+                    if not math.isfinite(norm) or abs(norm-1)>.001 or any(abs(msg.orientation_covariance[i]-c['attitude_stddev_rad']**2)>1e-9 for i in (0,4,8)):
+                        self.error('IMU noisy attitude/covariance contract mismatch')
+                elif msg.orientation_covariance[0]!=-1: self.error('IMU ideal orientation exposed to algorithm')
                 self.imu_norm_sum+=math.sqrt(sum(v*v for v in values[3:]));self.imu_count+=1
+            elif section=='gnss':
+                if msg.status.status==-1:
+                    if not all(math.isnan(v) for v in (msg.latitude,msg.longitude,msg.altitude)):self.error('lost GNSS must mark unavailable coordinates')
+                elif not all(math.isfinite(v) for v in (msg.latitude,msg.longitude,msg.altitude)) or any(msg.position_covariance[i]<=0 for i in (0,4,8)):
+                    self.error('GNSS measurement/covariance invalid')
             else:
                 if msg.child_frame_id!=c['child_frame']: self.error('truth child frame mismatch')
                 p,q=msg.pose.pose.position,msg.pose.pose.orientation
@@ -109,11 +121,27 @@ class SensorAudit:
         if zs and max(zs)-min(zs)<.05: self.error('point cloud lacks vertical extent')
         self.cloud_summary={'points_per_scan':count,'finite_sample_fraction':finite/max(1,sampled),
                             'sampled_z_extent_m':max(zs)-min(zs) if zs else 0}
+        if c.get('measurement_time')=='per_beam':
+            channel='ring' if c['kind']=='mechanical' else 'line'
+            if not ('time' in fields and fields['time'].datatype==7 and fields['time'].offset<=msg.point_step-4
+                    and channel in fields and fields[channel].datatype==4 and fields[channel].offset<=msg.point_step-2):
+                self.error('timed cloud sampling/channel fields missing');return
+            times=np.ndarray((msg.height,msg.width),dtype='>f4' if msg.is_bigendian else '<f4',buffer=data,
+                             offset=fields['time'].offset,strides=(msg.row_step,msg.point_step)).ravel()
+            channels=np.ndarray((msg.height,msg.width),dtype='>u2' if msg.is_bigendian else '<u2',buffer=data,
+                                offset=fields[channel].offset,strides=(msg.row_step,msg.point_step)).ravel()
+            if (not np.isfinite(times).all() or times.min()<-1e-7 or times.max()>1/c['hz']+1e-7
+                    or np.ptp(times)<.8/c['hz'] or np.any(np.diff(times)<0)):
+                self.error('timed cloud sampling interval invalid')
+            if set(np.unique(channels))!=set(range(c['vertical_samples'])):self.error('timed cloud channel contract invalid')
+            self.cloud_summary.update(point_time_min_s=float(times.min()),point_time_max_s=float(times.max()),channel=channel)
 
     def image(self,msg,c):
         if (msg.width,msg.height)!=(c['width'],c['height']) or msg.encoding!='rgb8': self.error('image size/encoding mismatch')
         if msg.step!=msg.width*3 or len(msg.data)!=msg.step*msg.height: self.error('image buffer mismatch')
-        elif max(msg.data,default=0)-min(msg.data,default=0)<10: self.error('image rendering appears blank')
+        else:
+            pixels=np.frombuffer(msg.data,dtype=np.uint8)
+            if int(pixels.max())-int(pixels.min())<10:self.error('image rendering appears blank')
 
     def camera_info(self,msg,c):
         fx=c['width']/(2*math.tan(c['horizontal_fov_rad']/2))

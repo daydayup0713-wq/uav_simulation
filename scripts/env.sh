@@ -23,6 +23,10 @@ exec env -i HOME="$HOME" USER="${USER:-pine}" LANG=C.UTF-8 PATH=/usr/bin:/bin \
     if [ -f "$LAB_ROOT/.runtime/current-run" ]; then
       export LAB_RUN_DIR="$(cat "$LAB_ROOT/.runtime/current-run")"
       export ROS_LOG_DIR="$LAB_RUN_DIR/operator-logs"
+      if [ -f "$LAB_RUN_DIR/configuration/fastdds-local.xml" ]; then
+        export FASTRTPS_DEFAULT_PROFILES_FILE="$LAB_RUN_DIR/configuration/fastdds-local.xml"
+        export ROS_LOCALHOST_ONLY=0
+      fi
     fi
     exec "$@"
   ' lab-env "$@"
