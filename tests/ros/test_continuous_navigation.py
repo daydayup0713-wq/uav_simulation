@@ -29,7 +29,8 @@ def test_continuous_navigation_sends_one_collision_checked_curve(monkeypatch, tm
     nav.flight_status = {'phase': 'HOLDING', 'armed': 'True', 'offboard': 'True', 'operator_generation': '0'}
     nav.flight_at = time.monotonic()
     healthy = [True]
-    monkeypatch.setattr(nav, 'report', lambda **kw: {'ready': healthy[0]})
+    monkeypatch.setattr(nav, 'report', lambda **kw: {'ready': healthy[0],
+                        'state': 'READY' if healthy[0] else 'FAILED', 'reason': 'controlled source'})
     monkeypatch.setattr(nav, 'make_plan', lambda goal, start_override=None:
         (nav.grid.snapshot(nav.envelope), Plan(True, 'PLANNED', [[0., 0., 2.], [0., 1., 2.], [1., 1., 2.]])))
     reference = TrajectoryReference(position=[0., 0., 2.], velocity=[0., 0., 0.], acceleration=[0., 0., 0.])

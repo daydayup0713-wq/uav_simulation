@@ -1,5 +1,17 @@
 # V0.1 接口契约
 
+## L1 新增：连续轨迹与后端选择
+
+`/uav001/execute_trajectory` 为 `ExecuteTrajectory` Action。输入 `odom` 中的分段五次多项式，系数按归一化时间 `u∈[0,1]` 的升幂排列，包含位置、航向、时长和所有权标识。服务器固定速度 0.5m/s、加速度 0.5m/s²、jerk 1m/s³，客户端不能提高限值。末端要求静止，中间段至少位置/速度/加速度连续。
+
+空 `replaces_id` 为新运动，重复运动拒绝。替换须引用当前轨迹 ID，指定未来 0.1～2 秒内的 ROS 仿真开始时刻，并精确匹配旧轨迹在该时刻的位置、速度、加速度、航向和航向变化率。替换提交至开始时刻之间继续执行旧曲线。HOLD 取消当前和待开始轨迹并生成受约束的停止；LAND 优先并沿用原生 PX4 降落确认。
+
+`/uav001/trajectory/reference` 为 `TrajectoryReference`，发布连续控制参考和轨迹运行时间，时间戳对应执行采样时刻。ENU 位置/速度/加速度在飞控边界转换为 NED，航向变化率符号同样转换。轨迹/setpoint 50Hz，独立 Offboard 心跳 20Hz。导航模式只接受带当前 `navigation_epoch` 的导航请求。
+
+`/uav001/experiments/select_backends` 为 `SelectBackends` 服务。飞控适配器在同一控制锁内检查新鲜遥测、落地、上锁、空闲和有效安装证据，原子保存下一次运行配置。必须重启实验后生效，当前运行不热切换。能力和各阶段报告由 `labctl experiments list/capabilities` 查询；无有效报告时仅显示 `configured`。
+
+旧 V0.4 导航配置保留；`start_lab.sh --profile navigation --continuous` 启用完整曲线碰撞检查和连续执行。复杂场景、Web 与算法对照的后续验收进度见 [L1 记录](validation/L1-progress.md)。
+
 ## 职责与坐标
 
 只有 `uav_lab_bridge` 发布 `/fmu/in/*`。发现其他发布者时停止控制并锁定故障。平台对外为 ENU/FLU；位置由 PX4 NED `(x,y,z)` 转为 ENU `(y,x,-z)`，姿态同时转换世界坐标和 FRD/FLU 机体坐标。Odometry 的速度在 `base_link` 中表达。
