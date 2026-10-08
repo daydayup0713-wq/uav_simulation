@@ -1,0 +1,6 @@
+{
+  "schema": 1,
+  "frame": "odom",
+  "controls": [[1.5, 0.0, 2.0], [1.5, 1.5, 2.0], [0.0, 1.5, 2.0], [0.0, 0.0, 2.0]],
+  "description": "Continuous fly-through turns; legacy stop-and-go demo remains available."
+}

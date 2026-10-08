@@ -217,10 +217,30 @@ class Trajectory:
         return {name: max(s.maximum_derivative(order) for s in self.segments)
                 for order, name in enumerate(('speed', 'acceleration', 'jerk'), 1)}
 
-    def collision_free(self, collision, max_nodes=50000):
+    def collision_free(self, collision, max_nodes=50000, start_time=0., end_time=None):
         if not isinstance(max_nodes, int) or max_nodes <= 0:
             raise ValueError('positive curve subdivision budget required')
-        queue = [(s.bezier(), 0) for s in self.segments]
+        end_time = self.duration if end_time is None else end_time
+        if not math.isfinite(start_time) or not math.isfinite(end_time) or not 0 <= start_time <= end_time <= self.duration + 1e-9:
+            raise ValueError('ordered collision interval within trajectory required')
+
+        def split(hull, u):
+            levels = [hull]
+            while len(levels[-1]) > 1:
+                levels.append(levels[-1][:-1] * (1 - u) + levels[-1][1:] * u)
+            return np.array([level[0] for level in levels]), np.array([level[-1] for level in reversed(levels)])
+
+        queue, offset = [], 0.
+        for segment in self.segments:
+            lo, hi = max(0., (start_time - offset) / segment.duration), min(1., (end_time - offset) / segment.duration)
+            if lo <= hi:
+                hull = segment.bezier()
+                if lo > 0:
+                    _, hull = split(hull, min(1., lo))
+                if hi < 1:
+                    hull, _ = split(hull, (hi - lo) / (1 - lo) if lo < 1 else 0.)
+                queue.append((hull, 0))
+            offset += segment.duration
         visited = 0
         while queue:
             hull, depth = queue.pop(); visited += 1
@@ -236,11 +256,9 @@ class Trajectory:
                 continue
             if depth >= 20 or np.linalg.norm(upper - lower) < collision.resolution * 1e-5:
                 return False
-            levels = [hull]
-            while len(levels[-1]) > 1:
-                levels.append((levels[-1][:-1] + levels[-1][1:]) / 2)
-            queue.append((np.array([level[0] for level in levels]), depth + 1))
-            queue.append((np.array([level[-1] for level in reversed(levels)]), depth + 1))
+            left, right = split(hull, .5)
+            queue.append((left, depth + 1))
+            queue.append((right, depth + 1))
         return True
 
     def to_dict(self):

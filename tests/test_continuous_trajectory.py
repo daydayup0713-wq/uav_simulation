@@ -109,3 +109,14 @@ def test_constrained_stop_keeps_initial_state_and_ends_at_rest_within_limits():
     assert trajectory.derivative_maxima()['jerk'] <= 1. + 1e-9
     stationary = Trajectory.stop(State(np.array([0., 0., 2.])))
     assert np.allclose(stationary.sample(1).position, [0, 0, 2])
+
+
+def test_collision_check_can_exclude_passed_geometry_but_checks_future_curve():
+    trajectory = Trajectory.generate([(0, 0, 2), (2, 0, 2)])
+    free = np.ones((50, 30, 40), dtype=bool)
+    collision = CollisionMap(.1, np.array([-1., -1., -1.]), free, 1)
+    free[10:15, :, :] = False
+    assert not trajectory.collision_free(collision)
+    assert trajectory.collision_free(collision, start_time=trajectory.duration * .8)
+    free[28:31, :, :] = False
+    assert not trajectory.collision_free(collision, start_time=trajectory.duration * .8)

@@ -21,6 +21,9 @@ def main(argv=None):
     selection.add_argument('--localization', required=True)
     selection.add_argument('--planning', required=True)
     selection.add_argument('--group', required=True)
+    route = sub.add_parser('route')
+    route.add_argument('file', type=Path)
+    route.add_argument('--timeout', type=float, default=600.)
     args = parser.parse_args(argv)
     root = Path(os.environ['LAB_ROOT'])
     try:
@@ -29,6 +32,9 @@ def main(argv=None):
             result = registry.list(args.role, args.group)
         elif args.command == 'capabilities':
             result = registry.describe(args.backend, args.group)
+        elif args.command == 'route':
+            from .flight import execute_route
+            result = execute_route(args.file, args.timeout)
         else:
             import rclpy
             from uav_lab_interfaces.srv import SelectBackends

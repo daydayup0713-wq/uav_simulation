@@ -128,6 +128,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--headless', action='store_true')
     p.add_argument('--rviz', action='store_true')
+    p.add_argument('--continuous', action='store_true', help='execute navigation as collision-checked C2 trajectories')
     p.add_argument('--profile', choices=('flight', 'sensors', 'localization', 'slam', 'navigation'), default='flight')
     options = p.parse_args()
     runtime = ROOT / '.runtime'
@@ -146,7 +147,7 @@ def main():
     (runtime / 'current-run').write_text(str(run_dir)+'\n')
     metadata = {'run_id': run_dir.name, 'supervisor_pid': os.getpid(), 'dependencies': json.loads((ROOT/'dependencies/lock.json').read_text()),
                 'environment': {k: env.get(k) for k in ('ROS_DOMAIN_ID','GZ_PARTITION','RMW_IMPLEMENTATION')},
-                'headless': options.headless, 'profile': options.profile,
+                'headless': options.headless, 'profile': options.profile, 'continuous_trajectory': options.continuous,
                 'parameters': {'COM_RC_IN_MODE': 4, 'COM_OF_LOSS_T': 1, 'COM_OBL_RC_ACT': 4,
                                'COM_DL_LOSS_T': 300, 'NAV_DLL_ACT': 0, 'UXRCE_DDS_SYNCT': 0,
                                'UXRCE_DDS_PTCFG': 1,
@@ -244,7 +245,10 @@ def main():
             wait_for(manager, lio_ready, 'validated continuous LIO', 45)
             wait_for(manager, vehicle_ready, 'PX4 ready after localization initialization', 60)
         if options.profile == 'navigation':
-            manager.start('navigation', ['ros2','run','uav_lab_navigation','navigation'], env=env)
+            navigation_command = ['ros2','run','uav_lab_navigation','navigation']
+            if options.continuous:
+                navigation_command += ['--ros-args', '-p', 'continuous_trajectory:=true']
+            manager.start('navigation', navigation_command, env=env)
             def navigation_ready():
                 result = subprocess.run(['ros2','run','uav_lab_navigation','navctl','--timeout','2','status'],
                                         env=env, capture_output=True, text=True, timeout=5)

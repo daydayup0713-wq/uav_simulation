@@ -21,7 +21,8 @@ from tf2_ros import TransformBroadcaster
 from px4_msgs.msg import (VehicleLocalPosition, VehicleStatus, VehicleAttitude,
                           VehicleLandDetected, VehicleCommandAck, VehicleCommand,
                           OffboardControlMode, TrajectorySetpoint, VehicleOdometry, EstimatorStatusFlags)
-from uav_lab_interfaces.action import ExecuteFlight
+from uav_lab_interfaces.action import ExecuteFlight, ExecuteTrajectory
+from uav_lab_interfaces.msg import TrajectoryReference
 from uav_lab_interfaces.srv import SelectBackends
 from .controller import FlightController
 from .coordinate import ned_to_enu, enu_to_ned, px4_to_ros_quaternion, yaw_to_ned
@@ -89,6 +90,7 @@ class Bridge(Node):
             self.create_subscription(msg, topic, callback, qos_profile_sensor_data, callback_group=self.telemetry_group)
         self.odom_pub = self.create_publisher(Odometry, 'odometry', 10)
         self.path_pub = self.create_publisher(NavPath, 'path', 10)
+        self.reference_pub = self.create_publisher(TrajectoryReference, 'trajectory/reference', 10)
         self.diag_pub = self.create_publisher(DiagnosticArray, 'diagnostics', 10)
         self.tf = TransformBroadcaster(self)
         for name in ('arm', 'disarm', 'hold'):
@@ -98,7 +100,14 @@ class Bridge(Node):
         self.server = ActionServer(self, ExecuteFlight, 'execute_flight',
                                    execute_callback=self.execute, goal_callback=self.goal,
                                    cancel_callback=self.cancel, callback_group=group)
-        self.timer = self.create_timer(.05, self.pump, callback_group=group,
+        self.trajectory_server = ActionServer(self, ExecuteTrajectory, 'execute_trajectory',
+                                    execute_callback=self.execute_trajectory,
+                                    goal_callback=self.trajectory_goal_callback,
+                                    cancel_callback=lambda handle: CancelResponse.ACCEPT,
+                                    callback_group=group)
+        self.timer = self.create_timer(.02, self.pump, callback_group=self.telemetry_group,
+                                      clock=Clock(clock_type=ClockType.STEADY_TIME))
+        self.heartbeat_timer = self.create_timer(.05, self.heartbeat, callback_group=group,
                                       clock=Clock(clock_type=ClockType.STEADY_TIME))
 
     def select_backend_callback(self, request, response):
@@ -264,7 +273,9 @@ class Bridge(Node):
                             self.external.failed = self.external.failed or str(error)
                 if self.external.failed:
                     self.policy.fail(self.external.failed)
-            self.policy.tick(wall, dt)
+            self.policy.tick(wall, dt, sim_time=sim/1e9)
+            if self.policy.fresh(wall):
+                self.reference_pub.publish(self.reference_message())
             if self.policy.streaming:
                 for topic in ('/fmu/in/offboard_control_mode', '/fmu/in/trajectory_setpoint', '/fmu/in/vehicle_command'):
                     if self.count_publishers(topic) > 1:
@@ -275,20 +286,14 @@ class Bridge(Node):
             except RuntimeError:
                 stamp = 0
             if self.policy.streaming and stamp:
-                mode = OffboardControlMode()
-                mode.timestamp = stamp
-                mode.position = True
-                self.control_pub.publish(mode)
                 if self.policy.t.offboard and self.policy.setpoint is not None:
-                    target = TrajectorySetpoint()
-                    target.timestamp = stamp
-                    target.position = list(enu_to_ned(self.policy.setpoint))
-                    target.velocity = [math.nan]*3
-                    target.acceleration = [math.nan]*3
-                    target.jerk = [math.nan]*3
-                    target.yaw = yaw_to_ned(self.policy.yaw)
-                    target.yawspeed = math.nan
-                    self.setpoint_pub.publish(target)
+                    self.setpoint_pub.publish(self.setpoint_message(stamp))
+                    if self.policy.trajectory is not None:
+                        self.record('trajectory_sample', trajectory_id=self.policy.trajectory_id,
+                                    elapsed=sim/1e9-self.policy.trajectory_started,
+                                    position=self.policy.setpoint, velocity=self.policy.reference.velocity.tolist(),
+                                    acceleration=self.policy.reference.acceleration.tolist(),
+                                    jerk=self.policy.reference.jerk.tolist(), yaw=self.policy.yaw)
             for command, params in self.policy.drain_commands():
                 msg = VehicleCommand()
                 msg.timestamp = stamp
@@ -348,6 +353,108 @@ class Bridge(Node):
             'operator_generation': self.operator_generation}.items()]
         diag.status = [status]
         self.diag_pub.publish(diag)
+
+    def heartbeat(self):
+        with self.lock:
+            if not self.policy.streaming:
+                return
+            try:
+                stamp = self.px4_clock.timestamp(self.get_clock().now().nanoseconds)
+            except RuntimeError:
+                return
+            mode = OffboardControlMode(timestamp=stamp, position=True)
+            self.control_pub.publish(mode)
+
+    def setpoint_message(self, stamp):
+        target = TrajectorySetpoint(timestamp=stamp)
+        target.position = list(enu_to_ned(self.policy.setpoint))
+        reference = self.policy.reference
+        target.velocity = list(enu_to_ned(reference.velocity)) if reference is not None else [math.nan]*3
+        target.acceleration = list(enu_to_ned(reference.acceleration)) if reference is not None else [math.nan]*3
+        target.jerk = [math.nan]*3
+        target.yaw = yaw_to_ned(self.policy.yaw)
+        target.yawspeed = -reference.yaw_rate if reference is not None else math.nan
+        return target
+
+    def reference_message(self):
+        msg = TrajectoryReference()
+        msg.header.frame_id = 'odom'
+        msg.header.stamp.sec, msg.header.stamp.nanosec = divmod(int(round(self.policy.sim_time * 1e9)), 10**9)
+        msg.trajectory_id = self.policy.trajectory_id
+        reference = self.policy.reference
+        if reference is not None:
+            msg.elapsed = max(0., self.policy.sim_time - self.policy.trajectory_started)
+            msg.position, msg.velocity, msg.acceleration = [list(map(float, v)) for v in
+                (reference.position, reference.velocity, reference.acceleration)]
+            msg.yaw, msg.yaw_rate = reference.yaw, reference.yaw_rate
+        else:
+            msg.position = list(map(float, self.policy.setpoint or self.policy.t.position))
+            msg.yaw = float(self.policy.yaw)
+        return msg
+
+    def trajectory_guard(self, request):
+        now = time.monotonic()
+        self.policy.require_ready(now)
+        if not self.external_ready(now) or not self.navigation_ready(now):
+            raise ValueError('validated localization and navigation required')
+        if self.navigation_enabled and (not request.navigation or request.navigation_epoch != self.operator_generation):
+            raise ValueError('stale navigation owner/epoch')
+        if not self.policy.t.armed or not self.policy.t.offboard or self.policy.state not in ('MOVING', 'HOLDING'):
+            raise ValueError('trajectory requires armed Offboard vehicle')
+
+    def trajectory_goal_callback(self, request):
+        from .trajectory_interface import trajectory_from_goal
+        try:
+            trajectory = trajectory_from_goal(request)
+            with self.lock:
+                self.trajectory_guard(request)
+                if request.replaces_id:
+                    if request.replaces_id != self.policy.trajectory_id or self.policy.trajectory_pending is not None:
+                        return GoalResponse.REJECT
+                elif self.policy.active is not None:
+                    return GoalResponse.REJECT
+                start = trajectory.sample(0.)
+                if not request.replaces_id and math.dist(start.position, self.policy.setpoint or self.policy.t.position) > 1e-6:
+                    return GoalResponse.REJECT
+            return GoalResponse.ACCEPT
+        except (ValueError, TypeError, KeyError):
+            return GoalResponse.REJECT
+
+    def execute_trajectory(self, handle):
+        from .trajectory_interface import trajectory_from_goal
+        result = ExecuteTrajectory.Result()
+        token = None
+        try:
+            trajectory = trajectory_from_goal(handle.request)
+            with self.lock:
+                self.trajectory_guard(handle.request)
+                stamp = handle.request.header.stamp
+                start = stamp.sec + stamp.nanosec / 1e9
+                if start == 0:
+                    start = self.policy.sim_time
+                token = self.policy.follow_trajectory(trajectory, handle.request.trajectory_id,
+                        time.monotonic(), start, replaces=handle.request.replaces_id)
+                self.record('trajectory_accepted', token=token, trajectory_id=handle.request.trajectory_id,
+                            replaces_id=handle.request.replaces_id, starts_at=start, trajectory=trajectory.to_dict())
+            while rclpy.ok():
+                with self.lock:
+                    if handle.is_cancel_requested and self.policy.cancel(token, time.monotonic()):
+                        handle.canceled()
+                        return ExecuteTrajectory.Result(success=False, reason='canceled; constrained hold commanded')
+                    outcome = self.policy.results.get(token)
+                    feedback = ExecuteTrajectory.Feedback(phase=self.policy.state, current_pose=self.pose(),
+                                                          reference=self.reference_message())
+                if outcome:
+                    result.success, result.reason = outcome
+                    handle.succeed() if result.success else handle.abort()
+                    return result
+                handle.publish_feedback(feedback)
+                time.sleep(.05)
+            result.reason = 'bridge shutting down'
+        except (ValueError, RuntimeError) as exc:
+            result.reason = str(exc)
+        handle.abort()
+        return result
 
     def service_callback(self, operation):
         def callback(request, response):
@@ -450,6 +557,7 @@ class Bridge(Node):
 
     def destroy_node(self):
         self.server.destroy()
+        self.trajectory_server.destroy()
         return super().destroy_node()
 
 def main(args=None):

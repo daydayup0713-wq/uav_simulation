@@ -24,7 +24,8 @@ from geometry_msgs.msg import PoseStamped,TransformStamped
 from nav_msgs.msg import Odometry,Path as NavPath
 from sensor_msgs.msg import PointCloud2,PointField
 from uav_lab_interfaces.srv import PlanPath
-from uav_lab_interfaces.action import Navigate,ExecuteFlight
+from uav_lab_interfaces.action import Navigate,ExecuteFlight,ExecuteTrajectory
+from uav_lab_interfaces.msg import TrajectoryReference
 from uav_lab_localization.ingress import validated_scan,RejectedScan
 from uav_lab_localization.benchmark import stamp
 from .occupancy import VoxelMap
@@ -36,6 +37,10 @@ class NavigationNode(Node):
     def __init__(self):
         super().__init__('navigation',namespace='uav001')
         self.set_parameters([rclpy.parameter.Parameter('use_sim_time',value=True)])
+        self.declare_parameter('continuous_trajectory', False)
+        self.continuous_enabled = bool(self.get_parameter('continuous_trajectory').value)
+        self.reference = None
+        self.reference_at = 0.
         root=Path(os.environ.get('LAB_ROOT',Path.cwd()));run=Path(os.environ['LAB_RUN_DIR']) if os.environ.get('LAB_RUN_DIR') else None
         config_file=run/'configuration/navigation.json' if run and (run/'configuration/navigation.json').exists() else root/'configs/navigation.json'
         self.config=json.loads(config_file.read_text())
@@ -71,6 +76,8 @@ class NavigationNode(Node):
         from std_srvs.srv import Trigger
         self.create_service(Trigger,'navigation/abort',self.abort_service,callback_group=self.action_group)
         self.flight_client=ActionClient(self,ExecuteFlight,'execute_flight',callback_group=self.action_group)
+        self.trajectory_client=ActionClient(self,ExecuteTrajectory,'execute_trajectory',callback_group=self.action_group)
+        self.create_subscription(TrajectoryReference,'trajectory/reference',self.on_reference,10)
         self.server=ActionServer(self,Navigate,'navigation/navigate',execute_callback=self.navigate,
             goal_callback=self.navigation_goal,cancel_callback=lambda handle:CancelResponse.ACCEPT,callback_group=self.action_group)
         self.create_timer(self.config['map_period_s'],self.map_cycle,callback_group=self.map_group,clock=Clock(clock_type=ClockType.STEADY_TIME))
@@ -199,7 +206,11 @@ class NavigationNode(Node):
             pose=PoseStamped();pose.header=path.header;pose.pose.position.x,pose.pose.position.y,pose.pose.position.z=map(float,values);pose.pose.orientation.w=1.;path.poses.append(pose)
         return path
 
-    def make_plan(self,goal):
+    def on_reference(self, msg):
+        if msg.header.frame_id == 'odom' and np.isfinite([*msg.position, *msg.velocity, *msg.acceleration, msg.yaw, msg.yaw_rate]).all():
+            self.reference, self.reference_at = msg, time.monotonic()
+
+    def make_plan(self,goal,start_override=None):
         if not self.report()['ready']:raise ValueError('navigation map/pose not ready: '+self.failure)
         if self.current is None or time.monotonic()-self.current_at>.5:raise ValueError('fresh flight pose required')
         if goal.header.frame_id!='odom':raise ValueError('navigation goal frame must be odom')
@@ -207,11 +218,11 @@ class NavigationNode(Node):
         if not np.isfinite([p.x,p.y,p.z,q.x,q.y,q.z,q.w]).all() or abs(q.x)>1e-6 or abs(q.y)>1e-6 or abs(q.z*q.z+q.w*q.w-1)>.001:
             raise ValueError('finite position and unit yaw quaternion required')
         if not .5<=p.z<=4.5:raise ValueError('navigation altitude outside 0.5..4.5m')
-        start=self.current.position
+        start=[self.current.position.x,self.current.position.y,self.current.position.z] if start_override is None else start_override
         with self.map_lock:collision=self.grid.snapshot(self.envelope)
         if not self.planning_lock.acquire(blocking=False):raise ValueError('planning worker busy')
         try:
-            pending=self.planning_worker.submit(plan,collision,[start.x,start.y,start.z],[p.x,p.y,p.z],self.config['max_expansions'],self.config['planning_timeout_s'])
+            pending=self.planning_worker.submit(plan,collision,start,[p.x,p.y,p.z],self.config['max_expansions'],self.config['planning_timeout_s'])
             result=pending.result(timeout=self.config['planning_timeout_s']+3.)
         except (WorkerTimeout,BrokenProcessPool,RuntimeError) as error:
             self.failure='planning worker failed: '+str(error)+'; restart lab';raise ValueError(self.failure) from error
@@ -286,6 +297,9 @@ class NavigationNode(Node):
         return response
 
     def navigate(self,handle):
+        if self.continuous_enabled:
+            from .continuous_navigation import navigate_continuous
+            return navigate_continuous(self, handle)
         outcome=Navigate.Result();leg=None;replans=0
         try:
             epoch=self.accepted_epoch;self.check_motion(epoch)
@@ -349,7 +363,7 @@ class NavigationNode(Node):
             with self.motion_lock:self.busy=False
 
     def destroy_node(self):
-        self.server.destroy();self.flight_client.destroy()
+        self.server.destroy();self.flight_client.destroy();self.trajectory_client.destroy()
         self.planning_worker.shutdown(wait=True,cancel_futures=True)
         self.storage.shutdown(wait=True)
         if self.trace:self.trace.close()
