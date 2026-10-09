@@ -46,6 +46,9 @@ if(BACKEND STREQUAL "vins_fusion")
 elseif(BACKEND STREQUAL "orb_slam3")
   find_package(Pangolin REQUIRED)
   add_executable(orb_slam3_node orb_node.cpp)
+  # The upstream Release core uses -march=native. Eigen types cross this DSO
+  # boundary, so the caller must use the same vectorization/alignment ABI.
+  target_compile_options(orb_slam3_node PRIVATE -march=native)
   target_include_directories(orb_slam3_node PRIVATE ${UPSTREAM}/include
     ${UPSTREAM}/include/CameraModels ${UPSTREAM}/Thirdparty/Sophus ${UPSTREAM}
     ${EIGEN3_INCLUDE_DIRS} ${Pangolin_INCLUDE_DIRS})
