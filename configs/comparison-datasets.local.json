@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "scope": "local native simulation recordings; no upstream fake-drone physics",
+  "jobs": [
+    {"backend":"glim","dataset":"recordings/20261004T171607Z-958c8746-172047-30135a","duration":175},
+    {"backend":"fast_lio2","dataset":"recordings/20261008T075831Z-333ee874-075903-7b9caf","duration":200},
+    {"backend":"fast_livo2","dataset":"recordings/20261008T075831Z-333ee874-075903-7b9caf","duration":200},
+    {"backend":"fast_livo2_rtk","dataset":"recordings/20261008T092101Z-d43acf42-092132-b394af"},
+    {"backend":"lio_sam","dataset":"recordings/20261009T012932Z-7cdc640e-013002-620a32","duration":210},
+    {"backend":"orb_slam3","dataset":"recordings/20261008T075831Z-333ee874-075903-7b9caf","duration":200},
+    {"backend":"vins_fusion","dataset":"recordings/20261008T075831Z-333ee874-075903-7b9caf","duration":200}
+  ]
+}

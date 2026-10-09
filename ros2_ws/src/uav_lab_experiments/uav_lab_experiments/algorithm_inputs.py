@@ -32,6 +32,46 @@ def livox_records(msg,lines=4,channel='line'):
     return stamp,result
 
 
+def ouster_cloud(msg, lines=16):
+    """Encode measured mechanical scans for LIO-SAM's channel-preserving path.
+
+    Timing is the measured beam offset, rounded to nanoseconds. Reflectivity
+    is a synthetic intensity proxy; the sensor has no noise-channel estimate.
+    Range is computed from measured XYZ, never from simulator geometry.
+    """
+    from sensor_msgs.msg import PointCloud2, PointField
+    _, records = livox_records(msg, lines=lines, channel='ring')
+    dtype = np.dtype({'names': ['x', 'y', 'z', 'intensity', 't', 'ring',
+                               'reflectivity', 'noise', 'range'],
+                     'formats': ['<f4'] * 4 + ['<u4', 'u1', '<u2', '<u2', '<u4'],
+                     'offsets': [0, 4, 8, 12, 16, 20, 22, 24, 28], 'itemsize': 32})
+    points = np.zeros(len(records), dtype=dtype)
+    for name in 'xyz':
+        points[name] = records[name]
+    fields = {field.name: field for field in msg.fields}
+    intensity = np.ndarray((msg.width,), dtype=('>' if msg.is_bigendian else '<')+'f4',
+                           buffer=msg.data, offset=fields['intensity'].offset,
+                           strides=(msg.point_step,))
+    xyz = [np.ndarray((msg.width,), dtype=('>' if msg.is_bigendian else '<')+'f4',
+                      buffer=msg.data, offset=fields[name].offset,
+                      strides=(msg.point_step,)) for name in 'xyz']
+    valid = np.isfinite(np.column_stack(xyz)).all(axis=1)
+    points['intensity'] = np.nan_to_num(intensity[valid])
+    points['t'] = records['offset_ns']
+    points['ring'] = records['line']
+    points['reflectivity'] = records['reflectivity']
+    points['range'] = np.rint(np.linalg.norm(np.column_stack([points[n] for n in 'xyz']),
+                                           axis=1) * 1000).astype('<u4')
+    output = PointCloud2(header=msg.header, height=1, width=len(points), is_bigendian=False,
+                         point_step=32, row_step=len(points)*32, is_dense=True,
+                         data=points.tobytes())
+    types = [PointField.FLOAT32]*4 + [PointField.UINT32, PointField.UINT8,
+                                    PointField.UINT16, PointField.UINT16, PointField.UINT32]
+    output.fields = [PointField(name=name, offset=dtype.fields[name][1], datatype=kind, count=1)
+                     for name, kind in zip(dtype.names, types)]
+    return output
+
+
 class RtkAdmission:
     """Reject invalid fixes and physically implausible jumps before RTK factors.
 

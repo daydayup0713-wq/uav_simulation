@@ -23,6 +23,19 @@
     "monocular_inertial": [
       "monocular_calibrated",
       "imu_6axis"
+    ],
+    "livox_inertial": [
+      "timed_livox_pointcloud",
+      "imu_6axis"
+    ],
+    "mechanical_lidar_imu": [
+      "timed_ring_pointcloud",
+      "imu_6axis"
+    ],
+    "mechanical_visual_imu": [
+      "timed_ring_pointcloud",
+      "imu_6axis",
+      "monocular_calibrated"
     ]
   },
   "backends": [
@@ -33,7 +46,9 @@
       "groups": [
         "synchronous_lidar_imu",
         "livox_visual_inertial",
-        "mechanical_inertial"
+        "mechanical_inertial",
+        "livox_inertial",
+        "mechanical_lidar_imu"
       ],
       "capabilities": {
         "odometry": true,
@@ -41,7 +56,8 @@
         "relocalization": false,
         "global_optimization": true,
         "visual_fusion": false
-      }
+      },
+      "implementation_sha256": "7e2330fb3c222a27b0ba0a8d089091a776d64c4a0b5d24ab4070cef0fb751acd"
     },
     {
       "id": "fast_lio2",
@@ -50,7 +66,9 @@
       "groups": [
         "livox_visual_inertial",
         "livox_visual_inertial_rtk",
-        "mechanical_inertial"
+        "mechanical_inertial",
+        "livox_inertial",
+        "mechanical_lidar_imu"
       ],
       "capabilities": {
         "odometry": true,
@@ -58,7 +76,7 @@
         "relocalization": false,
         "global_optimization": false
       },
-      "implementation_sha256": "6d1d1daa3f87782b5fb18cfaaca2dc41d2ecfeba3c8ecbd7d923d0c3f7e423f6"
+      "implementation_sha256": "1153cc61ea87bcc0b5ea1f98e0dc2100fedd69d4f9aebc85bf81142a1a107c86"
     },
     {
       "id": "fast_livo2",
@@ -66,7 +84,8 @@
       "source_ref": "0d2c0346107b75b59934975adec9a6eeeb913c64",
       "groups": [
         "livox_visual_inertial",
-        "livox_visual_inertial_rtk"
+        "livox_visual_inertial_rtk",
+        "mechanical_visual_imu"
       ],
       "capabilities": {
         "odometry": true,
@@ -75,7 +94,7 @@
         "global_optimization": false,
         "visual_fusion": true
       },
-      "implementation_sha256": "c350f69eb8038c50a2b181409354b6bed6ccbc7dc2d0b6c3a2234ee40376c81d"
+      "implementation_sha256": "57219dd840584fef6070971ffcd278da172e5a996a0a5b9ad86d84f2aae4581b"
     },
     {
       "id": "fast_livo2_rtk",
@@ -91,12 +110,12 @@
         "global_optimization": "offline_rtk",
         "visual_fusion": true
       },
-      "implementation_sha256": "c05a131cdc7b3f7642ca0bbe4a143b26eacaf7d355f74be997f8180472b3852d"
+      "implementation_sha256": "f9f7226fcc94cacfed5ce45a833fccb2c59b2d57f4bdd0d3c622cbad3f5bb50f"
     },
     {
       "id": "orb_slam3",
       "role": "localization",
-      "source_ref": null,
+      "source_ref": "4452a3c4ab75b1cde34e5505a36ec3f9edcdc4c4",
       "groups": [
         "monocular_inertial",
         "livox_visual_inertial",
@@ -108,12 +127,13 @@
         "relocalization": true,
         "global_optimization": true,
         "visual_fusion": true
-      }
+      },
+      "implementation_sha256": "2527e836c7564a151ce3f25e11e70fd65eda7959e5df99f64ddd258d1faaaf8d"
     },
     {
       "id": "lio_sam",
       "role": "localization",
-      "source_ref": null,
+      "source_ref": "08af3f32f01725372d4269838dc44c19c6d9e76b",
       "groups": [
         "mechanical_inertial"
       ],
@@ -122,12 +142,13 @@
         "loop_closure": true,
         "relocalization": false,
         "global_optimization": true
-      }
+      },
+      "implementation_sha256": "14a2b00816cc8c3a59ff92bc742d2a91a21eb4345e5fc22b3659cf9d07369467"
     },
     {
       "id": "vins_fusion",
       "role": "localization",
-      "source_ref": null,
+      "source_ref": "be55a937a57436548ddfb1bd324bc1e9a9e828e0",
       "groups": [
         "monocular_inertial",
         "livox_visual_inertial",
@@ -139,7 +160,8 @@
         "relocalization": true,
         "global_optimization": true,
         "visual_fusion": true
-      }
+      },
+      "implementation_sha256": "e07be617b1ea3513e372d4e6269fa112f6fdd9f6b5c9863b7e97b102b18ace14"
     },
     {
       "id": "astar",

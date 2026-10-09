@@ -13,8 +13,13 @@ def normalize_pose(position, quaternion, world_velocity):
 
 
 class LocalizationQuality:
-    def __init__(self, warmup_samples=20):
+    def __init__(self, warmup_samples=20, source_limits=None):
         self.warmup_samples = warmup_samples
+        self.source_limits = dict(source_limits or {'imu': .25, 'points': .4})
+        if ('imu' not in self.source_limits or
+            any(k not in ('imu','points','camera') or not np.isfinite(v) or v <= 0
+                for k,v in self.source_limits.items())):
+            raise ValueError('invalid required localization sources')
         self.sources = {}
         self.pose = None
         self.samples = 0
@@ -27,7 +32,7 @@ class LocalizationQuality:
         return False
 
     def observe_source(self, kind, stamp, now):
-        if kind not in ('imu', 'points') or not np.isfinite(stamp) or stamp <= 0:
+        if kind not in self.source_limits or not np.isfinite(stamp) or stamp <= 0:
             return self.fail('invalid source timestamp')
         previous = self.sources.get(kind)
         if previous and stamp <= previous[0]:
@@ -63,7 +68,7 @@ class LocalizationQuality:
                  -0.15 <= clock-self.pose[0] <= 0.5 and
                  all(k in self.sources and now-self.sources[k][1] <= 1.5 and
                      -0.15 <= clock-self.sources[k][0] <= limit
-                     for k, limit in (('imu', 0.25), ('points', 0.4))))
+                     for k, limit in self.source_limits.items()))
         if self.was_ready and not fresh:
             self.fail('localization source/output stale or simulation paused')
         ready = fresh and self.samples >= self.warmup_samples and not self.reason

@@ -10,7 +10,7 @@ from supervise import owned_run_ready
 from replay_backend import PoseObserver,stop_owned
 from backend_configs import write_config
 from backend_launch import core_command
-from backend_provenance import save_provenance
+from backend_provenance import save_provenance,verified_private_build
 from bootstrap_backends import verify_sources
 from uav_lab_tools.datasets import file_hash
 from uav_lab_experiments.backend_contract import trajectory_report
@@ -30,7 +30,7 @@ def main():
     verify_sources(ROOT,lock,lock['backends'][args.backend]['repositories'])
     provenance=save_provenance(ROOT,lock,args.backend,output,sys.argv)
     prefix=ROOT/'.deps/backends'/args.backend/'install'
-    build=json.loads((prefix/(args.backend+'-build-manifest.json')).read_text())
+    build=verified_private_build(prefix,args.backend)
     binary=Path(build['binary']).resolve()
     if not binary.is_relative_to(prefix.resolve()) or file_hash(binary)!=build['binary_sha256']:raise ValueError('private binary identity changed')
     (output/'build-manifest.json').write_text(json.dumps(build,indent=2)+'\n')

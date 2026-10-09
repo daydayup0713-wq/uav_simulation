@@ -3,6 +3,17 @@ import pytest
 from uav_lab_experiments.backend_contract import normalized_pose, input_topics, trajectory_report
 
 
+def test_short_tracking_prefix_reports_coverage_without_fabricated_rpe():
+    truth=np.array([[t,t-10,0,0,0,0,0,1] for t in np.arange(10.,20.,.04)])
+    estimate=truth[:5].copy()
+    report=trajectory_report(estimate,truth,truth[:,0])
+    assert not report['passed']
+    assert report['metrics'] is not None
+    assert report['metrics']['coverage']<.03
+    assert report['metrics']['rpe_translation_rmse_m'] is None
+    assert report['metrics']['rpe_rotation_rmse_deg'] is None
+
+
 def test_imu_pose_to_body_and_clock_validation():
     row = normalized_pose(1., [1., 2., 3.], [0., 0., 0., 1.],
                           {'xyz': [.1, .2, .3], 'rpy': [0., 0., 0.]})

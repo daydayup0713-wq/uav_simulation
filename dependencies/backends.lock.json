@@ -96,6 +96,74 @@
       "ref": "920702bc36ea13c384686556f25fb6369141a8e1",
       "tree_sha256": "97c27445c36ba5ba4b97175b88e75cf3a8e271dbf53582dfa0060ca51da89882",
       "patches": []
+    },
+    "lio_sam": {
+      "url": "https://github.com/TixiaoShan/LIO-SAM.git",
+      "ref": "08af3f32f01725372d4269838dc44c19c6d9e76b",
+      "tree_sha256": "e6e4a62d09fd87ebc50a5d3c859b1a0c07778d9585f0b074121ebc6f614d4b8f",
+      "patches": [
+        {
+          "path": "dependencies/patches/lio-sam-integration-audit.patch",
+          "sha256": "54626056650668d13a3809e939968f0fbc42e3938facba0f7502e5e271a5c94f"
+        }
+      ]
+    },
+    "vins_fusion": {
+      "url": "https://github.com/HKUST-Aerial-Robotics/VINS-Fusion.git",
+      "ref": "be55a937a57436548ddfb1bd324bc1e9a9e828e0",
+      "tree_sha256": "fb3697ac0f2e32d2513c7c4b7596fe5bee2308a8eeb442a0aff0f2a9faa48960",
+      "patches": [
+        {
+          "path": "dependencies/patches/vins-fusion-ros2-transport.patch",
+          "sha256": "53c8fd8ca5b3b0abb31b254eb8dd97d61bce1ffd16939b7d8f5d17dd64e25898"
+        }
+      ]
+    },
+    "orb_slam3": {
+      "url": "https://github.com/UZ-SLAMLab/ORB_SLAM3.git",
+      "ref": "4452a3c4ab75b1cde34e5505a36ec3f9edcdc4c4",
+      "tree_sha256": "ad150c87e893591eef595f1ae911b5b39642b5321f1087757d23363cf8d4e2be",
+      "patches": [
+        {
+          "path": "dependencies/patches/orb-slam3-private-transport.patch",
+          "sha256": "5420a763882a9d800be8dd6e94c773ab73a3ed656d475ee081aae34b606a01d3"
+        }
+      ]
+    },
+    "pangolin": {
+      "url": "https://github.com/stevenlovegrove/Pangolin.git",
+      "ref": "aff6883c83f3fd7e8268a9715e84266c42e2efe3",
+      "tree_sha256": "2b48261d5cd18d24fd6930bdeb55f6f6d1ccec76b96e4166d8186ce361d950a5",
+      "patches": []
+    },
+    "glim": {
+      "url": "https://github.com/koide3/glim.git",
+      "ref": "65a5562c6b8906e60693c63cc0c95de885426352",
+      "tree_sha256": "e71082c0e08ef2290fe71dbca5fa501f1b86616f89c05e0bbcc7505a4c2cba39",
+      "patches": []
+    },
+    "glim_ros2": {
+      "url": "https://github.com/koide3/glim_ros2.git",
+      "ref": "bb1d12a8a4ee24f8620da8bb30b585fb1a2b6846",
+      "tree_sha256": "07751062cb026e069a9bc1b85e5808e74eb1ad7ceaa242173e7bf37f2c134b21",
+      "patches": []
+    },
+    "gtsam_points": {
+      "url": "https://github.com/koide3/gtsam_points.git",
+      "ref": "dff0518ae456537a2b0b1362213e32952574a98e",
+      "tree_sha256": "f8804f7100495dba88b9ca2156543d9a241ca935d2d955fc947b474b7b014b72",
+      "patches": []
+    },
+    "vins-fusion-ros2": {
+      "url": "https://github.com/zinuok/VINS-Fusion-ROS2.git",
+      "ref": "72023bc5d2abb14faa4c02a5c040d84f996b587a",
+      "tree_sha256": "0e9420664d7b23f8a6dd7c4d0a370cba9c903f49d2c94cf281f5727117c9298e",
+      "patches": [
+        {
+          "path": "dependencies/patches/vins-fusion-loop-ros2-transport.patch",
+          "sha256": "8a467da7c99e501e39cc318ac7a3c568c076111428dc057f592c17648ee0ebc8"
+        }
+      ]
     }
   },
   "backends": {
@@ -118,6 +186,30 @@
         "fast_livo2_rtk_ros2",
         "sophus-legacy",
         "geographiclib"
+      ]
+    },
+    "lio_sam": {
+      "repositories": [
+        "lio_sam"
+      ]
+    },
+    "vins_fusion": {
+      "repositories": [
+        "vins_fusion",
+        "vins-fusion-ros2"
+      ]
+    },
+    "orb_slam3": {
+      "repositories": [
+        "orb_slam3",
+        "pangolin"
+      ]
+    },
+    "glim": {
+      "repositories": [
+        "glim",
+        "glim_ros2",
+        "gtsam_points"
       ]
     }
   },

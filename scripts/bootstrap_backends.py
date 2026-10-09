@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """Build pinned localization backends into independent private prefixes."""
-import argparse,hashlib,json,os,subprocess
+import argparse,hashlib,json,os,re,subprocess
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -60,7 +60,30 @@ def colcon(name,sources,prefix,jobs):
 
 def manifest(backend,prefix,binary,repositories,jobs=1):
     output=prefix/(backend+'-build-manifest.json')
+    runtime={}
+    for path in [binary,*prefix.rglob('*.so*'),*prefix.glob('lib/lio_sam/lio_sam_*'),
+                 *prefix.glob('lib/vins_fusion/vins_fusion_node'),*prefix.glob('lib/loop_fusion/loop_fusion_node'),
+                 *(ROOT/'.deps/backends/common/install').rglob('*.so*'),
+                 *prefix.glob('share/loop_fusion/support_files/*')]:
+        if path.is_file():runtime[str(path.resolve())]=sha(path)
+    if backend=='orb_slam3':
+        path=ROOT/'.deps/orb_slam3/Vocabulary/ORBvoc.txt'
+        runtime[str(path)]=sha(path)
+    # Pin the libraries the loader actually selects, including system GTSAM,
+    # ROS and the private shared Livox interface. Source hashes alone cannot
+    # detect an independently replaced binary or changed shared library.
+    linked={}
+    env={**os.environ,'LD_LIBRARY_PATH':str(prefix/'lib')+':'+str(ROOT/'.deps/backends/common/install/lib')+':'+os.environ.get('LD_LIBRARY_PATH','')}
+    for executable in [binary,*prefix.glob('lib/lio_sam/lio_sam_*'),*prefix.glob('lib/loop_fusion/loop_fusion_node')]:
+        listing=subprocess.check_output(['ldd',str(executable)],text=True,env=env)
+        if '=> not found' in listing:raise ValueError('linked backend dependency missing: '+listing)
+        for line in listing.splitlines():
+            match=re.search(r'=> (/[^ ]+)',line)
+            if match:
+                path=Path(match[1]).resolve();linked[str(path)]=sha(path)
+    runtime.update(linked)
     output.write_text(json.dumps({'schema':1,'backend':backend,'binary':str(binary),'binary_sha256':sha(binary),
+        'runtime_artifacts':runtime,'linked_runtime_artifacts':linked,
         'repositories':{name:{'ref':subprocess.check_output(['git','-C',str(ROOT/'.deps'/name),'rev-parse','HEAD'],text=True).strip(),
             'tree_sha256':source_tree(ROOT/'.deps'/name),
             'diff_sha256':hashlib.sha256(subprocess.check_output(['git','-C',str(ROOT/'.deps'/name),'diff','--binary'])).hexdigest()} for name in repositories},
@@ -68,11 +91,43 @@ def manifest(backend,prefix,binary,repositories,jobs=1):
     print('BUILT '+str(output),flush=True)
 
 def main():
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--backend',choices=['fast_lio2','fast_livo2','fast_livo2_rtk'],required=True)
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--backend',choices=['glim','fast_lio2','fast_livo2','fast_livo2_rtk','lio_sam','orb_slam3','vins_fusion'],required=True)
     parser.add_argument('--jobs',type=int,default=1);args=parser.parse_args()
     if not 1<=args.jobs<=2:parser.error('one or two jobs on this machine')
     lock=json.loads((ROOT/'dependencies/backends.lock.json').read_text())
     prepare_sources(ROOT,lock,lock['backends'][args.backend]['repositories'])
+    prefix=ROOT/'.deps/backends'/args.backend/'install'
+    if args.backend=='glim':
+        os.environ['CMAKE_PREFIX_PATH']=str(prefix)+':'+os.environ.get('CMAKE_PREFIX_PATH','')
+        for name in ('gtsam_points','glim','glim_ros2'):
+            native('workbench-'+name,ROOT/'.deps'/name,prefix,args.jobs,
+                   ['-DBUILD_WITH_CUDA=OFF','-DBUILD_WITH_VIEWER=OFF','-DBUILD_WITH_OPENCV=OFF',
+                    '-DBUILD_WITH_CV_BRIDGE=OFF','-DBUILD_WITH_MARCH_NATIVE=OFF','-DBUILD_WITH_TBB=ON','-DBUILD_TESTING=OFF'])
+        manifest(args.backend,prefix,prefix/'lib/glim_ros/glim_rosnode',['glim','glim_ros2','gtsam_points'],args.jobs);return
+    if args.backend=='lio_sam':
+        colcon(args.backend,[ROOT/'.deps/lio_sam'],prefix,args.jobs)
+        manifest(args.backend,prefix,prefix/'lib/lio_sam/lio_sam_mapOptimization',['lio_sam'],args.jobs);return
+    if args.backend=='vins_fusion':
+        native(args.backend,ROOT/'localization/visual_adapters',prefix,args.jobs,
+               ['-DBACKEND=vins_fusion','-DUPSTREAM='+str(ROOT/'.deps/vins_fusion')])
+        source=ROOT/'.deps/vins-fusion-ros2'
+        colcon('vins_fusion_loop',[source/'camera_models',source/'loop_fusion'],prefix,args.jobs)
+        manifest(args.backend,prefix,prefix/'lib/vins_fusion/vins_fusion_node',['vins_fusion','vins-fusion-ros2'],args.jobs);return
+    if args.backend=='orb_slam3':
+        native('pangolin',ROOT/'.deps/pangolin',prefix,args.jobs,
+               ['-DBUILD_EXAMPLES=OFF','-DBUILD_TOOLS=OFF','-DBUILD_PANGOLIN_PYTHON=OFF','-DBUILD_TESTS=OFF'])
+        os.environ['CMAKE_PREFIX_PATH']=str(prefix)+':'+os.environ.get('CMAKE_PREFIX_PATH','')
+        native('orb_dbow2',ROOT/'.deps/orb_slam3/Thirdparty/DBoW2',prefix,args.jobs)
+        native('orb_core',ROOT/'.deps/orb_slam3',prefix,args.jobs,target='ORB_SLAM3')
+        import tarfile
+        vocabulary=ROOT/'.deps/orb_slam3/Vocabulary'
+        if not (vocabulary/'ORBvoc.txt').exists():
+            with tarfile.open(vocabulary/'ORBvoc.txt.tar.gz') as archive:
+                member=archive.getmember('ORBvoc.txt')
+                with archive.extractfile(member) as stream:(vocabulary/'ORBvoc.txt').write_bytes(stream.read())
+        native('orb_adapter',ROOT/'localization/visual_adapters',prefix,args.jobs,
+               ['-DBACKEND=orb_slam3','-DUPSTREAM='+str(ROOT/'.deps/orb_slam3')])
+        manifest(args.backend,prefix,prefix/'lib/orb_slam3/orb_slam3_node',['orb_slam3','pangolin'],args.jobs);return
     common=ROOT/'.deps/backends/common/install'
     colcon('common',[ROOT/'localization/interfaces/livox_ros_driver2'],common,args.jobs)
     os.environ['CMAKE_PREFIX_PATH']=str(common)+':'+os.environ.get('CMAKE_PREFIX_PATH','')
@@ -80,7 +135,6 @@ def main():
         prefix=ROOT/'.deps/backends/fast_lio2/install'
         colcon('fast_lio2',[ROOT/'.deps/fast_lio2'],prefix,args.jobs)
         manifest(args.backend,prefix,prefix/'lib/fast_lio/fastlio_mapping',['fast_lio2','livox-driver2'],args.jobs);return
-    prefix=ROOT/'.deps/backends'/args.backend/'install'
     if args.backend=='fast_livo2':
         native('sophus-modern',ROOT/'.deps/sophus-modern',prefix,args.jobs,['-DBUILD_SOPHUS_TESTS=OFF','-DBUILD_SOPHUS_EXAMPLES=OFF'])
         os.environ['CMAKE_PREFIX_PATH']=str(prefix)+':'+os.environ['CMAKE_PREFIX_PATH']

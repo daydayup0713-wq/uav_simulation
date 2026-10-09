@@ -49,15 +49,17 @@ def evaluate(estimate, truth, expected_stamps=None, attitude_reference=True):
     i = np.flatnonzero(j < len(estimate))
     i = i[abs(estimate[j[i], 0]-estimate[i, 0]-1.0) <= 0.15]
     j = j[i]
-    de = Rotation.from_quat(estimate[i, 4:]).inv().apply(x[j]-x[i])
-    dt = truth_rotation[i].inv().apply(y[j]-y[i])
-    rpe = np.linalg.norm(de-dt, axis=1)
+    rpe=np.empty(0);rpe_rotation=np.empty(0)
+    if len(i):
+        de = Rotation.from_quat(estimate[i, 4:]).inv().apply(x[j]-x[i])
+        dt = truth_rotation[i].inv().apply(y[j]-y[i])
+        rpe = np.linalg.norm(de-dt, axis=1)
+        er=Rotation.from_quat(estimate[i,4:]).inv()*Rotation.from_quat(estimate[j,4:])
+        tr=truth_rotation[i].inv()*truth_rotation[j]
+        rpe_rotation=np.rad2deg((tr.inv()*er).magnitude())
     expected = estimate[:, 0] if expected_stamps is None else np.asarray(expected_stamps)
     indices=np.clip(np.searchsorted(estimate[:,0],expected),1,len(estimate)-1)
     nearest=np.minimum(abs(expected-estimate[indices,0]),abs(expected-estimate[indices-1,0]))
-    er=Rotation.from_quat(estimate[i,4:]).inv()*Rotation.from_quat(estimate[j,4:])
-    tr=truth_rotation[i].inv()*truth_rotation[j]
-    rpe_rotation=np.rad2deg((tr.inv()*er).magnitude())
     world_rpe=np.linalg.norm((aligned[j]-aligned[i])-(y[j]-y[i]),axis=1)
     return {
         'samples': len(estimate), 'coverage': float(np.mean(nearest < 0.051)),

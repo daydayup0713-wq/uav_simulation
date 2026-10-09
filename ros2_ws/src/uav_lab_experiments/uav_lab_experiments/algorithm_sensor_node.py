@@ -6,18 +6,19 @@ from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from sensor_msgs.msg import PointCloud2,NavSatFix
 from diagnostic_msgs.msg import DiagnosticArray,DiagnosticStatus,KeyValue
-from .algorithm_inputs import livox_records,RtkAdmission
+from .algorithm_inputs import livox_records,ouster_cloud,RtkAdmission
 
 class AlgorithmSensorAdapter(Node):
     def __init__(self):
         super().__init__('algorithm_sensor_adapter',namespace='uav001')
         self.set_parameters([rclpy.parameter.Parameter('use_sim_time',value=True)])
         self.backend=self.declare_parameter('backend','fast_lio2').value
-        if self.backend not in ('fast_lio2','fast_livo2','fast_livo2_rtk'):raise ValueError('unsupported backend')
+        if self.backend not in ('fast_lio2','fast_livo2','fast_livo2_rtk','lio_sam'):raise ValueError('unsupported backend')
         calibration=json.loads(Path(self.declare_parameter('calibration','').value).read_text())
         self.mechanical=calibration['lidar']['kind']=='mechanical'
         self.lines=calibration['lidar']['vertical_samples']
-        if self.mechanical and self.backend!='fast_lio2':raise ValueError('backend mechanical input unsupported')
+        if self.mechanical and self.backend not in ('fast_lio2','lio_sam'):raise ValueError('backend mechanical input unsupported')
+        if self.backend=='lio_sam' and not self.mechanical:raise ValueError('LIO-SAM requires mechanical input')
         if self.mechanical:CustomMsg,CustomPoint=PointCloud2,None
         elif self.backend=='fast_livo2_rtk':
             from livox_ros_driver.msg import CustomMsg,CustomPoint
@@ -48,7 +49,8 @@ class AlgorithmSensorAdapter(Node):
         try:
             start=time.perf_counter();stamp,records=livox_records(msg,lines=self.lines,channel='ring' if self.mechanical else 'line')
             if self.last is not None and stamp<=self.last:raise ValueError('source cloud clock regression')
-            if self.mechanical:output=msg
+            if self.backend=='lio_sam':output=ouster_cloud(msg,lines=self.lines)
+            elif self.mechanical:output=msg
             else:
                 output=self.CustomMsg();output.header=msg.header;output.timebase=stamp;output.point_num=len(records)
                 output.points=[self.CustomPoint(x=float(p['x']),y=float(p['y']),z=float(p['z']),

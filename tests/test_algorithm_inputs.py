@@ -40,3 +40,38 @@ def test_rtk_rejection_lost_and_implausible_jump_then_recovery():
     assert not gate.observe(1.2,[np.nan]*3,.02,-1)
     assert gate.observe(1.3,[.1,0,0],.02,2)
     assert not gate.observe(1.2,[.1,0,0],.02,2)
+
+
+def test_ouster_conversion_preserves_actual_channels_offsets_and_range():
+    from uav_lab_experiments.algorithm_inputs import ouster_cloud
+    msg = cloud()
+    data = bytearray(msg.data)
+    for index, ring in enumerate([2, 1, 15]):
+        data[index * 24 + 20:index * 24 + 22] = np.uint16(ring).tobytes()
+    msg.data = bytes(data)
+    output = ouster_cloud(msg, lines=16)
+    assert output.header == msg.header
+    assert output.width == 2 and output.is_dense and not output.is_bigendian
+    fields = {f.name: f for f in output.fields}
+    assert fields['ring'].datatype == PointField.UINT8
+    assert fields['t'].datatype == PointField.UINT32
+    def values(name, dtype):
+        return np.ndarray((output.width,), dtype=dtype, buffer=output.data,
+                          offset=fields[name].offset, strides=(output.point_step,))
+    assert values('ring', 'u1').tolist() == [2, 15]
+    assert values('t', '<u4')[0] == 0
+    assert abs(int(values('t', '<u4')[1]) - 99000000) <= 4
+    assert values('x', '<f4').tolist() == [1., 2.]
+    assert values('range', '<u4').tolist() == [1000, 2000]
+    assert values('intensity', '<f4').tolist() == [12., 300.]
+    assert values('noise', '<u2').tolist() == [0, 0]
+
+
+def test_ouster_conversion_rejects_invalid_timing_and_channel():
+    from uav_lab_experiments.algorithm_inputs import ouster_cloud
+    msg=cloud();msg.fields=[f for f in msg.fields if f.name != 'time']
+    with pytest.raises(ValueError, match='time'):
+        ouster_cloud(msg, lines=16)
+    msg=cloud();data=bytearray(msg.data);data[20:22]=np.uint16(20).tobytes();msg.data=bytes(data)
+    with pytest.raises(ValueError, match='line'):
+        ouster_cloud(msg, lines=16)

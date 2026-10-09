@@ -9,14 +9,17 @@ from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from rosgraph_msgs.msg import Clock
 from nav_msgs.msg import Odometry
-from sensor_msgs.msg import PointCloud2,Imu,Image,CameraInfo,NavSatFix
-from uav_lab_experiments.backend_contract import input_topics,normalized_pose,trajectory_report
+from sensor_msgs.msg import PointCloud2,PointCloud,Imu,Image,CameraInfo,NavSatFix
+from visualization_msgs.msg import MarkerArray
+from uav_lab_experiments.loop_evidence import loop_edge_count
+from uav_lab_experiments.backend_contract import input_topics,consumed_input_group,normalized_pose,trajectory_report
 from uav_lab_tools.datasets import load_dataset,file_hash,check_replay_domain
 from uav_lab_localization.benchmark import read_dataset
 from backend_configs import write_config
-from backend_launch import core_command
-from backend_provenance import save_provenance
+from backend_launch import core_commands
+from backend_provenance import save_provenance,verify_runtime_artifacts
 from bootstrap_backends import verify_sources
+from vins_map import snapshot_vins_map,graph_body_trajectory
 from uav_lab_experiments.benchmark_report import resource_summary
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -26,22 +29,40 @@ class PoseObserver(Node):
     def __init__(self,backend,calibration,directory):
         super().__init__('backend_evaluator')
         self.set_parameters([rclpy.parameter.Parameter('use_sim_time',value=True)])
-        self.imu=calibration['imu'];self.clock=None;self.rows=[];self.latencies=[];self.expected=[];self.failures=[]
+        self.imu=calibration['lidar'] if backend=='lio_sam' else calibration['imu']
+        self.backend=backend;self.clock=None;self.rows=[];self.latencies=[];self.expected=[];self.failures=[]
         self.pose_time_offset=calibration.get('pose_time_offset_s',{}).get(backend,0.)
-        self.scan_end_offset=calibration.get('scan_end_offset_s',.1)
+        self.scan_end_offset=0. if backend in ('glim','lio_sam') else calibration.get('scan_end_offset_s',.1)
         self.counts={};self.pose_stream=(directory/'estimate.tum').open('x')
         self.normalized=0;self.normalizer_states={};self.normalizer_events=[]
+        self.loop_edges=0;self.keyframes=0;self.global_rows=[]
         self.create_subscription(Clock,'/clock',self.tick,qos_profile_sensor_data)
         self.create_subscription(Odometry,'/uav001/backends/'+backend+'/raw_odometry',self.pose,qos_profile_sensor_data)
         self.create_subscription(Odometry,'/uav001/backends/'+backend+'/odometry',self.normalized_pose,qos_profile_sensor_data)
+        private='/uav001/backends/'+backend
+        self.create_subscription(Odometry,private+'/global_odometry',self.global_pose,qos_profile_sensor_data)
+        if backend=='vins_fusion':
+            self.create_subscription(PointCloud,private+'/keyframe_point',lambda msg:setattr(self,'keyframes',self.keyframes+1),qos_profile_sensor_data)
+        if backend in ('vins_fusion','lio_sam'):
+            self.create_subscription(MarkerArray,private+('/pose_graph' if backend=='vins_fusion' else '/loop_constraints'),
+                lambda msg:setattr(self,'loop_edges',max(self.loop_edges,loop_edge_count(self.backend,msg))),qos_profile_sensor_data)
         from diagnostic_msgs.msg import DiagnosticArray
         self.create_subscription(DiagnosticArray,'/uav001/backends/'+backend+'/diagnostics',self.normalizer,10)
+        from std_msgs.msg import String
+        self.core_states=[]
+        self.create_subscription(String,'/uav001/backends/'+backend+'/core_state',lambda msg:self.core_states.append({'source_s':self.clock,'state':json.loads(msg.data)}),10)
         for topic,kind in [('/uav001/lidar/points',PointCloud2),('/uav001/imu/data',Imu),('/uav001/camera/image_raw',Image),('/uav001/camera/camera_info',CameraInfo),('/uav001/gnss/fix',NavSatFix)]:
             self.create_subscription(kind,topic,lambda msg,t=topic:self.input(t,msg),qos_profile_sensor_data)
 
     def tick(self,msg):self.clock=msg.clock.sec+msg.clock.nanosec/1e9
 
     def normalized_pose(self,msg):self.normalized+=1
+
+    def global_pose(self,msg):
+        p,q=msg.pose.pose.position,msg.pose.pose.orientation
+        stamp=msg.header.stamp.sec+msg.header.stamp.nanosec/1e9+self.pose_time_offset
+        try:self.global_rows.append(normalized_pose(stamp,[p.x,p.y,p.z],[q.x,q.y,q.z,q.w],self.imu))
+        except ValueError:pass
 
     def normalizer(self,msg):
         for status in msg.status:
@@ -53,7 +74,10 @@ class PoseObserver(Node):
 
     def input(self,topic,msg):
         self.counts[topic]=self.counts.get(topic,0)+1
-        if topic.endswith('/points'):self.expected.append(msg.header.stamp.sec+msg.header.stamp.nanosec/1e9+self.scan_end_offset)
+        if topic.endswith('/image_raw') and self.backend in ('orb_slam3','vins_fusion'):
+            self.expected.append(msg.header.stamp.sec+msg.header.stamp.nanosec/1e9)
+        elif topic.endswith('/points') and self.backend not in ('orb_slam3','vins_fusion'):
+            self.expected.append(msg.header.stamp.sec+msg.header.stamp.nanosec/1e9+self.scan_end_offset)
 
     def pose(self,msg):
         try:
@@ -92,13 +116,15 @@ def log_tail(path,limit=20000):
 def main():
     global OWNED_OUTPUT
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--backend',choices=['fast_lio2','fast_livo2','fast_livo2_rtk'],required=True)
+    parser.add_argument('--backend',choices=['glim','fast_lio2','fast_livo2','fast_livo2_rtk','lio_sam','orb_slam3','vins_fusion'],required=True)
     parser.add_argument('--dataset',type=Path,required=True);parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--rate',type=float,default=1.);parser.add_argument('--duration',type=float,default=0.)
     parser.add_argument('--public-config',type=Path);parser.add_argument('--position-only',action='store_true')
+    parser.add_argument('--vins-map',type=Path,help='load an owned copy of a previously saved VINS pose_graph.txt')
     parser.add_argument('--debug-core',action='store_true',help='capture a native crash backtrace; diagnostic run only')
     args=parser.parse_args()
     if not .1<=args.rate<=1. or not 0<=args.duration<=1800:parser.error('rate .1..1, duration 0..1800')
+    if args.vins_map and (args.backend!='vins_fusion' or args.public_config):parser.error('VINS map loading requires local VINS configuration')
     if args.output.exists():parser.error('output exists; evidence is immutable')
     domain=int(os.environ.get('ROS_DOMAIN_ID','42'))
     active=[]
@@ -116,6 +142,12 @@ def main():
         import shutil
         shutil.copytree(args.public_config,output/'configuration');config=output/'configuration/parameters.yaml'
     else:config=write_config(args.backend,metadata['calibration'],output/'configuration',output.name)
+    map_snapshot=None
+    if args.vins_map:
+        map_snapshot=snapshot_vins_map(args.vins_map,output/'configuration/pose_graph')
+        path=output/'configuration/algorithm.yaml'
+        path.write_text(path.read_text().replace('load_previous_pose_graph: 0','load_previous_pose_graph: 1'))
+        (output/'map-input-snapshot.json').write_text(json.dumps(map_snapshot,indent=2)+'\n')
     truth=[]
     for topic,msg,_,_ in read_dataset(dataset,['/uav001/ground_truth/odometry']):
         p,q=msg.pose.pose.position,msg.pose.pose.orientation
@@ -124,6 +156,7 @@ def main():
     (output/'calibration.json').write_text(json.dumps(metadata['calibration'],indent=2)+'\n')
     prefix=ROOT/'.deps/backends'/args.backend/'install'
     source=json.loads((prefix/(args.backend+'-build-manifest.json')).read_text())
+    verify_runtime_artifacts(source)
     binary=Path(source['binary']).resolve()
     if not binary.is_relative_to(prefix.resolve()):raise ValueError('backend binary outside private prefix')
     if file_hash(binary)!=source['binary_sha256']:raise ValueError('backend binary changed since build')
@@ -151,17 +184,25 @@ def main():
         if args.backend=='fast_livo2':
             launch(['/opt/ros/humble/lib/demo_nodes_cpp/parameter_blackboard','--ros-args','--params-file',output/'configuration/camera.yaml'],'camera-parameters')
         if not args.public_config:
-            launch(['/usr/bin/python3','-m','uav_lab_experiments.algorithm_sensor_node','--ros-args','-p','backend:='+args.backend,
-                    '-p','trace_file:='+str(output/'input-trace.jsonl'),'-p','calibration:='+str(output/'calibration.json')],'input-adapter')
+            if args.backend in ('fast_lio2','fast_livo2','fast_livo2_rtk','lio_sam'):
+                launch(['/usr/bin/python3','-m','uav_lab_experiments.algorithm_sensor_node','--ros-args','-p','backend:='+args.backend,
+                        '-p','trace_file:='+str(output/'input-trace.jsonl'),'-p','calibration:='+str(output/'calibration.json')],'input-adapter')
             launch(['/usr/bin/python3','-m','uav_lab_experiments.backend_node','--ros-args','-p','backend:='+args.backend,
                     '-p','calibration:='+str(output/'calibration.json')],'normalizer')
-        command=core_command(args.backend,binary,output/'configuration')
-        if args.debug_core:command=['gdb','-q','-batch','-ex','run','-ex','thread apply all bt','--args',*command]
-        backend=launch(command,'backend',subprocess.PIPE)
+        backend=None
+        for i,command in enumerate(core_commands(args.backend,binary,output/'configuration')):
+            if args.debug_core:command=['gdb','-q','-batch','-ex','run','-ex','thread apply all bt','--args',*command]
+            backend=launch(command,'backend' if i==0 else 'backend-'+str(i),subprocess.PIPE)
         discovery=time.monotonic()+3.
         while time.monotonic()<discovery:
             rclpy.spin_once(node,timeout_sec=.05)
             if any(p.poll() is not None for p in children):raise RuntimeError('backend or input adapter exited during startup')
+        if args.backend in ('orb_slam3','vins_fusion'):
+            deadline=time.monotonic()+90.
+            while not any(event['state'].get('input_ready') for event in node.core_states):
+                rclpy.spin_once(node,timeout_sec=.05)
+                if any(p.poll() is not None for p in children):raise RuntimeError('visual core exited before input readiness')
+                if time.monotonic()>deadline:raise RuntimeError('visual input readiness timed out')
         player=launch(['ros2','bag','play',dataset/'bag','--rate',str(args.rate),'--read-ahead-queue-size','100',
                        '--disable-keyboard-controls','--qos-profile-overrides-path',output/'playback-qos.yaml','--topics',*input_topics(args.backend)],'player',subprocess.DEVNULL)
         playback_start=time.monotonic();deadline=playback_start+(args.duration or 1900)/args.rate+20
@@ -206,18 +247,37 @@ def main():
         if rclpy.ok():rclpy.shutdown()
     expected=[t for t in node.expected if t>=node.expected[0]+3] if node and node.expected else []
     quality=trajectory_report(node.rows if node else [],truth,expected,not args.position_only)
+    global_quality=trajectory_report(node.global_rows,truth,expected,not args.position_only) if node and node.global_rows else None
+    pose_graph=None
+    if args.backend=='vins_fusion':
+        path=output/'configuration/pose_graph/pose_graph.txt'
+        try:
+            rows,cross_session=graph_body_trajectory(path,metadata['calibration']['imu'],map_snapshot['source_keyframes'] if map_snapshot else 0)
+            np.savetxt(output/'optimized-keyframe-body.tum',rows,fmt='%.9f')
+            pose_graph={'saved':True,'current_keyframes':len(rows),'cross_session_constraints':cross_session,
+                'quality':trajectory_report(rows,truth,[row[0] for row in rows],not args.position_only),
+                'scope':'optimized keyframes only; separate from online odometry and dense coverage'}
+        except (OSError,ValueError) as failure:pose_graph={'saved':False,'reason':str(failure)}
     latency=np.asarray(node.latencies if node else [])
     report={'schema':1,'backend':args.backend,'success':not error and not (node and node.failures) and quality['passed'] and (batch is None or batch.get('completed',False) and batch.get('quality',{}).get('passed',False)),
         'error':error,'quality':quality,'dataset':str(dataset),'dataset_sha256':metadata['bag_sha256'],
-        'input_topics':input_topics(args.backend),'input_counts':node.counts if node else {},'invalid_poses':node.failures if node else [],
+        'input_topics':input_topics(args.backend),'input_group':consumed_input_group(args.backend,metadata['calibration']),
+        'input_counts':node.counts if node else {},'invalid_poses':node.failures if node else [],
         'normalized_output_count':node.normalized if node else 0,'normalizer_states':node.normalizer_states if node else {},
         'normalizer_events':node.normalizer_events if node else [],'rtk_batch':batch,'debug_core':args.debug_core,
+        'core_states':node.core_states if node else [],
+        'pose_graph':pose_graph,'map_input_snapshot':map_snapshot,'global_quality':global_quality,
+        'capability_observations':{'keyframe_point_messages':node.keyframes if node else 0,
+            'confirmed_loop_edges':node.loop_edges if node else 0,'global_pose_messages':len(node.global_rows) if node else 0,
+            'loop_closure':'observed' if node and node.loop_edges else 'not observed in this run',
+            'relocalization':'cross-session constraints observed' if pose_graph and pose_graph.get('cross_session_constraints',0)>0 else 'not verified by this replay; no control qualification'},
         'playback_rate':args.rate,'player_exit_code':exit_code,'requested_source_duration_s':args.duration or None,
         'latency_source_s':{'p50':float(np.median(latency)),'p95':float(np.quantile(latency,.95)),'min':float(latency.min())} if len(latency) else None,
         'runtime_s':time.monotonic()-start,'resources':resources,'resource_summary':resource_summary(resources),
         'implementation_sha256':provenance['implementation_sha256'],
         'scope':'offline replay; no realtime or flight qualification','build':source}
     (output/'report.json').write_text(json.dumps(report,indent=2,allow_nan=False)+'\n')
+    if node and node.global_rows:np.savetxt(output/'global-estimate.tum',node.global_rows,fmt='%.9f')
     print(json.dumps({k:v for k,v in report.items() if k not in ('resources','build')},indent=2))
     return 0 if report['success'] else 1
 

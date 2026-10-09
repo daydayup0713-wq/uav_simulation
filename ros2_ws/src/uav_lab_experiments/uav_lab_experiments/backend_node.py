@@ -9,6 +9,7 @@ from rclpy.clock import Clock,ClockType
 from rclpy.qos import qos_profile_sensor_data,QoSProfile,DurabilityPolicy
 from nav_msgs.msg import Odometry,Path as NavPath
 from sensor_msgs.msg import PointCloud2,Imu,Image
+from std_msgs.msg import String
 from geometry_msgs.msg import PoseStamped,TransformStamped
 from diagnostic_msgs.msg import DiagnosticArray,DiagnosticStatus,KeyValue
 from tf2_ros import TransformBroadcaster,StaticTransformBroadcaster
@@ -26,18 +27,23 @@ class BackendNormalizer(Node):
         super().__init__('backend_normalizer',namespace='uav001')
         self.set_parameters([rclpy.parameter.Parameter('use_sim_time',value=True)])
         self.backend=self.declare_parameter('backend','fast_livo2').value
-        if self.backend not in ('fast_lio2','fast_livo2','fast_livo2_rtk'):raise ValueError('unknown backend')
+        if self.backend not in ('glim','fast_lio2','fast_livo2','fast_livo2_rtk','lio_sam','orb_slam3','vins_fusion'):raise ValueError('unknown backend')
         self.active=self.declare_parameter('active',False).value
         self.calibration=json.loads(Path(self.declare_parameter('calibration','').value).read_text())
         self.prefix='/uav001/backends/'+self.backend
         frame_prefix='lio' if self.active else self.backend
         self.world,self.body=frame_prefix+'_odom',frame_prefix+'_base_link'
-        self.quality=LocalizationQuality();self.previous=self.latest=None;self.camera=None
+        self.visual_only=self.backend in ('orb_slam3','vins_fusion')
+        self.uses_camera=self.backend in ('fast_livo2','fast_livo2_rtk','orb_slam3','vins_fusion')
+        self.pose_sensor=self.calibration['lidar'] if self.backend=='lio_sam' else self.calibration['imu']
+        self.quality=LocalizationQuality(source_limits={'imu':.25,'camera':.25} if self.visual_only else None)
+        self.previous=self.latest=None;self.camera=None
         self.flight_state={};self.flight_received=0.;self.alignment=None
         self.create_subscription(Odometry,self.prefix+'/raw_odometry',self.pose,qos_profile_sensor_data)
+        self.create_subscription(String,self.prefix+'/core_state',self.core_state,10)
         self.create_subscription(Imu,'/uav001/imu/data',self.imu,qos_profile_sensor_data)
-        self.create_subscription(PointCloud2,'/uav001/lidar/points',self.points,qos_profile_sensor_data)
-        if self.backend!='fast_lio2':self.create_subscription(Image,'/uav001/camera/image_raw',self.image,qos_profile_sensor_data)
+        if not self.visual_only:self.create_subscription(PointCloud2,'/uav001/lidar/points',self.points,qos_profile_sensor_data)
+        if self.uses_camera:self.create_subscription(Image,'/uav001/camera/image_raw',self.image,qos_profile_sensor_data)
         self.pub=self.create_publisher(Odometry,self.prefix+'/odometry',20)
         self.diag=self.create_publisher(DiagnosticArray,self.prefix+'/diagnostics',10)
         self.registered=self.create_publisher(PointCloud2,self.prefix+'/registered',qos_profile_sensor_data)
@@ -61,13 +67,28 @@ class BackendNormalizer(Node):
         if msg.header.frame_id!=self.calibration['imu']['frame'] or not np.isfinite(vectors).all():self.quality.fail('invalid inertial source');return
         self.quality.observe_source('imu',source_seconds(msg),time.monotonic())
 
+    def core_state(self,msg):
+        try:
+            state=json.loads(msg.data)
+            if not isinstance(state,dict):raise ValueError('core state must be an object')
+            if 'continuity_failed' in state and not isinstance(state['continuity_failed'],bool):
+                raise ValueError('continuity status must be boolean')
+            if state.get('continuity_failed'):
+                self.quality.fail('local continuity failed: '+str(state.get('reason','unknown')))
+        except (ValueError,TypeError) as error:self.quality.fail('invalid backend core state: '+str(error))
+
     def points(self,msg):
         if msg.header.frame_id!=self.calibration['lidar']['frame']:self.quality.fail('invalid point cloud source frame');return
         try:
-            lidar=self.calibration['lidar'];mechanical=lidar['kind']=='mechanical'
-            start,records=livox_records(msg,lidar['vertical_samples'] if mechanical else 4,'ring' if mechanical else 'line')
-            if not len(records):raise ValueError('point cloud has no finite measured returns')
-            measured=(start+int(records['offset_ns'].max()))/1e9
+            lidar=self.calibration['lidar'];mechanical=lidar.get('kind')=='mechanical'
+            if self.backend=='glim' and lidar.get('measurement_time')!='per_beam':
+                from uav_lab_localization.ingress import validated_scan
+                validated_scan(msg)
+                measured=source_seconds(msg)
+            else:
+                start,records=livox_records(msg,lidar['vertical_samples'] if mechanical else 4,'ring' if mechanical else 'line')
+                if not len(records):raise ValueError('point cloud has no finite measured returns')
+                measured=(start+int(records['offset_ns'].max()))/1e9
         except ValueError as error:self.quality.fail(str(error));return
         self.quality.observe_source('points',measured,time.monotonic())
 
@@ -76,10 +97,11 @@ class BackendNormalizer(Node):
         if (msg.header.frame_id!=self.calibration['camera']['optical_frame'] or stamp<=0 or
             self.camera and stamp<=self.camera[0]):self.quality.fail('invalid camera source time/frame');return
         self.camera=(stamp,time.monotonic())
+        if self.visual_only:self.quality.observe_source('camera',stamp,self.camera[1])
 
     def report(self):
         clock=self.get_clock().now().nanoseconds/1e9;now=time.monotonic()
-        if self.backend!='fast_lio2' and self.quality.was_ready:
+        if self.uses_camera and self.quality.was_ready:
             if self.camera is None or now-self.camera[1]>1.5 or not -.15<=clock-self.camera[0]<=.25:self.quality.fail('visual source stale or simulation paused')
         result=self.quality.check(clock,now)
         result['clock_s']=clock
@@ -87,14 +109,15 @@ class BackendNormalizer(Node):
             result[kind+'_age_s']=clock-source[0]
             result[kind+'_arrival_age_s']=now-source[1]
         result['pose_arrival_age_s']=None if self.quality.pose is None else now-self.quality.pose[1]
-        if self.backend!='fast_lio2' and self.camera is None:result.update(ready=False,state='INITIALIZING')
+        if self.uses_camera and self.camera is None and result['state']!='FAILED':result.update(ready=False,state='INITIALIZING')
         return result
 
     def pose(self,msg):
         p,q=msg.pose.pose.position,msg.pose.pose.orientation
         try:
-            row=normalized_pose(source_seconds(msg),[p.x,p.y,p.z],[q.x,q.y,q.z,q.w],self.calibration['imu'])
-            if msg.header.frame_id!='camera_init' or msg.child_frame_id not in ('body','aft_mapped'):raise ValueError('unexpected estimator pose frame')
+            row=normalized_pose(source_seconds(msg),[p.x,p.y,p.z],[q.x,q.y,q.z,q.w],self.pose_sensor)
+            expected=(self.backend+'_odom',('imu_link',)) if self.visual_only or self.backend=='glim' else ('lio_sam_odom',('odom_mapping',)) if self.backend=='lio_sam' else ('camera_init',('body','aft_mapped'))
+            if msg.header.frame_id!=expected[0] or msg.child_frame_id not in expected[1]:raise ValueError('unexpected estimator pose frame')
             if not self.quality.observe_pose(row[0],row[1:4],row[4:],time.monotonic()):return
         except ValueError as error:self.quality.fail(str(error));return
         output=Odometry();output.header=copy.deepcopy(msg.header);output.header.frame_id=self.world;output.child_frame_id=self.body
@@ -122,7 +145,8 @@ class BackendNormalizer(Node):
         tf.transform.rotation=output.pose.pose.orientation;self.tf.sendTransform(tf)
 
     def cloud(self,msg):
-        if msg.header.frame_id!='camera_init' or source_seconds(msg)<=0:return
+        expected=self.backend+'_odom' if self.visual_only or self.backend=='glim' else 'lio_sam_odom' if self.backend=='lio_sam' else 'camera_init'
+        if msg.header.frame_id!=expected or source_seconds(msg)<=0:return
         output=copy.deepcopy(msg);output.header.frame_id=self.world;self.registered.publish(output)
 
     def flight(self,msg):

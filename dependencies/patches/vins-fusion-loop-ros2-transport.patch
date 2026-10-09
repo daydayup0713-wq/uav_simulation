@@ -1,0 +1,661 @@
+diff --git a/camera_models/CMakeLists.txt b/camera_models/CMakeLists.txt
+index 723ff03..d730f4d 100755
+--- a/camera_models/CMakeLists.txt
++++ b/camera_models/CMakeLists.txt
+@@ -29,6 +29,8 @@ ament_export_dependencies(std_msgs)
+ 
+ include_directories("include")
+ 
++add_compile_options("SHELL:-include opencv2/imgproc/imgproc_c.h" "SHELL:-include opencv2/calib3d/calib3d_c.h" "SHELL:-include opencv2/imgcodecs/legacy/constants_c.h")
++
+ add_executable(Calibrations 
+     src/intrinsic_calib.cc
+     src/chessboard/Chessboard.cc
+@@ -92,3 +94,5 @@ install(DIRECTORY include/
+ 
+ 
+ ament_package()
++
++
+diff --git a/camera_models/include/camodocal/calib/CameraCalibration.h b/camera_models/include/camodocal/calib/CameraCalibration.h
+old mode 100755
+new mode 100644
+diff --git a/camera_models/include/camodocal/camera_models/Camera.h b/camera_models/include/camodocal/camera_models/Camera.h
+old mode 100755
+new mode 100644
+diff --git a/camera_models/include/camodocal/camera_models/CameraFactory.h b/camera_models/include/camodocal/camera_models/CameraFactory.h
+old mode 100755
+new mode 100644
+diff --git a/camera_models/include/camodocal/camera_models/CataCamera.h b/camera_models/include/camodocal/camera_models/CataCamera.h
+old mode 100755
+new mode 100644
+diff --git a/camera_models/include/camodocal/camera_models/CostFunctionFactory.h b/camera_models/include/camodocal/camera_models/CostFunctionFactory.h
+old mode 100755
+new mode 100644
+diff --git a/camera_models/include/camodocal/camera_models/EquidistantCamera.h b/camera_models/include/camodocal/camera_models/EquidistantCamera.h
+old mode 100755
+new mode 100644
+diff --git a/camera_models/include/camodocal/camera_models/PinholeCamera.h b/camera_models/include/camodocal/camera_models/PinholeCamera.h
+old mode 100755
+new mode 100644
+diff --git a/camera_models/include/camodocal/camera_models/PinholeFullCamera.h b/camera_models/include/camodocal/camera_models/PinholeFullCamera.h
+old mode 100755
+new mode 100644
+diff --git a/camera_models/include/camodocal/camera_models/ScaramuzzaCamera.h b/camera_models/include/camodocal/camera_models/ScaramuzzaCamera.h
+old mode 100755
+new mode 100644
+diff --git a/camera_models/include/camodocal/chessboard/Chessboard.h b/camera_models/include/camodocal/chessboard/Chessboard.h
+old mode 100755
+new mode 100644
+diff --git a/camera_models/include/camodocal/chessboard/ChessboardCorner.h b/camera_models/include/camodocal/chessboard/ChessboardCorner.h
+old mode 100755
+new mode 100644
+diff --git a/camera_models/include/camodocal/chessboard/ChessboardQuad.h b/camera_models/include/camodocal/chessboard/ChessboardQuad.h
+old mode 100755
+new mode 100644
+diff --git a/camera_models/include/camodocal/chessboard/Spline.h b/camera_models/include/camodocal/chessboard/Spline.h
+old mode 100755
+new mode 100644
+diff --git a/camera_models/include/camodocal/gpl/EigenQuaternionParameterization.h b/camera_models/include/camodocal/gpl/EigenQuaternionParameterization.h
+old mode 100755
+new mode 100644
+index c892ec8..3d08f0e
+--- a/camera_models/include/camodocal/gpl/EigenQuaternionParameterization.h
++++ b/camera_models/include/camodocal/gpl/EigenQuaternionParameterization.h
+@@ -1,27 +1,22 @@
+ #ifndef EIGENQUATERNIONPARAMETERIZATION_H
+ #define EIGENQUATERNIONPARAMETERIZATION_H
+ 
+-#include <ceres/ceres.h>
++#include "ceres/local_parameterization.h"
+ 
+ namespace camodocal
+ {
+ 
+-class EigenQuaternionParameterization : public ceres::Manifold
++class EigenQuaternionParameterization : public ceres::LocalParameterization
+ {
+ public:
+     virtual ~EigenQuaternionParameterization() {}
+-    bool Plus(const double* x,
+-              const double* delta,
+-              double* x_plus_delta) const override;
+-    bool PlusJacobian(const double* x,
+-                      double* jacobian) const override;
+-    bool Minus(const double* y,
+-               const double* x,
+-               double* y_minus_x) const override;
+-    bool MinusJacobian(const double* x,
+-                       double* jacobian) const override;
+-    int AmbientSize() const override { return 4; }
+-    int TangentSize() const override { return 3; }
++    virtual bool Plus(const double* x,
++                      const double* delta,
++                      double* x_plus_delta) const;
++    virtual bool ComputeJacobian(const double* x,
++                                 double* jacobian) const;
++    virtual int GlobalSize() const { return 4; }
++    virtual int LocalSize() const { return 3; }
+ 
+ private:
+     template<typename T>
+@@ -42,3 +37,4 @@ EigenQuaternionParameterization::EigenQuaternionProduct(const T z[4], const T w[
+ }
+ 
+ #endif
++
+diff --git a/camera_models/include/camodocal/gpl/EigenUtils.h b/camera_models/include/camodocal/gpl/EigenUtils.h
+old mode 100755
+new mode 100644
+diff --git a/camera_models/include/camodocal/gpl/gpl.h b/camera_models/include/camodocal/gpl/gpl.h
+old mode 100755
+new mode 100644
+diff --git a/camera_models/include/camodocal/sparse_graph/Transform.h b/camera_models/include/camodocal/sparse_graph/Transform.h
+old mode 100755
+new mode 100644
+diff --git a/camera_models/src/calib/CameraCalibration.cc b/camera_models/src/calib/CameraCalibration.cc
+old mode 100755
+new mode 100644
+index e3e9807..10543e9
+--- a/camera_models/src/calib/CameraCalibration.cc
++++ b/camera_models/src/calib/CameraCalibration.cc
+@@ -232,7 +232,7 @@ CameraCalibration::drawResults(std::vector<cv::Mat>& images) const
+         cv::Mat& image = images.at(i);
+         if (image.channels() == 1)
+         {
+-            cv::cvtColor(image, image, cv::COLOR_GRAY2RGB);
++            cv::cvtColor(image, image, CV_GRAY2RGB);
+         }
+ 
+         std::vector<cv::Point2f> estImagePoints;
+@@ -250,12 +250,12 @@ CameraCalibration::drawResults(std::vector<cv::Mat>& images) const
+             cv::circle(image,
+                        cv::Point(cvRound(pObs.x * drawMultiplier),
+                                  cvRound(pObs.y * drawMultiplier)),
+-                       5, green, 2, cv::LINE_AA, drawShiftBits);
++                       5, green, 2, CV_AA, drawShiftBits);
+ 
+             cv::circle(image,
+                        cv::Point(cvRound(pEst.x * drawMultiplier),
+                                  cvRound(pEst.y * drawMultiplier)),
+-                       5, red, 2, cv::LINE_AA, drawShiftBits);
++                       5, red, 2, CV_AA, drawShiftBits);
+ 
+             float error = cv::norm(pObs - pEst);
+ 
+@@ -272,7 +272,7 @@ CameraCalibration::drawResults(std::vector<cv::Mat>& images) const
+ 
+         cv::putText(image, oss.str(), cv::Point(10, image.rows - 10),
+                     cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(255, 255, 255),
+-                    1, cv::LINE_AA);
++                    1, CV_AA);
+     }
+ }
+ 
+@@ -504,11 +504,11 @@ CameraCalibration::optimize(CameraPtr& camera,
+                                      transformVec.at(i).translationData());
+         }
+ 
+-        ceres::Manifold* quaternionManifold =
++        ceres::LocalParameterization* quaternionParameterization =
+             new EigenQuaternionParameterization;
+ 
+-        problem.SetManifold(transformVec.at(i).rotationData(),
+-                            quaternionManifold);
++        problem.SetParameterization(transformVec.at(i).rotationData(),
++                                    quaternionParameterization);
+     }
+ 
+     std::cout << "begin ceres" << std::endl;
+@@ -557,7 +557,6 @@ CameraCalibration::readData(std::ifstream& ifs, T& data) const
+     data = *(reinterpret_cast<T*>(buffer));
+ 
+     delete[] buffer;
+-    buffer = nullptr;
+ }
+ 
+ template<typename T>
+diff --git a/camera_models/src/camera_models/Camera.cc b/camera_models/src/camera_models/Camera.cc
+old mode 100755
+new mode 100644
+diff --git a/camera_models/src/camera_models/CameraFactory.cc b/camera_models/src/camera_models/CameraFactory.cc
+old mode 100755
+new mode 100644
+diff --git a/camera_models/src/camera_models/CataCamera.cc b/camera_models/src/camera_models/CataCamera.cc
+old mode 100755
+new mode 100644
+diff --git a/camera_models/src/camera_models/CostFunctionFactory.cc b/camera_models/src/camera_models/CostFunctionFactory.cc
+old mode 100755
+new mode 100644
+diff --git a/camera_models/src/camera_models/EquidistantCamera.cc b/camera_models/src/camera_models/EquidistantCamera.cc
+old mode 100755
+new mode 100644
+diff --git a/camera_models/src/camera_models/PinholeCamera.cc b/camera_models/src/camera_models/PinholeCamera.cc
+old mode 100755
+new mode 100644
+diff --git a/camera_models/src/camera_models/PinholeFullCamera.cc b/camera_models/src/camera_models/PinholeFullCamera.cc
+old mode 100755
+new mode 100644
+diff --git a/camera_models/src/camera_models/ScaramuzzaCamera.cc b/camera_models/src/camera_models/ScaramuzzaCamera.cc
+old mode 100755
+new mode 100644
+diff --git a/camera_models/src/chessboard/Chessboard.cc b/camera_models/src/chessboard/Chessboard.cc
+old mode 100755
+new mode 100644
+index 22558ba..4c0a761
+--- a/camera_models/src/chessboard/Chessboard.cc
++++ b/camera_models/src/chessboard/Chessboard.cc
+@@ -17,13 +17,13 @@ Chessboard::Chessboard(cv::Size boardSize, cv::Mat& image)
+ {
+     if (image.channels() == 1)
+     {
+-        cv::cvtColor(image, mSketch, cv::COLOR_GRAY2BGR);
++        cv::cvtColor(image, mSketch, CV_GRAY2BGR);
+         image.copyTo(mImage);
+     }
+     else
+     {
+         image.copyTo(mSketch);
+-        cv::cvtColor(image, mImage, cv::COLOR_GRAY2RGB);
++        cv::cvtColor(image, mImage, CV_BGR2GRAY);
+     }
+ }
+ 
+@@ -31,10 +31,10 @@ void
+ Chessboard::findCorners(bool useOpenCV)
+ {
+     mCornersFound = findChessboardCorners(mImage, mBoardSize, mCorners,
+-                                          cv::CALIB_CB_ADAPTIVE_THRESH +
+-                                          cv::CALIB_CB_NORMALIZE_IMAGE +
+-                                          cv::CALIB_CB_FILTER_QUADS +
+-                                          cv::CALIB_CB_FAST_CHECK,
++                                          CV_CALIB_CB_ADAPTIVE_THRESH +
++                                          CV_CALIB_CB_NORMALIZE_IMAGE +
++                                          CV_CALIB_CB_FILTER_QUADS +
++                                          CV_CALIB_CB_FAST_CHECK,
+                                           useOpenCV);
+ 
+     if (mCornersFound)
+@@ -141,24 +141,24 @@ Chessboard::findChessboardCornersImproved(const cv::Mat& image,
+     // Image histogram normalization and
+     // BGR to Grayscale image conversion (if applicable)
+     // MARTIN: Set to "false"
+-    if (image.channels() != 1 || (flags & cv::CALIB_CB_NORMALIZE_IMAGE))
++    if (image.channels() != 1 || (flags & CV_CALIB_CB_NORMALIZE_IMAGE))
+     {
+         cv::Mat norm_img(image.rows, image.cols, CV_8UC1);
+ 
+         if (image.channels() != 1)
+         {
+-            cv::cvtColor(image, norm_img, cv::COLOR_GRAY2RGB);
++            cv::cvtColor(image, norm_img, CV_BGR2GRAY);
+             img = norm_img;
+         }
+ 
+-        if (flags & cv::CALIB_CB_NORMALIZE_IMAGE)
++        if (flags & CV_CALIB_CB_NORMALIZE_IMAGE)
+         {
+             cv::equalizeHist(image, norm_img);
+             img = norm_img;
+         }
+     }
+ 
+-    if (flags & cv::CALIB_CB_FAST_CHECK)
++    if (flags & CV_CALIB_CB_FAST_CHECK)
+     {
+         if (!checkChessboard(img, patternSize))
+         {
+@@ -189,13 +189,13 @@ Chessboard::findChessboardCornersImproved(const cv::Mat& image,
+             cv::Mat thresh_img;
+ 
+             // convert the input grayscale image to binary (black-n-white)
+-            if (flags & cv::CALIB_CB_ADAPTIVE_THRESH)
++            if (flags & CV_CALIB_CB_ADAPTIVE_THRESH)
+             {
+                 int blockSize = lround(prevSqrSize == 0 ?
+                     std::min(img.cols,img.rows)*(k%2 == 0 ? 0.2 : 0.1): prevSqrSize*2)|1;
+ 
+                 // convert to binary
+-                cv::adaptiveThreshold(img, thresh_img, 255, cv::ADAPTIVE_THRESH_MEAN_C, cv::THRESH_BINARY, blockSize, (k/2)*5);
++                cv::adaptiveThreshold(img, thresh_img, 255, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY, blockSize, (k/2)*5);
+             }
+             else
+             {
+@@ -204,7 +204,7 @@ Chessboard::findChessboardCornersImproved(const cv::Mat& image,
+                 int thresh_level = lround(mean - 10);
+                 thresh_level = std::max(thresh_level, 10);
+ 
+-                cv::threshold(img, thresh_img, thresh_level, 255, cv::THRESH_BINARY);
++                cv::threshold(img, thresh_img, thresh_level, 255, CV_THRESH_BINARY);
+             }
+ 
+             // MARTIN's Code
+@@ -212,8 +212,8 @@ Chessboard::findChessboardCornersImproved(const cv::Mat& image,
+             // homogeneous dilation is performed, which is crucial for small,
+             // distorted checkers. Use the CROSS kernel first, since its action
+             // on the image is more subtle
+-            cv::Mat kernel1 = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3,3), cv::Point(1,1));
+-            cv::Mat kernel2 = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3,3), cv::Point(1,1));
++            cv::Mat kernel1 = cv::getStructuringElement(CV_SHAPE_CROSS, cv::Size(3,3), cv::Point(1,1));
++            cv::Mat kernel2 = cv::getStructuringElement(CV_SHAPE_RECT, cv::Size(3,3), cv::Point(1,1));
+ 
+             if (dilations >= 1)
+                 cv::dilate(thresh_img, thresh_img, kernel1);
+@@ -317,7 +317,7 @@ Chessboard::findChessboardCornersImproved(const cv::Mat& image,
+         }
+ 
+         cv::cornerSubPix(image, corners, cv::Size(11, 11), cv::Size(-1,-1),
+-                         cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER, 30, 0.1));
++                         cv::TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
+ 
+         return true;
+     }
+@@ -1172,7 +1172,7 @@ Chessboard::generateQuads(std::vector<ChessboardQuadPtr>& quads,
+     std::vector<cv::Vec4i> hierarchy;
+ 
+     // Initialize contour retrieving routine
+-    cv::findContours(image, contours, hierarchy, cv::RETR_CCOMP, cv::CHAIN_APPROX_SIMPLE);
++    cv::findContours(image, contours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
+ 
+     std::vector< std::vector<cv::Point> > quadContours;
+ 
+@@ -1238,7 +1238,7 @@ Chessboard::generateQuads(std::vector<ChessboardQuadPtr>& quads,
+             dp = pt[1] - pt[2];
+             double d4 = sqrt(dp.dot(dp));
+ 
+-            if (!(flags & cv::CALIB_CB_FILTER_QUADS) ||
++            if (!(flags & CV_CALIB_CB_FILTER_QUADS) ||
+                 (d3*4 > d4 && d4*4 > d3 && d3*d4 < area*1.5 && area > minSize &&
+                 d1 >= 0.15 * p && d2 >= 0.15 * p))
+             {
+@@ -1583,20 +1583,20 @@ Chessboard::checkChessboard(const cv::Mat& image, cv::Size patternSize) const
+     bool result = false;
+     for (float threshLevel = blackLevel; threshLevel < whiteLevel && !result; threshLevel += 20.0f)
+     {
+-        cv::threshold(white, thresh, threshLevel + blackWhiteGap, 255, cv::THRESH_BINARY);
++        cv::threshold(white, thresh, threshLevel + blackWhiteGap, 255, CV_THRESH_BINARY);
+ 
+         std::vector< std::vector<cv::Point> > contours;
+         std::vector<cv::Vec4i> hierarchy;
+ 
+         // Initialize contour retrieving routine
+-        cv::findContours(thresh, contours, hierarchy, cv::RETR_CCOMP, cv::CHAIN_APPROX_SIMPLE);
++        cv::findContours(thresh, contours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
+ 
+         std::vector<std::pair<float, int> > quads;
+         getQuadrangleHypotheses(contours, quads, 1);
+ 
+-        cv::threshold(black, thresh, threshLevel, 255, cv::THRESH_BINARY_INV);
++        cv::threshold(black, thresh, threshLevel, 255, CV_THRESH_BINARY_INV);
+ 
+-        cv::findContours(thresh, contours, hierarchy, cv::RETR_CCOMP, cv::CHAIN_APPROX_SIMPLE);
++        cv::findContours(thresh, contours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
+         getQuadrangleHypotheses(contours, quads, 0);
+ 
+         const size_t min_quads_count = patternSize.width * patternSize.height / 2;
+diff --git a/camera_models/src/gpl/EigenQuaternionParameterization.cc b/camera_models/src/gpl/EigenQuaternionParameterization.cc
+old mode 100755
+new mode 100644
+index 5d28789..e97b057
+--- a/camera_models/src/gpl/EigenQuaternionParameterization.cc
++++ b/camera_models/src/gpl/EigenQuaternionParameterization.cc
+@@ -33,8 +33,8 @@ EigenQuaternionParameterization::Plus(const double* x,
+ }
+ 
+ bool
+-EigenQuaternionParameterization::PlusJacobian(const double* x,
+-                                              double* jacobian) const
++EigenQuaternionParameterization::ComputeJacobian(const double* x,
++                                                 double* jacobian) const
+ {
+     jacobian[0] =  x[3]; jacobian[1]  =  x[2]; jacobian[2]  = -x[1];  // NOLINT
+     jacobian[3] = -x[2]; jacobian[4]  =  x[3]; jacobian[5]  =  x[0];  // NOLINT
+@@ -43,50 +43,4 @@ EigenQuaternionParameterization::PlusJacobian(const double* x,
+     return true;
+ }
+ 
+-bool
+-EigenQuaternionParameterization::Minus(const double* y,
+-                                       const double* x,
+-                                       double* y_minus_x) const
+-{
+-    // Compute x_inverse * y
+-    // x_inverse for unit quaternion: conjugate
+-    double x_inv[4] = {-x[0], -x[1], -x[2], x[3]};
+-    double delta_q[4];
+-    EigenQuaternionProduct(x_inv, y, delta_q);
+-
+-    // Convert quaternion to angle-axis
+-    // delta_q = [sin(theta/2) * axis, cos(theta/2)]
+-    const double sin_half_angle = sqrt(delta_q[0] * delta_q[0] +
+-                                       delta_q[1] * delta_q[1] +
+-                                       delta_q[2] * delta_q[2]);
+-    if (sin_half_angle > 0.0)
+-    {
+-        const double cos_half_angle = delta_q[3];
+-        const double two_theta = 2.0 * atan2(sin_half_angle, cos_half_angle);
+-        const double k = two_theta / sin_half_angle;
+-        y_minus_x[0] = k * delta_q[0];
+-        y_minus_x[1] = k * delta_q[1];
+-        y_minus_x[2] = k * delta_q[2];
+-    }
+-    else
+-    {
+-        y_minus_x[0] = 2.0 * delta_q[0];
+-        y_minus_x[1] = 2.0 * delta_q[1];
+-        y_minus_x[2] = 2.0 * delta_q[2];
+-    }
+-    return true;
+-}
+-
+-bool
+-EigenQuaternionParameterization::MinusJacobian(const double* x,
+-                                               double* jacobian) const
+-{
+-    // The MinusJacobian at identity is the pseudo-inverse of PlusJacobian
+-    // For unit quaternion manifold, this is approximately:
+-    jacobian[0] =  x[3]; jacobian[1]  = -x[2]; jacobian[2]  =  x[1]; jacobian[3]  = -x[0];  // NOLINT
+-    jacobian[4] =  x[2]; jacobian[5]  =  x[3]; jacobian[6]  = -x[0]; jacobian[7]  = -x[1];  // NOLINT
+-    jacobian[8] = -x[1]; jacobian[9]  =  x[0]; jacobian[10] =  x[3]; jacobian[11] = -x[2];  // NOLINT
+-    return true;
+-}
+-
+ }
+diff --git a/camera_models/src/gpl/gpl.cc b/camera_models/src/gpl/gpl.cc
+old mode 100755
+new mode 100644
+diff --git a/camera_models/src/intrinsic_calib.cc b/camera_models/src/intrinsic_calib.cc
+old mode 100755
+new mode 100644
+index 2742d3d..7590a64
+--- a/camera_models/src/intrinsic_calib.cc
++++ b/camera_models/src/intrinsic_calib.cc
+@@ -274,7 +274,7 @@ main( int argc, char** argv )
+                          0.5,
+                          cv::Scalar( 255, 255, 255 ),
+                          1,
+-                         cv::LINE_AA );
++                         CV_AA );
+             cv::imshow( "Image", cbImages.at( i ) );
+             cv::waitKey( 0 );
+         }
+diff --git a/camera_models/src/sparse_graph/Transform.cc b/camera_models/src/sparse_graph/Transform.cc
+old mode 100755
+new mode 100644
+diff --git a/loop_fusion/CMakeLists.txt b/loop_fusion/CMakeLists.txt
+index aff3409..e927709 100755
+--- a/loop_fusion/CMakeLists.txt
++++ b/loop_fusion/CMakeLists.txt
+@@ -78,3 +78,5 @@ install(
+ 
+ 
+ ament_package()
++
++install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../support_files/ DESTINATION share/loop_fusion/support_files)
+diff --git a/loop_fusion/src/pose_graph.cpp b/loop_fusion/src/pose_graph.cpp
+index f1ce1a4..eb81411 100755
+--- a/loop_fusion/src/pose_graph.cpp
++++ b/loop_fusion/src/pose_graph.cpp
+@@ -31,7 +31,8 @@ PoseGraph::PoseGraph()
+ 
+ PoseGraph::~PoseGraph()
+ {
+-    t_optimization.detach();
++    platform_running=false;
++    if(t_optimization.joinable()) t_optimization.join();
+ }
+ 
+ void PoseGraph::registerPub(rclcpp::Node::SharedPtr n)
+@@ -443,7 +444,7 @@ void PoseGraph::addKeyFrameIntoVoc(KeyFrame* keyframe)
+ 
+ void PoseGraph::optimize4DoF()
+ {
+-    while(true)
++    while(platform_running && rclcpp::ok())
+     {
+         int cur_index = -1;
+         int first_looped_index = -1;
+@@ -480,8 +481,8 @@ void PoseGraph::optimize4DoF()
+             ceres::LossFunction *loss_function;
+             loss_function = new ceres::HuberLoss(0.1);
+             //loss_function = new ceres::CauchyLoss(1.0);
+-            ceres::Manifold* angle_manifold =
+-                AngleManifoldFunctor::Create();
++            ceres::LocalParameterization* angle_manifold =
++                AngleLocalParameterization::Create();
+ 
+             list<KeyFrame*>::iterator it;
+ 
+@@ -623,7 +624,7 @@ void PoseGraph::optimize4DoF()
+ 
+ void PoseGraph::optimize6DoF()
+ {
+-    while(true)
++    while(platform_running && rclcpp::ok())
+     {
+         int cur_index = -1;
+         int first_looped_index = -1;
+@@ -659,7 +660,7 @@ void PoseGraph::optimize6DoF()
+             ceres::LossFunction *loss_function;
+             loss_function = new ceres::HuberLoss(0.1);
+             //loss_function = new ceres::CauchyLoss(1.0);
+-            ceres::Manifold* quaternion_manifold = new ceres::QuaternionManifold();
++            ceres::LocalParameterization* quaternion_manifold = new ceres::QuaternionParameterization();
+ 
+             list<KeyFrame*>::iterator it;
+ 
+diff --git a/loop_fusion/src/pose_graph.h b/loop_fusion/src/pose_graph.h
+index 93b2137..c3caeda 100755
+--- a/loop_fusion/src/pose_graph.h
++++ b/loop_fusion/src/pose_graph.h
+@@ -12,6 +12,7 @@
+ #pragma once
+ 
+ #include <thread>
++#include <atomic>
+ #include <mutex>
+ #include <opencv2/opencv.hpp>
+ #include <eigen3/Eigen/Dense>
+@@ -84,6 +85,7 @@ private:
+ 	std::mutex m_path;
+ 	std::mutex m_drift;
+ 	std::thread t_optimization;
++    std::atomic<bool> platform_running{true};
+ 	std::queue<int> optimize_buf;
+ 
+ 	int global_index;
+@@ -122,23 +124,21 @@ T NormalizeAngle(const T& angle_degrees) {
+   	return angle_degrees;
+ };
+ 
+-struct AngleManifoldFunctor {
++class AngleLocalParameterization {
++ public:
++
+   template <typename T>
+-  bool Plus(const T* theta_radians, const T* delta_theta_radians,
+-            T* theta_radians_plus_delta) const {
++  bool operator()(const T* theta_radians, const T* delta_theta_radians,
++                  T* theta_radians_plus_delta) const {
+     *theta_radians_plus_delta =
+         NormalizeAngle(*theta_radians + *delta_theta_radians);
+-    return true;
+-  }
+ 
+-  template <typename T>
+-  bool Minus(const T* y, const T* x, T* y_minus_x) const {
+-    *y_minus_x = NormalizeAngle(*y - *x);
+     return true;
+   }
+ 
+-  static ceres::Manifold* Create() {
+-    return new ceres::AutoDiffManifold<AngleManifoldFunctor, 1, 1>;
++  static ceres::LocalParameterization* Create() {
++    return (new ceres::AutoDiffLocalParameterization<AngleLocalParameterization,
++                                                     1, 1>);
+   }
+ };
+ 
+diff --git a/loop_fusion/src/pose_graph_node.cpp b/loop_fusion/src/pose_graph_node.cpp
+index 8bc5832..0c23f1d 100755
+--- a/loop_fusion/src/pose_graph_node.cpp
++++ b/loop_fusion/src/pose_graph_node.cpp
+@@ -110,6 +110,7 @@ void image_callback(const sensor_msgs::msg::Image::SharedPtr image_msg)
+     //ROS_INFO("image_callback!");
+     m_buf.lock();
+     image_buf.push(image_msg);
++    while(image_buf.size()>120) image_buf.pop();
+     m_buf.unlock();
+     //printf(" image time %f \n", image_msg->header.stamp.sec);
+ 
+@@ -130,6 +131,7 @@ void point_callback(const sensor_msgs::msg::PointCloud::SharedPtr point_msg)
+     //ROS_INFO("point_callback!");
+     m_buf.lock();
+     point_buf.push(point_msg);
++    while(point_buf.size()>100) point_buf.pop();
+     m_buf.unlock();
+     /*
+     for (unsigned int i = 0; i < point_msg->points.size(); i++)
+@@ -186,6 +188,7 @@ void pose_callback(const nav_msgs::msg::Odometry::SharedPtr pose_msg)
+     //ROS_INFO("pose_callback!");
+     m_buf.lock();
+     pose_buf.push(pose_msg);
++    while(pose_buf.size()>100) pose_buf.pop();
+     m_buf.unlock();
+     /*
+     printf("pose t: %f, %f, %f   q: %f, %f, %f %f \n", pose_msg->pose.pose.position.x,
+@@ -253,7 +256,7 @@ void extrinsic_callback(const nav_msgs::msg::Odometry::SharedPtr pose_msg)
+ 
+ void process()
+ {
+-    while (true)
++    while (rclcpp::ok())
+     {
+         sensor_msgs::msg::Image::ConstPtr image_msg = NULL;
+         sensor_msgs::msg::PointCloud::ConstPtr point_msg = NULL;
+@@ -423,7 +426,8 @@ int main(int argc, char **argv)
+     SKIP_CNT = 0;
+     SKIP_DIS = 0;
+ 
+-    if(argc != 2)
++    auto platform_arguments=rclcpp::remove_ros_arguments(argc,argv);
++    if(platform_arguments.size() != 2)
+     {
+         printf("please intput: rosrun loop_fusion loop_fusion_node [config file] \n"
+                "for example: rosrun loop_fusion loop_fusion_node "
+@@ -431,7 +435,7 @@ int main(int argc, char **argv)
+         return 0;
+     }
+     
+-    string config_file = argv[1];
++    string config_file = platform_arguments[1];
+     printf("config_file: %s\n", argv[1]);
+ 
+     cv::FileStorage fsSettings(config_file, cv::FileStorage::READ);
+@@ -451,11 +455,11 @@ int main(int argc, char **argv)
+ 
+     // referred from: https://answers.ros.org/question/288501/ros2-equivalent-of-rospackagegetpath/
+     std::string pkg_path = ament_index_cpp::get_package_share_directory("loop_fusion");
+-    string vocabulary_file = pkg_path + "/../support_files/brief_k10L6.bin";
++    string vocabulary_file = pkg_path + "/support_files/brief_k10L6.bin";
+     cout << "vocabulary_file" << vocabulary_file << endl;
+     posegraph.loadVocabulary(vocabulary_file);
+ 
+-    BRIEF_PATTERN_FILE = pkg_path + "/../support_files/brief_pattern.yml";
++    BRIEF_PATTERN_FILE = pkg_path + "/support_files/brief_pattern.yml";
+     cout << "BRIEF_PATTERN_FILE" << BRIEF_PATTERN_FILE << endl;
+ 
+     int pn = config_file.find_last_of('/');
+@@ -502,12 +506,12 @@ int main(int argc, char **argv)
+         load_flag = 1;
+     }
+ 
+-    auto sub_vio          = n->create_subscription<nav_msgs::msg::Odometry>("/vins_estimator/odometry", rclcpp::QoS(rclcpp::KeepLast(2000)), vio_callback);
+-    auto sub_image        = n->create_subscription<sensor_msgs::msg::Image>(IMAGE_TOPIC, rclcpp::QoS(rclcpp::KeepLast(2000)), image_callback);
+-    auto sub_pose         = n->create_subscription<nav_msgs::msg::Odometry>("/vins_estimator/keyframe_pose", rclcpp::QoS(rclcpp::KeepLast(2000)), pose_callback);
+-    auto sub_extrinsic    = n->create_subscription<nav_msgs::msg::Odometry>("/vins_estimator/extrinsic", rclcpp::QoS(rclcpp::KeepLast(2000)), extrinsic_callback);
+-    auto sub_point        = n->create_subscription<sensor_msgs::msg::PointCloud>("/vins_estimator/keyframe_point", rclcpp::QoS(rclcpp::KeepLast(2000)), point_callback);
+-    auto sub_margin_point = n->create_subscription<sensor_msgs::msg::PointCloud>("/vins_estimator/margin_cloud", rclcpp::QoS(rclcpp::KeepLast(2000)), margin_point_callback);
++    auto sub_vio          = n->create_subscription<nav_msgs::msg::Odometry>("/vins_estimator/odometry", rclcpp::SensorDataQoS().keep_last(100), vio_callback);
++    auto sub_image        = n->create_subscription<sensor_msgs::msg::Image>(IMAGE_TOPIC, rclcpp::SensorDataQoS().keep_last(100), image_callback);
++    auto sub_pose         = n->create_subscription<nav_msgs::msg::Odometry>("/vins_estimator/keyframe_pose", rclcpp::SensorDataQoS().keep_last(100), pose_callback);
++    auto sub_extrinsic    = n->create_subscription<nav_msgs::msg::Odometry>("/vins_estimator/extrinsic", rclcpp::SensorDataQoS().keep_last(100), extrinsic_callback);
++    auto sub_point        = n->create_subscription<sensor_msgs::msg::PointCloud>("/vins_estimator/keyframe_point", rclcpp::SensorDataQoS().keep_last(100), point_callback);
++    auto sub_margin_point = n->create_subscription<sensor_msgs::msg::PointCloud>("/vins_estimator/margin_cloud", rclcpp::SensorDataQoS().keep_last(100), margin_point_callback);
+ 
+ 
+     pub_match_img          = n->create_publisher<sensor_msgs::msg::Image>("match_image", 1000);
+@@ -520,9 +524,12 @@ int main(int argc, char **argv)
+     std::thread keyboard_command_process;
+ 
+     measurement_process = std::thread(process);
+-    keyboard_command_process = std::thread(command);
++    // Keyboard stdin is owned by the platform supervisor; no detached reader.
+     
+     rclcpp::spin(n);
++    if(measurement_process.joinable()) measurement_process.join();
++    // Preserve the upstream pose graph for a separate relocalization run.
++    posegraph.savePoseGraph();
+ 
+     return 0;
+ }

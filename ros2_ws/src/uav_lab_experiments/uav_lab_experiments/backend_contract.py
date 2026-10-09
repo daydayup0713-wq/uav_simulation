@@ -5,11 +5,34 @@ from .trajectory_evaluation import evaluate
 
 
 def input_topics(backend):
+    if backend not in ('glim','fast_lio2','fast_livo2','fast_livo2_rtk','lio_sam','orb_slam3','vins_fusion'):
+        raise ValueError('unknown backend')
+    if backend in ('orb_slam3','vins_fusion'):
+        return ['/clock','/uav001/imu/data','/uav001/camera/image_raw','/uav001/camera/camera_info']
     topics=['/clock','/uav001/lidar/points','/uav001/imu/data']
     if backend in ('fast_livo2','fast_livo2_rtk'):
         topics+=['/uav001/camera/image_raw','/uav001/camera/camera_info']
     if backend=='fast_livo2_rtk':topics+=['/uav001/gnss/fix']
     return topics
+
+
+def consumed_input_group(backend, calibration):
+    input_topics(backend)  # Unknown backends cannot inherit a fallback group.
+    if backend in ('orb_slam3','vins_fusion'):
+        return 'monocular_inertial'
+    lidar=calibration.get('lidar',{})
+    kind=lidar.get('kind','mechanical' if calibration.get('reference')=='NTU_VIRAL upstream parameters' else 'generic')
+    if backend=='fast_livo2_rtk':
+        return 'livox_visual_inertial_rtk'
+    if backend=='fast_livo2':
+        return 'mechanical_visual_imu' if kind=='mechanical' else 'livox_visual_inertial'
+    if kind=='mechanical':
+        return 'mechanical_inertial' if backend=='lio_sam' else 'mechanical_lidar_imu'
+    if backend=='lio_sam':
+        raise ValueError('LIO-SAM requires measured mechanical channels and attitude IMU')
+    if kind=='livox':
+        return 'livox_inertial'
+    return 'synchronous_lidar_imu'
 
 
 def normalized_pose(stamp,position,quaternion,imu):
