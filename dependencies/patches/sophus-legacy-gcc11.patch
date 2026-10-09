@@ -1,0 +1,24 @@
+--- a/sophus/so2.cpp
++++ b/sophus/so2.cpp
+@@ -29,8 +29,8 @@
+ 
+ SO2::SO2()
+ {
+-  unit_complex_.real() = 1.;
+-  unit_complex_.imag() = 0.;
++  unit_complex_.real(1.);
++  unit_complex_.imag(0.);
+ }
+ 
+ SO2
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -13,7 +13,7 @@
+    SET(CMAKE_CXX_FLAGS_DEBUG  "-O0 -g")
+    SET(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG ")
+ 
+-  ADD_DEFINITIONS("-Wall -Werror -Wno-unused-variable
++  ADD_DEFINITIONS("-Wall  -Wno-unused-variable
+                    -Wno-unused-but-set-variable -Wno-unknown-pragmas ")
+ ENDIF()
+ 

@@ -46,6 +46,8 @@ class Registry:
             if (report['schema'] != 1 or report['backend'] != backend
                     or report['source_ref'] != spec['source_ref']
                     or not re.fullmatch(r'[0-9a-f]{40}', report['source_ref'] or '')
+                    or (spec.get('implementation_sha256') is not None and
+                        report.get('implementation_sha256') != spec['implementation_sha256'])
                     or report['input_group'] != group or group not in spec['groups']
                     or report['success'] is not True or report['checks']['all_passed'] is not True
                     or report['stage'] not in STAGES[1:] or not report['artifacts']):

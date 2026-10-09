@@ -1,0 +1,147 @@
+diff --git a/src/fast_livo/CMakeLists.txt b/src/fast_livo/CMakeLists.txt
+index 820a4e8..15f7d8b 100644
+--- a/src/fast_livo/CMakeLists.txt
++++ b/src/fast_livo/CMakeLists.txt
+@@ -88,7 +88,7 @@ endif()
+ find_package(GeographicLib REQUIRED)
+ find_package(GTSAM REQUIRED QUIET)
+ 
+-set(Sophus_LIBRARIES libSophus.so)
++
+ 
+ set(ament_dependencies
+   rclcpp
+diff --git a/src/fast_livo/include/platform_cloud_transform.hpp b/src/fast_livo/include/platform_cloud_transform.hpp
+new file mode 100644
+index 0000000..ed95221
+--- /dev/null
++++ b/src/fast_livo/include/platform_cloud_transform.hpp
+@@ -0,0 +1,15 @@
++#pragma once
++#include <pcl/common/transforms.h>
++
++namespace platform_io {
++inline void appendKeyframeCloud(const pcl::PointCloud<pcl::PointXYZRGB>& frame,
++                               const Eigen::Affine3f& transform,
++                               pcl::PointCloud<pcl::PointXYZRGB>& global) {
++    // PCL 1.12 transformPointCloud assigns with the incoming width. A valid
++    // empty RGB frame has width=0, causing integer division by zero there.
++    if (frame.empty()) return;
++    pcl::PointCloud<pcl::PointXYZRGB> transformed;
++    pcl::transformPointCloud(frame, transformed, transform);
++    global += transformed;
++}
++}
+diff --git a/src/fast_livo/src/LIVMapper.cpp b/src/fast_livo/src/LIVMapper.cpp
+index dc756d9..a027dc5 100755
+--- a/src/fast_livo/src/LIVMapper.cpp
++++ b/src/fast_livo/src/LIVMapper.cpp
+@@ -250,8 +250,8 @@ void LIVMapper::initializeSubscribersAndPublishers(image_transport::ImageTranspo
+       "/ublox_driver/receiver_pvt", rclcpp::QoS(rclcpp::KeepLast(2000)),
+       std::bind(&LIVMapper::rtk_cbk, this, _1));
+ 
+-  pub_odom = node_->create_publisher<nav_msgs::msg::Odometry>("/odometry/fast_livo2", rclcpp::QoS(rclcpp::KeepLast(10000)));
+-  pub_lidarRGB = node_->create_publisher<sensor_msgs::msg::PointCloud2>("/synced_cloud", rclcpp::QoS(rclcpp::KeepLast(10000)));
++  pub_odom = node_->create_publisher<nav_msgs::msg::Odometry>("/odometry/fast_livo2", rclcpp::QoS(rclcpp::KeepLast(8)));
++  pub_lidarRGB = node_->create_publisher<sensor_msgs::msg::PointCloud2>("/synced_cloud", rclcpp::QoS(rclcpp::KeepLast(8)));
+   pub_rtk = node_->create_publisher<nav_msgs::msg::Odometry>("/gps/odometry", rclcpp::QoS(rclcpp::KeepLast(2000)));
+ 
+   pubLaserCloudFullRes = node_->create_publisher<sensor_msgs::msg::PointCloud2>("/cloud_registered", rclcpp::QoS(rclcpp::KeepLast(100)));
+@@ -914,7 +914,8 @@ void LIVMapper::rtk_cbk(const gnss_comm::msg::GnssPVTSolnMsg::ConstSharedPtr& gp
+     int week = gpsMsg->time.week;
+     double tow = gpsMsg->time.tow; 
+     double total_gps_seconds = (double)week * SECONDS_PER_WEEK + tow;
+-    double timestamp_sec = total_gps_seconds + GPS_EPOCH_UNIX_TIME - LEAP_SECONDS;
++    double offset=0.; node_->get_parameter_or("platform.gnss_unix_offset",offset,0.);
++    double timestamp_sec = total_gps_seconds + GPS_EPOCH_UNIX_TIME - LEAP_SECONDS - offset;
+     ros::Time stamp;
+     stamp.fromSec(timestamp_sec);
+ 
+@@ -1541,7 +1542,7 @@ void LIVMapper::publish_frame_world(const rclcpp::Publisher<sensor_msgs::msg::Po
+   { 
+     pcl::toROSMsg(*pcl_w_wait_pub, laserCloudmsg); 
+   }
+-  laserCloudmsg.header.stamp = ros::Time::now(); //.fromSec(last_timestamp_lidar);
++  laserCloudmsg.header.stamp = ros::Time(LidarMeasures.last_lio_update_time); //.fromSec(last_timestamp_lidar);
+   laserCloudmsg.header.frame_id = "camera_init";
+   pubLaserCloudFullRes->publish(laserCloudmsg);
+ 
+@@ -1728,7 +1729,7 @@ void LIVMapper::publish_visual_sub_map(const rclcpp::Publisher<sensor_msgs::msg:
+   {
+     sensor_msgs::msg::PointCloud2 laserCloudmsg;
+     pcl::toROSMsg(*sub_pcl_visual_map_pub, laserCloudmsg);
+-    laserCloudmsg.header.stamp = ros::Time::now();
++    laserCloudmsg.header.stamp = ros::Time(LidarMeasures.last_lio_update_time);
+     laserCloudmsg.header.frame_id = "camera_init";
+     pubSubVisualMap->publish(laserCloudmsg);
+   }
+@@ -1766,7 +1767,7 @@ void LIVMapper::publish_odometry(const rclcpp::Publisher<nav_msgs::msg::Odometry
+ {
+   odomAftMapped.header.frame_id = "camera_init";
+   odomAftMapped.child_frame_id = "aft_mapped";
+-  odomAftMapped.header.stamp = ros::Time::now(); //.ros::Time()fromSec(last_timestamp_lidar);
++  odomAftMapped.header.stamp = ros::Time(LidarMeasures.last_lio_update_time); //.ros::Time()fromSec(last_timestamp_lidar);
+   set_posestamp(odomAftMapped.pose.pose);
+ 
+   geometry_msgs::msg::TransformStamped transform;
+@@ -1799,4 +1800,4 @@ void LIVMapper::publish_path(const rclcpp::Publisher<nav_msgs::msg::Path>::Share
+   msg_body_pose.header.frame_id = "camera_init";
+   path.poses.push_back(msg_body_pose);
+   pubPath->publish(path);
+-}
+\ No newline at end of file
++}
+diff --git a/src/fast_livo/src/optimization.cpp b/src/fast_livo/src/optimization.cpp
+index 22d3dc7..3291465 100644
+--- a/src/fast_livo/src/optimization.cpp
++++ b/src/fast_livo/src/optimization.cpp
+@@ -2,6 +2,7 @@
+ #include "tf_compat.hpp"
+ #include "FastDTW/example.hpp"
+ #include <filesystem>
++#include "platform_cloud_transform.hpp"
+ 
+ optimization::optimization(const rclcpp::Node::SharedPtr &node)
+ {
+@@ -45,11 +46,11 @@ optimization::optimization(const rclcpp::Node::SharedPtr &node)
+     gps_lever_arm_(2) = gps_extrinT[2];
+     T_imu_rtk = gtsam::Pose3(gtsam::Rot3(), gtsam::Point3(gps_lever_arm_));
+ 
+-    const auto mf_qos = rclcpp::QoS(rclcpp::KeepLast(10000)).get_rmw_qos_profile();
++    const auto mf_qos = rclcpp::QoS(rclcpp::KeepLast(20)).get_rmw_qos_profile();
+     subOdom_.subscribe(node_, "/odometry/fast_livo2", mf_qos);
+     subCloud_.subscribe(node_, "/synced_cloud", mf_qos);
+     // Larger ApproximateTime queue so keyframe pairs are not dropped before sync.
+-    sync_ = std::make_unique<message_filters::Synchronizer<SyncPolicy>>(SyncPolicy(200), subOdom_, subCloud_);
++    sync_ = std::make_unique<message_filters::Synchronizer<SyncPolicy>>(SyncPolicy(20), subOdom_, subCloud_);
+     sync_->registerCallback(std::bind(&optimization::syncedCallback, this, std::placeholders::_1, std::placeholders::_2));
+ 
+     laserCloudSurfLastDS.reset(new PointCloudXYZRGB());
+@@ -606,7 +607,8 @@ void optimization::gpsHandler(const gnss_comm::msg::GnssPVTSolnMsg::ConstSharedP
+     int week = gpsMsg->time.week;
+     double tow = gpsMsg->time.tow; 
+     double total_gps_seconds = (double)week * SECONDS_PER_WEEK + tow;
+-    double timestamp_sec = total_gps_seconds + GPS_EPOCH_UNIX_TIME - LEAP_SECONDS;
++    double offset=0.; node_->get_parameter_or("platform.gnss_unix_offset",offset,0.);
++    double timestamp_sec = total_gps_seconds + GPS_EPOCH_UNIX_TIME - LEAP_SECONDS - offset;
+     
+     ros::Time stamp;
+     stamp.fromSec(timestamp_sec);
+@@ -656,9 +658,7 @@ void optimization::saveOptimizedGlobalMap()
+     {
+         Eigen::Affine3f transform = pclPointToAffine3f(cloudKeyPoses6D->points[i]);
+         PointCloudXYZRGB::Ptr original_cloud = surfCloudKeyFrames[i];
+-        PointCloudXYZRGB::Ptr transformed_cloud(new PointCloudXYZRGB());
+-        pcl::transformPointCloud(*original_cloud, *transformed_cloud, transform);
+-        *globalMapCloud += *transformed_cloud;
++        platform_io::appendKeyframeCloud(*original_cloud, transform, *globalMapCloud);
+     }
+     
+     std::string save_path;
+@@ -824,4 +824,4 @@ void optimization::loadData(const std::string& data_dir)
+     odom_file.close();
+     cov_file.close();
+     ROS_INFO("Load complete. Total frames: %d", processed_count);
+-}
+\ No newline at end of file
++}

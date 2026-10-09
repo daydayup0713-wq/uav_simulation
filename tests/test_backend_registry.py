@@ -73,6 +73,15 @@ def test_artifact_tampering_revokes_stage(registry):
     assert registry.describe('lio')['stage'] == 'configured'
 
 
+def test_source_patches_and_adapter_fingerprint_revoke_old_stage(registry):
+    registry.backends['lio']['implementation_sha256']='a'*64
+    evidence=report(registry);evidence['implementation_sha256']='a'*64
+    registry.record(evidence)
+    assert registry.describe('lio')['stage']=='installed'
+    registry.backends['lio']['implementation_sha256']='b'*64
+    assert registry.describe('lio')['stage']=='configured'
+
+
 def test_evidence_immutable_and_rejects_missing_artifact(registry):
     evidence = report(registry)
     registry.record(evidence)
