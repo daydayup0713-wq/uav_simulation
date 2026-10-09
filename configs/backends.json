@@ -171,57 +171,80 @@
         "synchronous_lidar_imu",
         "livox_visual_inertial",
         "livox_visual_inertial_rtk",
-        "mechanical_inertial"
+        "mechanical_inertial",
+        "monocular_inertial",
+        "livox_inertial",
+        "mechanical_lidar_imu",
+        "mechanical_visual_imu"
       ],
       "capabilities": {
         "observed_space_only": true,
         "continuous_trajectory": true,
         "online_replan": true
-      }
+      },
+      "implementation_sha256": "1088f15dd53877419061b1e366bc4ca7b4b74a0d50b888affc76f77c3258ede5"
     },
     {
       "id": "ego",
       "role": "planning",
-      "source_ref": null,
+      "source_ref": "23a8d5a191711dd65633df689bd00f55d4dea8f9",
       "groups": [
+        "synchronous_lidar_imu",
         "livox_visual_inertial",
         "livox_visual_inertial_rtk",
-        "mechanical_inertial"
+        "mechanical_inertial",
+        "monocular_inertial",
+        "livox_inertial",
+        "mechanical_lidar_imu",
+        "mechanical_visual_imu"
       ],
       "capabilities": {
         "continuous_trajectory": true,
         "online_replan": true,
         "single_drone": true
-      }
+      },
+      "implementation_sha256": "57fca48dbd6fd44eae6bba25aafb16a75c163a5951613ed26b6bb36f76b2b613"
     },
     {
       "id": "fast_planner",
       "role": "planning",
-      "source_ref": null,
+      "source_ref": "41be219fe4ecc43bf0e0c2b42a523f8755ccc0bd",
       "groups": [
+        "synchronous_lidar_imu",
         "livox_visual_inertial",
         "livox_visual_inertial_rtk",
-        "mechanical_inertial"
+        "mechanical_inertial",
+        "monocular_inertial",
+        "livox_inertial",
+        "mechanical_lidar_imu",
+        "mechanical_visual_imu"
       ],
       "capabilities": {
         "continuous_trajectory": true,
         "online_replan": true
-      }
+      },
+      "implementation_sha256": "90387c140d48d62966a7e16be88046d46f3239e15facf0e5f260fbb6e877c58a"
     },
     {
       "id": "gcopter",
       "role": "planning",
-      "source_ref": null,
+      "source_ref": "e0444f6d47b84f972ced91746b05feb36ce1fd4f",
       "groups": [
+        "synchronous_lidar_imu",
         "livox_visual_inertial",
         "livox_visual_inertial_rtk",
-        "mechanical_inertial"
+        "mechanical_inertial",
+        "monocular_inertial",
+        "livox_inertial",
+        "mechanical_lidar_imu",
+        "mechanical_visual_imu"
       ],
       "capabilities": {
         "continuous_trajectory": true,
         "online_replan": true,
         "requires_safe_corridor": true
-      }
+      },
+      "implementation_sha256": "218b2c9fc6e916fc28cbfa16768d5997994ddc4db5e6f1915cc142ef70ba747f"
     }
   ]
 }

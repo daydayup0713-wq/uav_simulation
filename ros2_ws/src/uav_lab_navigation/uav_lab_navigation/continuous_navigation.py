@@ -26,6 +26,15 @@ def reference(node):
 
 
 def checked_curve(node, goal, initial):
+    if getattr(node,'planner_backend','astar')!='astar':
+        curve,collision=node.make_curve(goal,initial)
+        if not curve.collision_free(collision):raise RuntimeError('NO_SAFE_CONTINUOUS_TRAJECTORY')
+        node.record('continuous_plan',trajectory=curve.to_dict(),backend=node.planner_backend,
+                    map_version=collision.version,**node.archive_plan(collision))
+        sampled=[curve.sample(t).position for t in np.arange(0.,curve.duration,.1)]
+        sampled.append(curve.sample(curve.duration).position)
+        node.path_pub.publish(node.as_path(sampled))
+        return curve,collision
     collision, result = node.make_plan(goal, start_override=initial.position.tolist())
     if not result.success:
         raise RuntimeError(result.reason)

@@ -2,3 +2,4 @@
 dependencies/patches/*.patch -whitespace
 # Preserve upstream license text byte for byte.
 dependencies/patches/licenses/* -whitespace
+navigation/native/licenses/* -whitespace

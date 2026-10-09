@@ -15,13 +15,20 @@ from uav_lab_navigation.planner import Plan
 from uav_lab_bridge.trajectory_interface import trajectory_from_goal
 
 
-@pytest.mark.parametrize('mode', ['success', 'source_loss', 'operator_hold', 'cancel', 'reject'])
-def test_continuous_navigation_sends_one_collision_checked_curve(monkeypatch, tmp_path, isolated_ros_domain, mode):
+@pytest.mark.parametrize(('mode','backend'), [(m,'astar') for m in ('success','source_loss','operator_hold','cancel','reject')]
+                         + [('success',b) for b in ('ego','fast_planner','gcopter')])
+def test_continuous_navigation_sends_one_collision_checked_curve(monkeypatch, tmp_path, isolated_ros_domain, mode, backend):
+    from pathlib import Path
+    if backend!='astar' and not (Path('.deps/ego').exists()):pytest.skip('native planner sources absent')
     monkeypatch.delenv('LAB_RUN_DIR', raising=False)
     monkeypatch.setenv('ROS_LOG_DIR', str(tmp_path / 'ros'))
     rclpy.init(domain_id=isolated_ros_domain)
     nav = NavigationNode()
     nav.continuous_enabled = True
+    nav.planner_backend = backend
+    if backend!='astar':
+        assert hasattr(nav,'make_curve'),'native planner is not connected to the navigation Action'
+        nav.run=tmp_path
     nav.grid.score[:] = -4
     nav.grid.seen[:] = True
     nav.current = pose([0, 0, 2]).pose
@@ -37,12 +44,18 @@ def test_continuous_navigation_sends_one_collision_checked_curve(monkeypatch, tm
     reference.header.frame_id = 'odom'
     nav.on_reference(reference)
     adapter = rclpy.create_node('continuous_flight_double')
+    reference_pub=adapter.create_publisher(TrajectoryReference,'/uav001/trajectory/reference',10)
+    def refresh_double():
+        reference_pub.publish(reference)
+        nav.current_at=nav.flight_at=time.monotonic()
+    adapter.create_timer(.05,refresh_double)
     client_node = rclpy.create_node('continuous_navigation_test')
     requests = []
     def execute(handle):
         requests.append(handle.request)
         trajectory = trajectory_from_goal(handle.request)
-        midpoint = trajectory.segments[0].sample(trajectory.segments[0].duration)
+        midpoint = (trajectory.segments[0].sample(trajectory.segments[0].duration) if backend=='astar'
+                    else trajectory.sample(trajectory.duration/2))
         assert np.linalg.norm(midpoint.velocity) > .05
         if mode != 'success':
             if mode == 'source_loss':

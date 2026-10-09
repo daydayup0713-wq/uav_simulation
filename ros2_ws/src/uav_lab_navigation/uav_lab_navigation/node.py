@@ -39,9 +39,16 @@ class NavigationNode(Node):
         self.set_parameters([rclpy.parameter.Parameter('use_sim_time',value=True)])
         self.declare_parameter('continuous_trajectory', False)
         self.continuous_enabled = bool(self.get_parameter('continuous_trajectory').value)
+        self.declare_parameter('planner_backend','astar')
+        self.planner_backend=self.get_parameter('planner_backend').value
+        if self.planner_backend not in ('astar','ego','fast_planner','gcopter'):
+            raise ValueError('unknown planner backend')
+        if self.planner_backend!='astar' and not self.continuous_enabled:
+            raise ValueError('native planner requires continuous trajectory execution')
         self.reference = None
         self.reference_at = 0.
         root=Path(os.environ.get('LAB_ROOT',Path.cwd()));run=Path(os.environ['LAB_RUN_DIR']) if os.environ.get('LAB_RUN_DIR') else None
+        self.root=root
         config_file=run/'configuration/navigation.json' if run and (run/'configuration/navigation.json').exists() else root/'configs/navigation.json'
         self.config=json.loads(config_file.read_text())
         calibration_file=run/'configuration/calibration.json' if run and (run/'configuration/calibration.json').exists() else root/'configs/navigation-sensors.json'
@@ -243,6 +250,26 @@ class NavigationNode(Node):
             self.record('plan',success=result.success,reason=result.reason,points=result.points,expanded=result.expanded,map_version=collision.version,**self.archive_plan(collision))
         except ValueError as error:response.success,response.reason=False,str(error)
         return response
+
+    def make_curve(self,goal,initial):
+        from .planner_backends import plan_curve
+        collision,guide=self.make_plan(goal,start_override=initial.position.tolist())
+        if not guide.success:raise ValueError(guide.reason)
+        if not self.planning_lock.acquire(blocking=False):raise ValueError('planning worker busy')
+        directory=(self.run if self.run else self.root/'.runtime/planner-probes')/'planner-core'/uuid.uuid4().hex
+        p,q=goal.pose.position,goal.pose.orientation
+        timeout=8.
+        try:
+            pending=self.planning_worker.submit(plan_curve,self.root,self.planner_backend,collision,initial,
+                [p.x,p.y,p.z],directory,timeout=timeout,goal_yaw=2*np.arctan2(q.z,q.w))
+            result=pending.result(timeout=timeout+3.)
+        except (WorkerTimeout,BrokenProcessPool,RuntimeError) as error:
+            self.failure='native planning worker failed: '+str(error)+'; restart lab'
+            raise ValueError(self.failure) from error
+        finally:self.planning_lock.release()
+        self.record('native_plan',evidence=str(directory),**{k:v for k,v in result.items() if k!='curve'})
+        if not result['success']:raise ValueError(result['reason'])
+        return result['curve'],collision
 
     def tick(self):
         report=self.report();msg=DiagnosticArray();msg.header.stamp=self.get_clock().now().to_msg()
