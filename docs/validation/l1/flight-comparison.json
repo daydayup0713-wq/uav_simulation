@@ -1,0 +1,1150 @@
+{
+  "schema": 1,
+  "scope": "Actual repeated PX4 runs and failed attempts, each with its own scene/source; historical passes do not qualify current control",
+  "rows": [
+    {
+      "localization": "fast_livo2",
+      "planning": "ego",
+      "qualification_run": true,
+      "sensor_profile": "livox",
+      "scene": "circle-eight",
+      "backend": "fast_livo2 + ego",
+      "run_id": "20261009T164432Z-ced3eb17",
+      "report_id": "task9-native-matrix-02/fast-livo-ego",
+      "runs": 3,
+      "passed": false,
+      "reason": "supervisor exited during startup",
+      "current_implementation": true,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-02/fast-livo-ego/acceptance.json",
+          "sha256": "acb8d4528bf959896154ee252076b0b705233d8541b0ddc6b24f5e5c0a3488de"
+        }
+      ],
+      "resources": {},
+      "tracking_p95_m": null,
+      "minimum_body_clearance_m": null,
+      "handoff_limits": null,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
+      "localization": "glim",
+      "planning": "ego",
+      "qualification_run": true,
+      "sensor_profile": null,
+      "scene": "outdoor-rtk",
+      "backend": "glim + ego",
+      "run_id": "20261009T164345Z-9194bc30",
+      "report_id": "task9-native-matrix-02/outdoor-rtk",
+      "runs": 1,
+      "passed": false,
+      "reason": "command failed: nav --timeout 3300 route-demo /home/pine/workspace/ai/UAV/uav_simulation/.runtime/20261009T164345Z-9194bc30/configuration/scene/route.json --runs 1: {\"success\": false, \"reason\": \"route failed: {'success': False, 'reason': 'START_BLOCKED_OR_UNOBSERVED'}\"}\n[ros2run]: Process exited with failure 1\n; evaluator failed; see tracking/geometry report and observer.log; evaluator failed; see tracking/geometry report and observer.log",
+      "current_implementation": true,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-02/outdoor-rtk/acceptance.json",
+          "sha256": "642a5f4d9acf3061610198a84e3d0697677e36f3de15a33c687e55f01b7c0285"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-02/outdoor-rtk/tracking.json",
+          "sha256": "199f9f4306733cb9df51ae2251d8558475279ad334df7e8c8f0dfd050b52adad"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-02/outdoor-rtk/geometry.json",
+          "sha256": "bf7e16b72c3413cd7a2678a94b01ee8c28bb6d2c18c0d81deb2e1a626073a2ac"
+        }
+      ],
+      "resources": {
+        "closed_loop": {
+          "observed_wall_s": 23.32659453598899,
+          "observed_cpu_s": 32.3,
+          "mean_cpu_cores": 1.3846856192474457,
+          "peak_combined_rss_bytes": 536719360,
+          "process_peak_rss_bytes": {
+            "544931": 149082112,
+            "544932": 200896512,
+            "545268": 25690112,
+            "545271": 103157760,
+            "545294": 11628544,
+            "545400": 46571520
+          },
+          "scope": "sampled owned flight bridge, navigation, localization and native planner processes; excludes PX4, Gazebo, rendering, recorder and browser"
+        }
+      },
+      "tracking_p95_m": null,
+      "minimum_body_clearance_m": 0.7116972906971276,
+      "handoff_limits": 0,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
+      "localization": "glim",
+      "planning": "ego",
+      "qualification_run": true,
+      "sensor_profile": null,
+      "scene": "dense",
+      "backend": "glim + ego",
+      "run_id": "20261009T164234Z-285d686d",
+      "report_id": "task9-native-matrix-02/dense",
+      "runs": 1,
+      "passed": false,
+      "reason": "command failed: nav --timeout 3300 route-demo /home/pine/workspace/ai/UAV/uav_simulation/.runtime/20261009T164234Z-285d686d/configuration/scene/route.json --runs 1: {\"success\": false, \"reason\": \"route failed: {'success': False, 'reason': 'GOAL_BLOCKED_OR_UNOBSERVED'}\"}\n[ros2run]: Process exited with failure 1\n; evaluator failed; see tracking/geometry report and observer.log",
+      "current_implementation": true,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-02/dense/acceptance.json",
+          "sha256": "ce5841b85d2cc708b11a1d25f9403426cda2b589540ab85c38e830a5a5886780"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-02/dense/tracking.json",
+          "sha256": "3684531c751db3299fab9c8c5d2cf828fe3eeee3e2fb762269ac6b6ac5310aac"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-02/dense/geometry.json",
+          "sha256": "9072a1fcd1ab1f4a47cdda11af6482e28e8737cf793a021dc7d7d468070d2b95"
+        }
+      ],
+      "resources": {
+        "closed_loop": {
+          "observed_wall_s": 46.624908828001935,
+          "observed_cpu_s": 74.05999999999999,
+          "mean_cpu_cores": 1.5884213366122684,
+          "peak_combined_rss_bytes": 625913856,
+          "process_peak_rss_bytes": {
+            "543469": 149479424,
+            "543470": 266612736,
+            "543814": 25673728,
+            "543816": 106168320,
+            "543841": 11526144,
+            "543949": 54841344,
+            "543986": 32878592,
+            "544005": 32956416,
+            "544025": 0,
+            "544041": 22171648,
+            "544058": 32473088,
+            "544075": 20406272
+          },
+          "scope": "sampled owned flight bridge, navigation, localization and native planner processes; excludes PX4, Gazebo, rendering, recorder and browser"
+        }
+      },
+      "tracking_p95_m": 0.05225643802597525,
+      "minimum_body_clearance_m": 0.7069438898295373,
+      "handoff_limits": 8,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
+      "localization": "glim",
+      "planning": "ego",
+      "qualification_run": true,
+      "sensor_profile": null,
+      "scene": "corridor",
+      "backend": "glim + ego",
+      "run_id": "20261009T164134Z-a6287ccc",
+      "report_id": "task9-native-matrix-02/corridor",
+      "runs": 1,
+      "passed": false,
+      "reason": "command failed: nav --timeout 3300 route-demo /home/pine/workspace/ai/UAV/uav_simulation/.runtime/20261009T164134Z-a6287ccc/configuration/scene/route.json --runs 1: {\"success\": false, \"reason\": \"route failed: {'success': False, 'reason': 'distant route has no observed admissible local target'}\"}\n[ros2run]: Process exited with failure 1\n; evaluator failed; see tracking/geometry report and observer.log",
+      "current_implementation": true,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-02/corridor/acceptance.json",
+          "sha256": "6ae79c70952bbd1ada163146f0ab96c680f648ea62bdd8f53e3486a63ddf0bc6"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-02/corridor/tracking.json",
+          "sha256": "fe28063f6d9096edb6df952bbef2398f4f3eeb4703239a4630543d1d00c857ab"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-02/corridor/geometry.json",
+          "sha256": "a590ba07f6aaa595907e5be9fbb0eea36fece6ad02b21ee250f8af37a20ecbff"
+        }
+      ],
+      "resources": {
+        "closed_loop": {
+          "observed_wall_s": 35.71362170600332,
+          "observed_cpu_s": 59.459999999999994,
+          "mean_cpu_cores": 1.6649109544105687,
+          "peak_combined_rss_bytes": 635752448,
+          "process_peak_rss_bytes": {
+            "542156": 155656192,
+            "542157": 257830912,
+            "542508": 25677824,
+            "542511": 140304384,
+            "542535": 11563008,
+            "542627": 54886400,
+            "542631": 22892544
+          },
+          "scope": "sampled owned flight bridge, navigation, localization and native planner processes; excludes PX4, Gazebo, rendering, recorder and browser"
+        }
+      },
+      "tracking_p95_m": 0.04827932968272755,
+      "minimum_body_clearance_m": 0.7038370486040451,
+      "handoff_limits": 0,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
+      "localization": "glim",
+      "planning": "ego",
+      "qualification_run": true,
+      "sensor_profile": null,
+      "scene": "multi-room",
+      "backend": "glim + ego",
+      "run_id": "20261009T163922Z-a3bb49cd",
+      "report_id": "task9-native-matrix-02/multi-room",
+      "runs": 1,
+      "passed": false,
+      "reason": "command failed: nav --timeout 3300 route-demo /home/pine/workspace/ai/UAV/uav_simulation/.runtime/20261009T163922Z-a3bb49cd/configuration/scene/route.json --runs 1: {\"success\": false, \"reason\": \"route failed: {'success': False, 'reason': 'GOAL_BLOCKED_OR_UNOBSERVED'}\"}\n[ros2run]: Process exited with failure 1\n; evaluator failed; see tracking/geometry report and observer.log",
+      "current_implementation": true,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-02/multi-room/acceptance.json",
+          "sha256": "6a11d079515b2016b3828c1bb1cac521f1241db3f1877dacfd4ecc6804a730ea"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-02/multi-room/tracking.json",
+          "sha256": "168774dceb43a93c810c3360bfd8fd53f0a28994c6492ba5dbdc9f421498e8eb"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-02/multi-room/geometry.json",
+          "sha256": "c8599211a50f28e06a79ffb1998669de91be1353cc59a1354793e733762da2c5"
+        }
+      ],
+      "resources": {
+        "closed_loop": {
+          "observed_wall_s": 107.49571749998722,
+          "observed_cpu_s": 173.79999999999998,
+          "mean_cpu_cores": 1.616808595189112,
+          "peak_combined_rss_bytes": 683569152,
+          "process_peak_rss_bytes": {
+            "540243": 150417408,
+            "540244": 306675712,
+            "540602": 25604096,
+            "540604": 108670976,
+            "540628": 11636736,
+            "540753": 54759424,
+            "540965": 35495936,
+            "541022": 21766144,
+            "541141": 32722944,
+            "541194": 32776192,
+            "541232": 32866304,
+            "541266": 32907264,
+            "541282": 32866304,
+            "541317": 34791424
+          },
+          "scope": "sampled owned flight bridge, navigation, localization and native planner processes; excludes PX4, Gazebo, rendering, recorder and browser"
+        }
+      },
+      "tracking_p95_m": 0.043158247409005236,
+      "minimum_body_clearance_m": 0.7074280985973365,
+      "handoff_limits": 31,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
+      "localization": "glim",
+      "planning": "ego",
+      "qualification_run": true,
+      "sensor_profile": null,
+      "scene": "helix",
+      "backend": "glim + ego",
+      "run_id": "20261009T163658Z-55fe1701",
+      "report_id": "task9-native-matrix-02/helix",
+      "runs": 1,
+      "passed": true,
+      "reason": "",
+      "current_implementation": true,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-02/helix/acceptance.json",
+          "sha256": "b19f75f33f0c37b14123a14ab130c584315de1c08fca9f8f2a1b2c86b9d2dda4"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-02/helix/tracking.json",
+          "sha256": "c5e3384e1856435c9b6c53bd11c662edc38028e4fd837dd74acde80458245f65"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-02/helix/geometry.json",
+          "sha256": "45a02c44ab89e371d4016ad55f0a79073bb2fffb23596a7a64197f997631a61d"
+        }
+      ],
+      "resources": {
+        "closed_loop": {
+          "observed_wall_s": 116.99053379698307,
+          "observed_cpu_s": 202.31000000000003,
+          "mean_cpu_cores": 1.729285211665708,
+          "peak_combined_rss_bytes": 701169664,
+          "process_peak_rss_bytes": {
+            "538071": 149831680,
+            "538072": 337948672,
+            "538507": 25731072,
+            "538509": 107925504,
+            "538536": 11649024,
+            "538646": 54734848,
+            "538684": 22200320,
+            "538734": 23166976,
+            "538907": 32751616,
+            "539064": 32849920,
+            "539117": 21020672,
+            "539135": 32776192,
+            "539151": 23384064,
+            "539186": 32899072,
+            "539204": 23621632,
+            "539261": 32718848,
+            "539383": 32948224,
+            "539399": 22843392,
+            "539417": 34664448,
+            "539433": 33009664,
+            "539451": 22962176
+          },
+          "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+        }
+      },
+      "tracking_p95_m": 0.03212590804345252,
+      "minimum_body_clearance_m": 0.6884988498494238,
+      "handoff_limits": 31,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
+      "localization": "glim",
+      "planning": "gcopter",
+      "qualification_run": true,
+      "sensor_profile": null,
+      "scene": "circle-eight",
+      "backend": "glim + gcopter",
+      "run_id": "20261009T163311Z-b69f88dc",
+      "report_id": "task9-native-matrix-02/gcopter",
+      "runs": 3,
+      "passed": false,
+      "reason": "command failed: nav --timeout 3300 route-demo /home/pine/workspace/ai/UAV/uav_simulation/.runtime/20261009T163311Z-b69f88dc/configuration/scene/route.json --runs 3: {\"success\": false, \"reason\": \"route failed: {'success': False, 'reason': 'native trajectory cannot meet derivative limits'}\"}\n[ros2run]: Process exited with failure 1\n; evaluator failed; see tracking/geometry report and observer.log",
+      "current_implementation": true,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-02/gcopter/acceptance.json",
+          "sha256": "93285a7fd0214a1ddd60627e476bf01bb5b6e88ac3bc993911c0032d45f8ac5d"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-02/gcopter/tracking.json",
+          "sha256": "a152bd933cd57b62483806e2ceb1299156ec5bd68fb4663e164618cc6ed61e7c"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-02/gcopter/geometry.json",
+          "sha256": "17313a18abbb080ea9729f743056edb737f49d00e41e6898b5879d1e720bc0b9"
+        }
+      ],
+      "resources": {
+        "closed_loop": {
+          "observed_wall_s": 202.2989451760077,
+          "observed_cpu_s": 418.85999999999996,
+          "mean_cpu_cores": 2.07050016813274,
+          "peak_combined_rss_bytes": 758546432,
+          "process_peak_rss_bytes": {
+            "533844": 150437888,
+            "533845": 414187520,
+            "534424": 25640960,
+            "534427": 107712512,
+            "534454": 11587584,
+            "534711": 57966592,
+            "534721": 5267456,
+            "535818": 4313088,
+            "536869": 0,
+            "536877": 0,
+            "536893": 0,
+            "536992": 0,
+            "536999": 0,
+            "537073": 0
+          },
+          "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+        }
+      },
+      "tracking_p95_m": 0.04635448934263643,
+      "minimum_body_clearance_m": 0.6972239770602091,
+      "handoff_limits": 51,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
+      "localization": "glim",
+      "planning": "fast_planner",
+      "qualification_run": true,
+      "sensor_profile": null,
+      "scene": "circle-eight",
+      "backend": "glim + fast_planner",
+      "run_id": "20261009T162429Z-941d3e0a",
+      "report_id": "task9-native-matrix-02/fast_planner",
+      "runs": 3,
+      "passed": true,
+      "reason": "",
+      "current_implementation": true,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-02/fast_planner/acceptance.json",
+          "sha256": "9d8855f0d9e02c4c9bfb80e09a802e0a8068574352a2445a40a5ad53baaa4d8f"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-02/fast_planner/tracking.json",
+          "sha256": "0e494ecc72647f6740fc37e30fcc48edbe4d2940b6fc82b5fc6020047603042a"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-02/fast_planner/geometry.json",
+          "sha256": "c051ddd3235195fb4c6987fedc30bb79d593370d7c23d9fefe1e40a51e6e313b"
+        }
+      ],
+      "resources": {
+        "closed_loop": {
+          "observed_wall_s": 492.9990320969955,
+          "observed_cpu_s": 905.96,
+          "mean_cpu_cores": 1.8376506666685628,
+          "peak_combined_rss_bytes": 996556800,
+          "process_peak_rss_bytes": {
+            "527965": 152846336,
+            "527966": 608202752,
+            "528536": 25735168,
+            "528540": 112365568,
+            "528563": 11583488,
+            "528905": 58515456,
+            "528944": 22982656,
+            "528964": 39325696,
+            "529002": 39063552,
+            "529037": 39137280,
+            "529077": 38936576,
+            "529207": 22810624,
+            "529224": 39186432,
+            "529311": 25649152,
+            "529437": 0,
+            "529484": 39153664,
+            "529503": 38981632,
+            "529518": 25968640,
+            "529642": 40538112,
+            "529692": 22372352,
+            "529726": 39309312,
+            "529743": 22769664,
+            "529774": 39337984,
+            "530032": 0,
+            "530046": 42700800,
+            "530066": 23838720,
+            "530201": 38952960,
+            "530257": 19738624,
+            "530370": 38948864,
+            "530412": 22446080,
+            "530429": 21741568,
+            "530467": 39383040,
+            "530518": 38252544,
+            "530616": 43175936,
+            "530670": 39464960,
+            "530686": 39280640,
+            "530790": 0,
+            "530827": 41472000,
+            "531598": 39378944,
+            "531831": 39444480,
+            "531872": 39157760,
+            "531888": 39186432,
+            "531983": 39075840,
+            "532038": 39206912,
+            "532114": 22605824,
+            "532168": 39346176,
+            "532231": 21803008,
+            "532288": 39002112,
+            "532399": 39243776,
+            "532451": 22548480,
+            "532605": 23990272,
+            "532709": 39370752,
+            "532725": 21110784,
+            "532741": 39022592,
+            "532901": 21065728,
+            "532920": 39116800,
+            "532983": 43581440,
+            "533045": 39149568
+          },
+          "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+        }
+      },
+      "tracking_p95_m": 0.04047205294888423,
+      "minimum_body_clearance_m": 0.7168929993730278,
+      "handoff_limits": 138,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
+      "localization": "glim",
+      "planning": "astar",
+      "qualification_run": true,
+      "sensor_profile": null,
+      "scene": "circle-eight",
+      "backend": "glim + astar",
+      "run_id": "20261009T161656Z-6e883456",
+      "report_id": "task9-native-matrix-02/astar",
+      "runs": 3,
+      "passed": true,
+      "reason": "",
+      "current_implementation": true,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-02/astar/acceptance.json",
+          "sha256": "9c48aea07e41970b44064b283c1b8cfc6add673caf36caa3eb868851347099b6"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-02/astar/tracking.json",
+          "sha256": "55014b825b2fecf9c96c6ebb91f860cc908a1598186e555fe3bc3d8d52f1b782"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-02/astar/geometry.json",
+          "sha256": "8df484936be1267f866aa7cf48d4ecfd2adef6653340631cd0270369343fc640"
+        }
+      ],
+      "resources": {
+        "closed_loop": {
+          "observed_wall_s": 426.52720149300876,
+          "observed_cpu_s": 785.41,
+          "mean_cpu_cores": 1.8414065908358572,
+          "peak_combined_rss_bytes": 939888640,
+          "process_peak_rss_bytes": {
+            "523594": 152059904,
+            "523595": 596770816,
+            "523960": 25739264,
+            "523963": 111796224,
+            "523989": 11591680,
+            "524094": 46407680
+          },
+          "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+        }
+      },
+      "tracking_p95_m": 0.04510162841540152,
+      "minimum_body_clearance_m": 0.7027839170332095,
+      "handoff_limits": 138,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
+      "localization": "glim",
+      "planning": "ego",
+      "qualification_run": true,
+      "sensor_profile": null,
+      "scene": "circle-eight",
+      "backend": "glim + ego",
+      "run_id": "20261009T160937Z-a89d1be9",
+      "report_id": "task9-native-matrix-02/ego",
+      "runs": 3,
+      "passed": false,
+      "reason": "command failed: nav --timeout 3300 route-demo /home/pine/workspace/ai/UAV/uav_simulation/.runtime/20261009T160937Z-a89d1be9/configuration/scene/route.json --runs 3: {\"success\": false, \"reason\": \"route failed: {'success': False, 'reason': 'navigation source failed; restart lab'}; landing failed: flight goal rejected\"}\n[ros2run]: Process exited with failure 1\n; evaluator failed; see tracking/geometry report and observer.log",
+      "current_implementation": true,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-02/ego/acceptance.json",
+          "sha256": "178dc0cc8f3b54d7ebd0a68c7c5798cc2b11386d518143a135d0e70467cc25c8"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-02/ego/tracking.json",
+          "sha256": "803822146539124183c648bf35b6d4ed558ed500a20ca2b57436570b71904b5e"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-02/ego/geometry.json",
+          "sha256": "387c5a4dc3c5d594766371a6a1f0574d7a55cd66aef60317657bc660037dd48c"
+        }
+      ],
+      "resources": {
+        "closed_loop": {
+          "observed_wall_s": 145.15775333100464,
+          "observed_cpu_s": 292.88000000000005,
+          "mean_cpu_cores": 2.0176669401333522,
+          "peak_combined_rss_bytes": 733978624,
+          "process_peak_rss_bytes": {
+            "513158": 150327296,
+            "513159": 369102848,
+            "513562": 25751552,
+            "513565": 109268992,
+            "513595": 11542528,
+            "513690": 54685696,
+            "513791": 32731136,
+            "513851": 32894976,
+            "513957": 32800768,
+            "514099": 32804864,
+            "514135": 34725888,
+            "514187": 32661504,
+            "514373": 32542720,
+            "514392": 21798912,
+            "514413": 21929984,
+            "514430": 22913024,
+            "514448": 32432128,
+            "514519": 0,
+            "514561": 21487616
+          },
+          "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+        }
+      },
+      "tracking_p95_m": 0.04279880283827164,
+      "minimum_body_clearance_m": 0.7225071842537361,
+      "handoff_limits": 42,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
+      "localization": "glim",
+      "planning": "ego",
+      "qualification_run": true,
+      "sensor_profile": null,
+      "scene": "corridor",
+      "backend": "glim + ego",
+      "run_id": "20261009T155700Z-8bf5a712",
+      "report_id": "task9-corridor-02",
+      "runs": 1,
+      "passed": false,
+      "reason": "command failed: nav --timeout 3300 route-demo /home/pine/workspace/ai/UAV/uav_simulation/.runtime/20261009T155700Z-8bf5a712/configuration/scene/route.json --runs 1: {\"success\": false, \"reason\": \"route failed: {'success': False, 'reason': 'distant route has no observed admissible local target'}\"}\n[ros2run]: Process exited with failure 1\n; evaluator failed; see tracking/geometry report and observer.log",
+      "current_implementation": false,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-corridor-02/acceptance.json",
+          "sha256": "7ce88b4c010067b86d84b8f4e4289bf61c12216dc337f58e35cf3ca1b5c6fca0"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-corridor-02/tracking.json",
+          "sha256": "63fbabb9ab655747228061c8f562df8596620b5a38250920142e3238af6c5165"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-corridor-02/geometry.json",
+          "sha256": "9e98f760ae1114b21a76721db355e484026761abb3171d3a55705644ddadb952"
+        }
+      ],
+      "resources": {
+        "closed_loop": {
+          "observed_wall_s": 34.35842931800289,
+          "observed_cpu_s": 58.669999999999995,
+          "mean_cpu_cores": 1.7075867891684589,
+          "peak_combined_rss_bytes": 604737536,
+          "process_peak_rss_bytes": {
+            "505830": 149700608,
+            "505831": 259538944,
+            "506148": 25690112,
+            "506151": 104120320,
+            "506174": 11591680,
+            "506253": 54784000,
+            "506256": 21467136
+          },
+          "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+        }
+      },
+      "tracking_p95_m": 0.047791671975869934,
+      "minimum_body_clearance_m": 0.702894096440497,
+      "handoff_limits": 0,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
+      "localization": "fast_livo2",
+      "planning": "ego",
+      "qualification_run": true,
+      "sensor_profile": "livox",
+      "scene": "circle-eight",
+      "backend": "fast_livo2 + ego",
+      "run_id": "20261009T151730Z-61a6f717",
+      "report_id": "task9-native-matrix-01/fast-livo-ego",
+      "runs": 3,
+      "passed": false,
+      "reason": "supervisor exited during startup",
+      "current_implementation": false,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-01/fast-livo-ego/acceptance.json",
+          "sha256": "a3f99c97d76a884733c7832332d4c86f2b2067b1915004668f9c92e4520605aa"
+        }
+      ],
+      "resources": {},
+      "tracking_p95_m": null,
+      "minimum_body_clearance_m": null,
+      "handoff_limits": null,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
+      "localization": "glim",
+      "planning": "ego",
+      "qualification_run": true,
+      "sensor_profile": null,
+      "scene": "outdoor-rtk",
+      "backend": "glim + ego",
+      "run_id": "20261009T151641Z-642c8b07",
+      "report_id": "task9-native-matrix-01/outdoor-rtk",
+      "runs": 1,
+      "passed": false,
+      "reason": "command failed: nav --timeout 3300 route-demo /home/pine/workspace/ai/UAV/uav_simulation/.runtime/20261009T151641Z-642c8b07/configuration/scene/route.json --runs 1: {\"success\": false, \"reason\": \"route failed: {'success': False, 'reason': 'START_BLOCKED_OR_UNOBSERVED'}\"}\n[ros2run]: Process exited with failure 1\n; evaluator failed; see tracking/geometry report and observer.log; evaluator failed; see tracking/geometry report and observer.log",
+      "current_implementation": false,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-01/outdoor-rtk/acceptance.json",
+          "sha256": "5476855b9284ca805184823407d0dc4aa10cbd5c5f6d1e73d54210ddf9a7b0db"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-01/outdoor-rtk/tracking.json",
+          "sha256": "c1301d7128b316ad8846e09f8c08241726e32e3b268f3752232d9810c73b3440"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-01/outdoor-rtk/geometry.json",
+          "sha256": "78524e573d158d7af6622aea83e4b11451b25f4355a0f3b9c640b27ab77a4cd8"
+        }
+      ],
+      "resources": {
+        "closed_loop": {
+          "observed_wall_s": 24.898534571984783,
+          "observed_cpu_s": 34.75,
+          "mean_cpu_cores": 1.3956644677032457,
+          "peak_combined_rss_bytes": 533655552,
+          "process_peak_rss_bytes": {
+            "493760": 148983808,
+            "493761": 200912896,
+            "494093": 25735168,
+            "494096": 101380096,
+            "494122": 11583488,
+            "494193": 46284800
+          },
+          "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+        }
+      },
+      "tracking_p95_m": null,
+      "minimum_body_clearance_m": 0.7138425466719474,
+      "handoff_limits": 0,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
+      "localization": "glim",
+      "planning": "ego",
+      "qualification_run": true,
+      "sensor_profile": null,
+      "scene": "dense",
+      "backend": "glim + ego",
+      "run_id": "20261009T151527Z-be80887b",
+      "report_id": "task9-native-matrix-01/dense",
+      "runs": 1,
+      "passed": false,
+      "reason": "command failed: nav --timeout 3300 route-demo /home/pine/workspace/ai/UAV/uav_simulation/.runtime/20261009T151527Z-be80887b/configuration/scene/route.json --runs 1: {\"success\": false, \"reason\": \"route failed: {'success': False, 'reason': 'GOAL_BLOCKED_OR_UNOBSERVED'}\"}\n[ros2run]: Process exited with failure 1\n; evaluator failed; see tracking/geometry report and observer.log",
+      "current_implementation": false,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-01/dense/acceptance.json",
+          "sha256": "673e4f0df9a86c58bb42ddea59633ea1694491576fbf393fdd2ab4a7acfbcceb"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-01/dense/tracking.json",
+          "sha256": "4ad7c2ad5c2acb4e4b254e44866229e7279e6d231af1262d24a14effa20befc4"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-01/dense/geometry.json",
+          "sha256": "16b523c8ba6b3c7fe47d8477a63966b1ac3d3ff45fc9a66f476a7543d13e98f0"
+        }
+      ],
+      "resources": {
+        "closed_loop": {
+          "observed_wall_s": 48.21215958200628,
+          "observed_cpu_s": 76.77,
+          "mean_cpu_cores": 1.5923368848354194,
+          "peak_combined_rss_bytes": 630722560,
+          "process_peak_rss_bytes": {
+            "492446": 149778432,
+            "492447": 265588736,
+            "492775": 25698304,
+            "492777": 105517056,
+            "492801": 11653120,
+            "492884": 54816768,
+            "492887": 32849920,
+            "492899": 32825344,
+            "492911": 24268800,
+            "492925": 23883776,
+            "492939": 22970368,
+            "492951": 32915456,
+            "492975": 32808960
+          },
+          "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+        }
+      },
+      "tracking_p95_m": 0.049631648259087634,
+      "minimum_body_clearance_m": 0.7026400025515378,
+      "handoff_limits": 8,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
+      "localization": "glim",
+      "planning": "ego",
+      "qualification_run": true,
+      "sensor_profile": null,
+      "scene": "corridor",
+      "backend": "glim + ego",
+      "run_id": "20261009T151427Z-42fef7e4",
+      "report_id": "task9-native-matrix-01/corridor",
+      "runs": 1,
+      "passed": false,
+      "reason": "command failed: nav --timeout 3300 route-demo /home/pine/workspace/ai/UAV/uav_simulation/.runtime/20261009T151427Z-42fef7e4/configuration/scene/route.json --runs 1: {\"success\": false, \"reason\": \"route failed: {'success': False, 'reason': 'OUTSIDE_BOUNDS'}\"}\n[ros2run]: Process exited with failure 1\n; evaluator failed; see tracking/geometry report and observer.log",
+      "current_implementation": false,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-01/corridor/acceptance.json",
+          "sha256": "cb98d30f9973116b8f3a68f3c97aff4ab3d9fd755cdace8ba198982faddc0738"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-01/corridor/tracking.json",
+          "sha256": "67cc73fb02c86108d0073c753761922a95276f2d832911a88d5ce2c88f7bfb0d"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-01/corridor/geometry.json",
+          "sha256": "8ba9c63eab70bbe28eda60be36cf8343286bd5dc31ee2154bc8f5edf689610fd"
+        }
+      ],
+      "resources": {
+        "closed_loop": {
+          "observed_wall_s": 35.79727762800758,
+          "observed_cpu_s": 54.35,
+          "mean_cpu_cores": 1.518271879911809,
+          "peak_combined_rss_bytes": 602210304,
+          "process_peak_rss_bytes": {
+            "491227": 149688320,
+            "491228": 255832064,
+            "491560": 25702400,
+            "491562": 105672704,
+            "491586": 11608064,
+            "491652": 54706176,
+            "491655": 35475456
+          },
+          "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+        }
+      },
+      "tracking_p95_m": 0.04541028588370696,
+      "minimum_body_clearance_m": 0.7242008646322411,
+      "handoff_limits": 0,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
+      "localization": "glim",
+      "planning": "ego",
+      "qualification_run": true,
+      "sensor_profile": null,
+      "scene": "multi-room",
+      "backend": "glim + ego",
+      "run_id": "20261009T151214Z-2e4f3cb6",
+      "report_id": "task9-native-matrix-01/multi-room",
+      "runs": 1,
+      "passed": false,
+      "reason": "command failed: nav --timeout 3300 route-demo /home/pine/workspace/ai/UAV/uav_simulation/.runtime/20261009T151214Z-2e4f3cb6/configuration/scene/route.json --runs 1: {\"success\": false, \"reason\": \"route failed: {'success': False, 'reason': 'GOAL_BLOCKED_OR_UNOBSERVED'}\"}\n[ros2run]: Process exited with failure 1\n; evaluator failed; see tracking/geometry report and observer.log",
+      "current_implementation": false,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-01/multi-room/acceptance.json",
+          "sha256": "3be33cd1d832ce76763b327f647650955ac9d34d0dd8e6e48bcfb2471659e72a"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-01/multi-room/tracking.json",
+          "sha256": "073475d12da3cf83400837a9713e7e08566287f153f3c2741aa208c04d47f580"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-01/multi-room/geometry.json",
+          "sha256": "a4e3ccdb3c5b54c9744238e4340b0b81886fa697afd121ca3d03a975d8004051"
+        }
+      ],
+      "resources": null,
+      "tracking_p95_m": 0.04293998442168597,
+      "minimum_body_clearance_m": 0.704859396152216,
+      "handoff_limits": 31,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
+      "localization": "glim",
+      "planning": "ego",
+      "qualification_run": true,
+      "sensor_profile": null,
+      "scene": "helix",
+      "backend": "glim + ego",
+      "run_id": "20261009T150953Z-800cc64c",
+      "report_id": "task9-native-matrix-01/helix",
+      "runs": 1,
+      "passed": true,
+      "reason": "",
+      "current_implementation": false,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-01/helix/acceptance.json",
+          "sha256": "0b211c23a1285806218e2a8d6b72604fe4cd383f98204f87d8cbc7accda48265"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-01/helix/tracking.json",
+          "sha256": "769f657ea5d0bac82bf535993876e7ebc01c91899d527d994667fc7da18b8cdd"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-01/helix/geometry.json",
+          "sha256": "9971a8553a7a5ede10e951c6698935e0043c2b744b316bdfcd6654e77a81a76e"
+        }
+      ],
+      "resources": null,
+      "tracking_p95_m": 0.03158977037772169,
+      "minimum_body_clearance_m": 0.6923667441240084,
+      "handoff_limits": 31,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
+      "localization": "glim",
+      "planning": "gcopter",
+      "qualification_run": true,
+      "sensor_profile": null,
+      "scene": "circle-eight",
+      "backend": "glim + gcopter",
+      "run_id": "20261009T150847Z-d7db1bd9",
+      "report_id": "task9-native-matrix-01/gcopter",
+      "runs": 3,
+      "passed": false,
+      "reason": "command failed: nav --timeout 3300 route-demo /home/pine/workspace/ai/UAV/uav_simulation/.runtime/20261009T150847Z-d7db1bd9/configuration/scene/route.json --runs 3: {\"success\": false, \"reason\": \"route failed: {'success': False, 'reason': 'native trajectory cannot meet derivative limits'}\"}\n[ros2run]: Process exited with failure 1\n; evaluator failed; see tracking/geometry report and observer.log",
+      "current_implementation": false,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-01/gcopter/acceptance.json",
+          "sha256": "35314f8f3bef3ef9510658884bf34614a3e96df1e4fbdb45401ead8d3c492913"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-01/gcopter/tracking.json",
+          "sha256": "88b514aa570e47b79ef4401258bb22932548553283e6a402d1588a5446d23b5d"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-01/gcopter/geometry.json",
+          "sha256": "0b11b187a6b028fd2a26159136f7f3108748da726ea242ac366a6ae5ddb88798"
+        }
+      ],
+      "resources": null,
+      "tracking_p95_m": 0.05696114950808375,
+      "minimum_body_clearance_m": 0.7055180927390807,
+      "handoff_limits": 5,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
+      "localization": "glim",
+      "planning": "fast_planner",
+      "qualification_run": true,
+      "sensor_profile": null,
+      "scene": "circle-eight",
+      "backend": "glim + fast_planner",
+      "run_id": "20261009T150003Z-3d25ad69",
+      "report_id": "task9-native-matrix-01/fast_planner",
+      "runs": 3,
+      "passed": true,
+      "reason": "",
+      "current_implementation": false,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-01/fast_planner/acceptance.json",
+          "sha256": "b241c6e4b85bb1cf4c809a72082f74f9bd256250ccf37a3a25744f03bd0154d6"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-01/fast_planner/tracking.json",
+          "sha256": "bc9534eb1752a5b74ce9939e91c9e322dc48b91257e3b220c7296ae5d4f26f13"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-01/fast_planner/geometry.json",
+          "sha256": "ce69fcef8c1d6995d5d6b2a40611477be04843027bfebca33b998c9cb8269d62"
+        }
+      ],
+      "resources": null,
+      "tracking_p95_m": 0.040425646710362875,
+      "minimum_body_clearance_m": 0.7213093008357306,
+      "handoff_limits": 138,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
+      "localization": "glim",
+      "planning": "astar",
+      "qualification_run": true,
+      "sensor_profile": null,
+      "scene": "circle-eight",
+      "backend": "glim + astar",
+      "run_id": "20261009T145225Z-bd2e36a3",
+      "report_id": "task9-native-matrix-01/astar",
+      "runs": 3,
+      "passed": true,
+      "reason": "",
+      "current_implementation": false,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-01/astar/acceptance.json",
+          "sha256": "e13302470a240b9714c495253b9c2ba9702211d4f9f927969a6521609f91d267"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-01/astar/tracking.json",
+          "sha256": "cee7c1445a91a501c5ee0aec4feb945dd7928e0a2e016b0ef78f9a5ddaedb2a8"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-native-matrix-01/astar/geometry.json",
+          "sha256": "d2ddd03080607fb1fe109f68fc77b116c9987ab6a793ecc62202eacfd26ebddc"
+        }
+      ],
+      "resources": null,
+      "tracking_p95_m": 0.04493730619623463,
+      "minimum_body_clearance_m": 0.7087152781096147,
+      "handoff_limits": 138,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
+      "localization": "glim",
+      "planning": "ego",
+      "qualification_run": true,
+      "sensor_profile": null,
+      "scene": "circle-eight",
+      "backend": "glim + ego",
+      "run_id": "20261009T134700Z-7b21fcb2",
+      "report_id": "task9-glim-ego-circle-03",
+      "runs": 3,
+      "passed": true,
+      "reason": "",
+      "current_implementation": false,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-glim-ego-circle-03/acceptance.json",
+          "sha256": "b7848f9d04a6db0e5daf499e0f5ae41d1387e840eeb18b3f11d2d2bfb368e405"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-glim-ego-circle-03/tracking.json",
+          "sha256": "875a7362cd4fb4ad35407717a6bb91d6881cee35e0b6aadc723857b5e23439f8"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-glim-ego-circle-03/geometry.json",
+          "sha256": "c0d41a51f488d044bd9a0469f8670bc74a422c25bfcd13c223602f4ba9bfdd4d"
+        }
+      ],
+      "resources": null,
+      "tracking_p95_m": 0.04118791455517527,
+      "minimum_body_clearance_m": 0.7121053989809186,
+      "handoff_limits": 138,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
+      "localization": "glim",
+      "planning": "ego",
+      "qualification_run": true,
+      "sensor_profile": null,
+      "scene": "circle-eight",
+      "backend": "glim + ego",
+      "run_id": "20261009T112556Z-97ad731d",
+      "report_id": "task9-glim-ego-circle-02",
+      "runs": 1,
+      "passed": true,
+      "reason": "",
+      "current_implementation": false,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-glim-ego-circle-02/acceptance.json",
+          "sha256": "70363a7338f156824cf957f30c39bd30f990d4c6f532efa2045094059a0a5359"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-glim-ego-circle-02/tracking.json",
+          "sha256": "9e7e5384e9dc311d377576e17b5f48a5e4102cf10ea2345983a690fecedfec00"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-glim-ego-circle-02/geometry.json",
+          "sha256": "4c00827a02ef61057c1dd0a7ce0d6c4a3841a9bd95e93a51f323531be5a9f483"
+        }
+      ],
+      "resources": null,
+      "tracking_p95_m": 0.04175351651653797,
+      "minimum_body_clearance_m": 0.7092325966517148,
+      "handoff_limits": 46,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
+      "localization": "glim",
+      "planning": "ego",
+      "qualification_run": true,
+      "sensor_profile": null,
+      "scene": "circle-eight",
+      "backend": "glim + ego",
+      "run_id": "20261009T111701Z-050de050",
+      "report_id": "task9-glim-ego-circle-01",
+      "runs": 1,
+      "passed": false,
+      "reason": "command failed: nav --timeout 3300 route-demo /home/pine/workspace/ai/UAV/uav_simulation/.runtime/20261009T111701Z-050de050/configuration/scene/route.json --runs 1: {\"success\": false, \"reason\": \"route failed: {'success': False, 'reason': 'START_BLOCKED_OR_UNOBSERVED'}\"}\n[ros2run]: Process exited with failure 1\n; evaluator failed; see tracking/geometry report and observer.log; evaluator failed; see tracking/geometry report and observer.log",
+      "current_implementation": false,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-glim-ego-circle-01/acceptance.json",
+          "sha256": "0d570aa452e1d36a431717a2a11737c6dc63d38a2902339eee378c05604e9fbd"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-glim-ego-circle-01/tracking.json",
+          "sha256": "dd1b24700f9866778042341b66a5811fb70480d534a737ca88002fa9bfeff79b"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-glim-ego-circle-01/geometry.json",
+          "sha256": "b7f76497a379e17e4e763fdabf2dd66e1a0877aba726dfd5b893b74702142956"
+        }
+      ],
+      "resources": null,
+      "tracking_p95_m": null,
+      "minimum_body_clearance_m": 0.7171527103844186,
+      "handoff_limits": 0,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
+      "localization": "glim",
+      "planning": "ego",
+      "qualification_run": true,
+      "sensor_profile": null,
+      "scene": null,
+      "backend": "glim + ego",
+      "run_id": "20261009T105206Z-3d66b9cf",
+      "report_id": "task9-glim-ego-probe-02",
+      "runs": 1,
+      "passed": true,
+      "reason": "",
+      "current_implementation": false,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-glim-ego-probe-02/acceptance.json",
+          "sha256": "e820973bc6d008b21f3c36284842c2e32ab3c3d60dca23def5f7b3039ad2004b"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-glim-ego-probe-02/tracking.json",
+          "sha256": "4803249765090cdbdd8d2860885209bbc47324fd7808d5217ebd375d1cbab66e"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-glim-ego-probe-02/geometry.json",
+          "sha256": "8b4a45fc0c9191d6e25dd3557ed4bf093e4c73cbb8542ffd4ceed66e30f607a7"
+        }
+      ],
+      "resources": null,
+      "tracking_p95_m": 0.04707106361510486,
+      "minimum_body_clearance_m": 0.6841714599334577,
+      "handoff_limits": null,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    }
+  ]
+}

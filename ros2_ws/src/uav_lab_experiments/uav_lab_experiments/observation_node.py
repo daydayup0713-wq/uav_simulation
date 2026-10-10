@@ -1,5 +1,6 @@
 """Standard ROS subscriptions -> bounded display frames; no PX4 publisher."""
 import json
+from collections import deque
 import os
 from pathlib import Path
 import time
@@ -14,6 +15,7 @@ from sensor_msgs.msg import PointCloud2
 from nav_msgs.msg import Path as NavPath,Odometry
 from diagnostic_msgs.msg import DiagnosticArray
 from tf2_ros import Buffer,TransformListener,TransformException,ExtrapolationException
+from tf2_msgs.msg import TFMessage
 from .observatory import LatestFrames,Accumulation,read_cloud,pack_points
 from .observation_server import ObservationServer
 
@@ -26,15 +28,30 @@ class Observatory(Node):
         port=int(self.declare_parameter('port',8765).value)
         self.store=LatestFrames(evaluation=self.evaluation);self.pending={};self.errors={}
         self.accumulation=Accumulation();self.telemetry={};self.last_pose=None;self.global_cloud=None
+        run=Path(os.environ['LAB_RUN_DIR']) if os.environ.get('LAB_RUN_DIR') else None
+        manifest=json.loads((run/'manifest.json').read_text()) if run and (run/'manifest.json').exists() else {}
+        self.backend=self.declare_parameter('backend',(manifest.get('backend_selection') or {}).get('localization','')).value
+        calibration_path=self.declare_parameter('calibration','').value
+        self.calibration=json.loads(Path(calibration_path).read_text()) if calibration_path else manifest.get('calibration')
+        self.backend_local=deque(maxlen=1000);self.backend_global=None
         self.tf_buffer=Buffer(node=self);self.tf=TransformListener(self.tf_buffer,self)
+        self.backend_tf=Buffer(node=self)
         qos_map=QoSProfile(depth=1,durability=DurabilityPolicy.TRANSIENT_LOCAL)
+        registered_topic=('/uav001/backends/glim/registered_points' if self.backend=='glim' else
+            '/uav001/backends/'+self.backend+'/registered' if self.backend else '/glim_ros/aligned_points_corrected')
         for layer,topic,qos in [('raw','/uav001/lidar/points',qos_profile_sensor_data),
-                ('registered','/glim_ros/aligned_points_corrected',qos_profile_sensor_data),
-                ('global','/uav001/localization/map',qos_map),('voxels','/uav001/navigation/occupied',qos_map)]:
+                ('registered',registered_topic,qos_profile_sensor_data),
+                ('global','/uav001/backends/'+self.backend+'/global_map' if self.backend else '/uav001/localization/map',qos_map),('voxels','/uav001/navigation/occupied',qos_map)]:
             self.create_subscription(PointCloud2,topic,lambda msg,key=layer:self.pending.update({key:msg}),qos)
         for layer,topic in [('planned','/uav001/navigation/path'),('actual','/uav001/path')]:
             self.create_subscription(NavPath,topic,lambda msg,key=layer:self.path(key,msg),10)
         self.create_subscription(Odometry,'/uav001/odometry',self.pose,10)
+        if self.backend:
+            if self.calibration is None:raise ValueError('selected backend display requires archived calibration')
+            self.create_subscription(Odometry,'/uav001/backends/'+self.backend+'/odometry',self.backend_local_pose,qos_profile_sensor_data)
+            self.create_subscription(Odometry,'/uav001/backends/'+self.backend+'/global_odometry',self.backend_global_pose,qos_profile_sensor_data)
+            if self.backend=='glim':
+                self.create_subscription(TFMessage,'/uav001/backends/glim/tf',self.backend_transforms,qos_profile_sensor_data)
         for topic in ('/uav001/diagnostics','/uav001/localization/diagnostics','/uav001/navigation/diagnostics','/uav001/sensors/timed_diagnostics'):
             self.create_subscription(DiagnosticArray,topic,self.diagnostics,10)
         if self.evaluation:
@@ -50,7 +67,62 @@ class Observatory(Node):
         if self.ready_file:self.ready_file.write_text('observation socket ready\n')
         self.create_timer(.2,self.display,clock=Clock(clock_type=ClockType.STEADY_TIME))
 
+    def backend_local_pose(self,msg):
+        if msg.header.frame_id!='lio_odom':return
+        self.backend_local.append(msg)
+
+    def backend_global_pose(self,msg):
+        # Pinned GLIM odom_corrected remains local fixed-window odometry.
+        # Its global optimization is communicated by the private map->odom TF.
+        expected={'lio_sam':'lio_sam_odom','vins_fusion':'vins_fusion_map'}.get(self.backend)
+        if expected and msg.header.frame_id==expected:self.backend_global=msg
+
+    def backend_transforms(self,msg):
+        for tf in msg.transforms:
+            if tf.header.frame_id=='glim_map' and tf.child_frame_id=='glim_odom':
+                self.backend_tf.set_transform(tf,'selected GLIM core')
+
+    @staticmethod
+    def transform_matrix(tf):
+        p,q=tf.transform.translation,tf.transform.rotation
+        matrix=np.eye(4);matrix[:3,3]=[p.x,p.y,p.z]
+        matrix[:3,:3]=Rotation.from_quat([q.x,q.y,q.z,q.w]).as_matrix()
+        return matrix
+
+    def backend_map_transform(self,source,stamp):
+        if self.backend=='glim':
+            tf=self.backend_tf.lookup_transform('glim_odom','glim_map',Time())
+            measured=Time.from_msg(tf.header.stamp).nanoseconds/1e9
+            now=self.get_clock().now().nanoseconds/1e9
+            if measured<=0 or now and not -.15<=now-measured<=.25:
+                raise ExtrapolationException('actual GLIM global correction is stale')
+            # Both local world frames have identical coordinates; normalized
+            # odometry changes IMU->body pose, never the world origin/axes.
+            aligned,_=self.display_transform('lio_odom',tf.header.stamp)
+            return aligned@self.transform_matrix(tf),abs(Time.from_msg(stamp).nanoseconds/1e9-measured)
+        from .localization_frames import pose_matrix
+        from .backend_contract import normalized_pose
+        global_pose=self.backend_global
+        if global_pose is None or global_pose.header.frame_id!=source or not self.backend_local:
+            raise ValueError('global map has no matching actual local/global pose correction')
+        seconds=lambda msg:msg.header.stamp.sec+msg.header.stamp.nanosec/1e9
+        measured=seconds(global_pose)
+        local=min(self.backend_local,key=lambda p:abs(seconds(p)-measured))
+        now=self.get_clock().now().nanoseconds/1e9
+        if measured<=0 or abs(seconds(local)-measured)>.15 or now and not -.15<=now-measured<=.25:
+            raise ValueError('actual global/local display correction is stale or unmatched')
+        sensor=self.calibration['lidar'] if self.backend=='lio_sam' else self.calibration['imu']
+        p,q=global_pose.pose.pose.position,global_pose.pose.pose.orientation
+        row=normalized_pose(measured,[p.x,p.y,p.z],[q.x,q.y,q.z,q.w],sensor)
+        matrix=np.eye(4);matrix[:3,3]=row[1:4];matrix[:3,:3]=Rotation.from_quat(row[4:]).as_matrix()
+        correction=pose_matrix(local.pose.pose)@np.linalg.inv(matrix)
+        aligned,_=self.display_transform('lio_odom',local.header.stamp)
+        return aligned@correction,abs(Time.from_msg(stamp).nanoseconds/1e9-measured)
+
     def display_transform(self,source,stamp,*,global_map=False):
+        if self.backend and source in ('glim_map','lio_sam_odom','vins_fusion_map'):
+            if not global_map:raise ValueError('optimized global frame may only enter the global display layer')
+            return self.backend_map_transform(source,stamp)
         # GLIM's lio_map topic frame has an explicit platform alias, map.
         source='map' if source=='lio_map' else source
         if source=='odom':return np.eye(4),0.
@@ -69,10 +141,7 @@ class Observatory(Node):
                 tf=self.tf_buffer.lookup_transform('odom',source,Time())
                 delta=abs(Time.from_msg(stamp).nanoseconds-Time.from_msg(tf.header.stamp).nanoseconds)/1e9
                 if delta>.15:raise ExtrapolationException('display TF time difference exceeds 150ms')
-        p,q=tf.transform.translation,tf.transform.rotation
-        matrix=np.eye(4);matrix[:3,3]=[p.x,p.y,p.z]
-        matrix[:3,:3]=Rotation.from_quat([q.x,q.y,q.z,q.w]).as_matrix()
-        return matrix,delta
+        return self.transform_matrix(tf),delta
 
     def path(self,layer,msg):
         points=[[p.pose.position.x,p.pose.position.y,p.pose.position.z] for p in msg.poses]
@@ -104,9 +173,15 @@ class Observatory(Node):
         if self.global_cloud is not None:pending['global']=self.global_cloud
         for layer,msg in pending.items():
             try:
-                transform,delta=self.display_transform(msg.header.frame_id,msg.header.stamp,global_map=layer=='global')
+                source=msg.header.frame_id
+                # Upstream aligned_points uses local T_world_sensor while
+                # labeling it map_frame_id; the exact private topic distinguishes
+                # it from the genuinely globally optimized map layer.
+                local_glim=layer=='registered' and self.backend=='glim' and source=='glim_map'
+                transform,delta=self.display_transform('lio_odom' if local_glim else source,msg.header.stamp,global_map=layer=='global')
                 points,metadata=read_cloud(msg,transform=transform,frame='odom')
                 metadata['display_transform_time_difference_s']=delta
+                if local_glim:metadata['display_alignment']='pinned GLIM local aligned_points topic; source header preserved as glim_map'
                 if layer=='global':metadata['display_alignment']='current map correction; original source stamp preserved'
                 if layer=='registered':
                     source_count=len(self.accumulation.points)+len(points)

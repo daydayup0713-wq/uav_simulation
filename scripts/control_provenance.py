@@ -11,7 +11,8 @@ def control_files(root):
         'configs/sensors-livox.json','configs/sensors-livox-rtk.json','configs/sensors-mechanical.json',
         'configs/fastdds-local.xml',
         'configs/px4-start.sh','dependencies/lock.json','dependencies/backends.lock.json',
-        'dependencies/planners.lock.json']
+        'dependencies/planners.lock.json',
+        'ros2_ws/src/uav_lab_experiments/uav_lab_experiments/registry.py']
     files=[root/name for name in names]
     for package in ('uav_lab_bridge','uav_lab_navigation'):
         files.extend((root/'ros2_ws/src'/package/package).glob('*.py'))

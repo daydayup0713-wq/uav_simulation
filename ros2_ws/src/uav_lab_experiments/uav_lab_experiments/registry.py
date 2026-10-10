@@ -23,6 +23,26 @@ def digest(path):
     return value.hexdigest()
 
 
+def artifact_digest(path, verified):
+    """Attest shared artifacts once in this pass; detect concurrent replacement.
+
+    A new list/describe operation always has a new cache. Stat identity merely
+    avoids reading the same library repeatedly during one operation; the first
+    attestation still hashes its complete contents.
+    """
+    path=Path(path).resolve()
+    def identity(value):
+        return (str(path),value.st_dev,value.st_ino,value.st_size,value.st_mtime_ns,value.st_ctime_ns)
+    key=identity(path.stat())
+    value=verified.get(key)
+    if value is None:
+        value=digest(path)
+    if identity(path.stat())!=key:
+        raise ValueError('artifact changed during verification')
+    verified[key]=value
+    return value
+
+
 class Registry:
     def __init__(self, catalog_path, evidence_dir):
         self.catalog_path, self.evidence_dir = Path(catalog_path), Path(evidence_dir)
@@ -40,7 +60,8 @@ class Registry:
                 raise ValueError('unknown input group')
             self.backends[key] = item
 
-    def _valid(self, report, backend, group):
+    def _valid(self, report, backend, group, verified=None):
+        if verified is None:verified={}
         try:
             spec = self.backends[backend]
             if (report['schema'] != 1 or report['backend'] != backend
@@ -52,12 +73,15 @@ class Registry:
                     or report['success'] is not True or report['checks']['all_passed'] is not True
                     or report['stage'] not in STAGES[1:] or not report['artifacts']):
                 return False
-            return all(Path(a['path']).is_file() and digest(a['path']) == a['sha256']
+            return all(Path(a['path']).is_file() and artifact_digest(a['path'],verified) == a['sha256']
                        for a in report['artifacts'])
         except (KeyError, ValueError, TypeError, OSError):
             return False
 
     def describe(self, backend, group=None):
+        return self._describe(backend,group,{})
+
+    def _describe(self, backend, group, verified):
         if backend not in self.backends:
             raise ValueError('unknown backend: ' + backend)
         spec = self.backends[backend]
@@ -68,7 +92,7 @@ class Registry:
             for path in (self.evidence_dir / backend).glob('*.json'):
                 try:
                     report = json.loads(path.read_text())
-                    if self._valid(report, backend, input_group):
+                    if self._valid(report, backend, input_group,verified):
                         reports.append((report, str(path)))
                 except (OSError, ValueError):
                     continue
@@ -84,7 +108,8 @@ class Registry:
         return {**spec, 'stage': STAGES[best], 'evidence': witnesses}
 
     def list(self, role=None, group=None):
-        return [self.describe(key, group) for key, spec in self.backends.items()
+        verified={}
+        return [self._describe(key, group,verified) for key, spec in self.backends.items()
                 if role is None or spec['role'] == role]
 
     def record(self, report):

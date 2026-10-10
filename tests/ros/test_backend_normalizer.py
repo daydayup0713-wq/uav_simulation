@@ -1,7 +1,7 @@
 import json,time
 from pathlib import Path
 import pytest
-import rclpy
+rclpy=pytest.importorskip('rclpy')
 from sensor_msgs.msg import Imu,PointCloud2,Image
 from nav_msgs.msg import Odometry
 from uav_lab_experiments.backend_node import BackendNormalizer

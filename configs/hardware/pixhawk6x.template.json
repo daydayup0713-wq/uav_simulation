@@ -1,0 +1,25 @@
+{
+  "simulation": false,
+  "firmware_commit": null,
+  "xrce_client_major": 2,
+  "xrce_agent_version": "2.4.3",
+  "transport": null,
+  "computer_arch": null,
+  "mass_kg": null,
+  "body_size_m": null,
+  "inertia_kg_m2": null,
+  "calibration_id": null,
+  "calibration_source": null,
+  "sensor_extrinsics": {
+    "lidar": {"parent": "base_link", "child": "lidar_link", "xyz": null, "rpy": null},
+    "imu": {"parent": "base_link", "child": "imu_link", "xyz": null, "rpy": null},
+    "camera": {"parent": "base_link", "child": "camera_link", "xyz": null, "rpy": null},
+    "camera_optical": {"parent": "camera_link", "child": "camera_optical_frame", "xyz": null, "rpy": null}
+  },
+  "camera_intrinsics": null,
+  "rtk_antenna_lever_arm_m": null,
+  "clock_contract": null,
+  "clock_uncertainty_ms": null,
+  "sensor_latency_ms": {"lidar": null, "imu": null, "camera": null, "rtk": null},
+  "geofence_enu_m": {"lower": null, "upper": null}
+}

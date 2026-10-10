@@ -62,3 +62,8 @@ def test_large_sensor_dds_contract_is_bound_to_algorithm_and_control_identity():
     root=Path(__file__).resolve().parents[1]
     assert 'configs/fastdds-local.xml' in backend_provenance.ADAPTER_FILES
     assert root/'configs/fastdds-local.xml' in control_provenance.control_files(root)
+
+
+def test_qualification_policy_is_part_of_current_control_source_identity():
+    root=Path(__file__).resolve().parents[1]
+    assert root/'ros2_ws/src/uav_lab_experiments/uav_lab_experiments/registry.py' in api().control_files(root)

@@ -57,7 +57,7 @@
         "global_optimization": true,
         "visual_fusion": false
       },
-      "implementation_sha256": "d5b7bdf9b2e21b7002bb6cea5d763d1e1f0797fa34945b63f6d0b3ae81f3c326"
+      "implementation_sha256": "1c30c3feb84dd329eee09dbff2877a91418c75a8a9c7fe5a36aca23346953686"
     },
     {
       "id": "fast_lio2",
@@ -76,7 +76,7 @@
         "relocalization": false,
         "global_optimization": false
       },
-      "implementation_sha256": "4cb9bc48b0bc5927c4180b28892ba0ceec5f85b2dcf2e317449f0d26bbb45493"
+      "implementation_sha256": "126ec041e6e335123a8d15a947de1497f49406047a465d9c0a07d09854bc25d9"
     },
     {
       "id": "fast_livo2",
@@ -94,7 +94,7 @@
         "global_optimization": false,
         "visual_fusion": true
       },
-      "implementation_sha256": "a02f4ae3f139873b0ac7e712b25542f6c93380120017d2e288cd904cd3d0f7ae"
+      "implementation_sha256": "394e966472d8673e7e75bb7e0523ef56a541fa15285ff95bc38b2b6120105e09"
     },
     {
       "id": "fast_livo2_rtk",
@@ -110,7 +110,7 @@
         "global_optimization": "offline_rtk",
         "visual_fusion": true
       },
-      "implementation_sha256": "ffd895bb79da2ba7d91624924b968046ffc978ffab97e912143aca3ad8d7abcb"
+      "implementation_sha256": "460254859dee41057a5de9af6358119d94b485a5bae9f2c044a00da37e5ad813"
     },
     {
       "id": "orb_slam3",
@@ -128,7 +128,7 @@
         "global_optimization": true,
         "visual_fusion": true
       },
-      "implementation_sha256": "d079bc0a446c07b7cda62b040f02c51b6d712bdf3d432795cf86ddba6bb1b48e"
+      "implementation_sha256": "d908f74c0870f3730a7a5ac482efadac3355892ad09093d1b7837b556c8fc8c5"
     },
     {
       "id": "lio_sam",
@@ -143,7 +143,7 @@
         "relocalization": false,
         "global_optimization": true
       },
-      "implementation_sha256": "89cd442e71f43b4f717acb221d1422f02237e9e4ae0d4b6a41de0a79ab02c693"
+      "implementation_sha256": "decd365a4b4df1c84bf7ec3ad7790748e0a35a3c97c8a93f32211a4e73972f2d"
     },
     {
       "id": "vins_fusion",
@@ -161,7 +161,7 @@
         "global_optimization": true,
         "visual_fusion": true
       },
-      "implementation_sha256": "ae2c9687670a8fa99d1ed0e5d94b74b5e1af9e41e985ce88f82c7accbf8583d3"
+      "implementation_sha256": "01417a1698575765104f1897bf8fc2e137efceee5cb14e01be79fda263feb126"
     },
     {
       "id": "astar",

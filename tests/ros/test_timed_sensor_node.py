@@ -1,7 +1,8 @@
 import json
 from pathlib import Path
 import os
-import rclpy
+import pytest
+rclpy=pytest.importorskip('rclpy')
 from nav_msgs.msg import Odometry
 
 ROOT=Path(__file__).resolve().parents[2]

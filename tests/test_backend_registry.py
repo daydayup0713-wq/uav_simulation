@@ -131,3 +131,40 @@ def test_platform_catalog_declares_seven_localizers_four_planners_without_fake_r
     assert len(catalog.list('localization')) == 7
     assert len(catalog.list('planning')) == 4
     assert all(item['stage'] == 'configured' for item in catalog.list())
+
+
+def shared_artifact_pair(registry):
+    evidence=report(registry)
+    registry.record(evidence)
+    second={**evidence,'backend':'astar','run_id':'astar-shared-installed'}
+    registry.record(second)
+    return Path(evidence['artifacts'][0]['path'])
+
+
+def test_catalog_refresh_hashes_shared_libraries_once_per_pass_and_never_reuses_a_previous_pass(registry,monkeypatch):
+    import uav_lab_experiments.registry as module
+    shared=shared_artifact_pair(registry);original=module.digest;calls=[]
+    def measured(path):
+        calls.append(Path(path).resolve());return original(path)
+    monkeypatch.setattr(module,'digest',measured)
+    assert all(row['stage']=='installed' for row in registry.list())
+    assert calls==[shared.resolve()]
+    assert all(row['stage']=='installed' for row in registry.list())
+    assert calls==[shared.resolve(),shared.resolve()]
+    stamp=shared.stat();shared.write_bytes(b'x'*stamp.st_size)
+    import os
+    os.utime(shared,ns=(stamp.st_atime_ns,stamp.st_mtime_ns))
+    assert all(row['stage']=='configured' for row in registry.list())
+
+
+def test_artifact_changed_while_reading_is_never_certified_or_cached(registry,monkeypatch):
+    import uav_lab_experiments.registry as module
+    shared=shared_artifact_pair(registry);original=module.digest;changed=False
+    def racing(path):
+        nonlocal changed
+        value=original(path)
+        if not changed:
+            changed=True;shared.write_bytes(b'x'*shared.stat().st_size)
+        return value
+    monkeypatch.setattr(module,'digest',racing)
+    assert all(row['stage']=='configured' for row in registry.list())

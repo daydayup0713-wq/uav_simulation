@@ -36,6 +36,7 @@ class ObservationServer:
         self.loop=asyncio.get_running_loop();self.stop=asyncio.Event()
         async with serve(self.client,'127.0.0.1',self.port,
                          origins=['http://127.0.0.1:8080','http://localhost:8080',
+                                  'http://127.0.0.1:8780','http://localhost:8780',
                                   'http://127.0.0.1:5173','http://localhost:5173'],
                          max_size=4096,max_queue=1,write_limit=65536,ping_interval=10,ping_timeout=10) as server:
             self.port=server.sockets[0].getsockname()[1]

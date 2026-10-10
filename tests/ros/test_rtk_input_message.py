@@ -2,7 +2,7 @@
 import json
 from pathlib import Path
 import pytest
-import rclpy
+rclpy=pytest.importorskip('rclpy')
 from sensor_msgs.msg import NavSatFix
 GnssPVTSolnMsg=pytest.importorskip('gnss_comm.msg').GnssPVTSolnMsg
 from uav_lab_experiments.algorithm_sensor_node import AlgorithmSensorAdapter

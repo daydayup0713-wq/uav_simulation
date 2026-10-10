@@ -22,6 +22,24 @@ def isolated_environment(base, run_dir):
     return {**base, 'GZ_PARTITION': 'uav-lab-'+uuid.uuid4().hex,
             'LAB_RUN_DIR': str(run_dir), 'ROS_LOG_DIR': str(Path(run_dir)/'ros')}
 
+def configure_run_transport(environment, configuration, source, *, sensor_profile=None, scene=None):
+    """All experiment processes and later operators use the same owned profile.
+
+    Scene-only runs also archive this file. env.sh deliberately loads an
+    archived profile, so using builtin transport here would mix configurations
+    inside one run even when its lidar is synchronous.
+    """
+    environment=dict(environment)
+    environment.pop('FASTRTPS_DEFAULT_PROFILES_FILE',None)
+    environment['ROS_LOCALHOST_ONLY']='1'
+    relative=None
+    if sensor_profile or scene:
+        profile=Path(configuration)/'fastdds-local.xml'
+        profile.write_bytes(Path(source).read_bytes())
+        environment.update(FASTRTPS_DEFAULT_PROFILES_FILE=str(profile),ROS_LOCALHOST_ONLY='0')
+        relative='configuration/fastdds-local.xml'
+    return environment,relative
+
 def source_identity(root, environment):
     revision = subprocess.run(['git', '-C', str(root), 'rev-parse', 'HEAD'], capture_output=True, text=True)
     if revision.returncode != 0:
@@ -192,13 +210,9 @@ def main():
     # Keep larger image payloads on bounded local SHM. UDP discovery remains
     # restricted to loopback by the archived profile, even though ROS's generic
     # localhost flag is disabled to avoid its transport override.
-    env.pop('FASTRTPS_DEFAULT_PROFILES_FILE',None)
-    env['ROS_LOCALHOST_ONLY']='1'
-    if options.sensor_profile:
-        dds=snapshots/'fastdds-local.xml'
-        dds.write_bytes((ROOT/'configs/fastdds-local.xml').read_bytes())
-        env.update(FASTRTPS_DEFAULT_PROFILES_FILE=str(dds),ROS_LOCALHOST_ONLY='0')
-        metadata['dds_profile']='configuration/fastdds-local.xml'
+    env,dds_profile=configure_run_transport(env,snapshots,ROOT/'configs/fastdds-local.xml',
+        sensor_profile=options.sensor_profile,scene=options.scene)
+    if dds_profile:metadata['dds_profile']=dds_profile
     localization = options.profile in ('localization', 'slam', 'navigation')
     if localization and not selected and not (ROOT/'.deps/slam/install/build-manifest.json').is_file():
         raise RuntimeError('private CPU localization backend missing; run bootstrap_slam.py')

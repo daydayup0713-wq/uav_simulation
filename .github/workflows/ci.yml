@@ -12,11 +12,27 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get update && sudo apt-get install -y python3-pytest python3-numpy python3-scipy
+      - run: sudo apt-get update && sudo apt-get install -y python3-pytest python3-numpy python3-scipy python3-psutil python3-yaml python3-websockets
       - run: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python3 -m pytest -q
+  web:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm --prefix web ci
+      - run: npm --prefix web test
+      - run: npm --prefix web run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: web/dist
   headless-sitl:
     runs-on: ubuntu-22.04
-    timeout-minutes: 60
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
@@ -37,6 +53,10 @@ jobs:
         run: docker run --rm --shm-size=1g -v "$PWD/ci-evidence:/opt/uav_lab/.runtime" uav-lab bash scripts/ci_localization.sh
       - name: CPU observed-space 3D navigation benchmark
         run: docker run --rm --shm-size=1g -v "$PWD/ci-evidence:/opt/uav_lab/.runtime" uav-lab bash scripts/ci_navigation.sh
+      - name: Build pinned native workbench cores
+        run: docker build -t uav-workbench -f containers/Dockerfile.workbench .
+      - name: Real GLIM and three planner CPU fixtures
+        run: docker run --rm --shm-size=1g -v "$PWD/ci-evidence:/opt/uav_lab/.runtime" uav-workbench
       - uses: actions/upload-artifact@v4
         if: always()
         with:

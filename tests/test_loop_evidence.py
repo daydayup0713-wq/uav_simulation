@@ -1,3 +1,5 @@
+import pytest
+pytest.importorskip('visualization_msgs.msg')
 from visualization_msgs.msg import Marker, MarkerArray
 from geometry_msgs.msg import Point
 

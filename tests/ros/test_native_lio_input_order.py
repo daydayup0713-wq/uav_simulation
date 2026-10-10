@@ -2,7 +2,7 @@
 import json, os, subprocess, time
 from pathlib import Path
 import pytest
-import rclpy
+rclpy=pytest.importorskip('rclpy')
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import Imu
 from rclpy.qos import qos_profile_sensor_data

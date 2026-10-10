@@ -193,8 +193,6 @@ def main(args=None):
 def run_cli(args=None):
     options=parser().parse_args(args)
     root=Path(os.environ.get('LAB_ROOT','.')).resolve()
-    import rclpy
-    from rclpy.signals import SignalHandlerOptions
     initialized=False;monitor=None
     try:
         if options.command in ('record','sensors') and (not math.isfinite(options.duration) or not 3<=options.duration<=3600):
@@ -203,6 +201,8 @@ def run_cli(args=None):
             raise ValueError('--rate must be finite and between 0.1 and 4')
         if options.command=='bag-check':result,_=inspect_bag(options.dataset)
         else:
+            import rclpy
+            from rclpy.signals import SignalHandlerOptions
             if options.command=='replay':
                 check_replay_domain(options.domain,active_domains(root))
                 os.environ['ROS_DOMAIN_ID']=str(options.domain)

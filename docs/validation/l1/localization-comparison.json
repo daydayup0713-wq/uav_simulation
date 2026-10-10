@@ -7,10 +7,13 @@
       "cases": [
         {
           "dataset_identity": "c5cda0f867b57a7d4f0c9708274e5d2c037dff35103152e335b7728f249a3252",
+          "comparison_identity": "cbbc888a31e2b80dc5440b14e5df4ca7c29ba21a5f350b11366fc756d6d8277c",
           "dataset_sha256": {
             "metadata.yaml": "37a7676e36a5d03e055131ce22d7309704c540e7aa891589ad6904828684244c",
             "bag_0.db3": "90678bac996085595968848643933b1130c5e5ee73307c8fc2abd5c7814f57fa"
           },
+          "playback_rate": 1.0,
+          "requested_source_duration_s": 200.0,
           "runs": [
             {
               "backend": "fast_lio2",
@@ -66,6 +69,8 @@
               },
               "global_quality": null,
               "pose_graph": null,
+              "rtk_batch": null,
+              "transport": null,
               "capability_observations": {
                 "keyframe_point_messages": 0,
                 "confirmed_loop_edges": 0,
@@ -162,10 +167,352 @@
                 }
               ],
               "implementation_sha256": "506c18115d0e5d7208e48d78748f4d311ae7fdbc3203ef3fbdd4b50e1f1e89e6",
+              "input_counts": {
+                "/uav001/lidar/points": 2000,
+                "/uav001/imu/data": 39999
+              },
+              "playback_rate": 1.0,
+              "requested_source_duration_s": 200.0,
+              "player_exit_code": 0,
               "run_id": "fast_lio2",
               "source_report": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/localization-task7-final-01/fast_lio2/report.json",
               "source_report_sha256": "6019b3d519433cae67006433161578221b37584b8535ffb3eed90f0ec1249b02",
               "current_implementation": false,
+              "binary_sha256": "c96f191b0a60d4fb0eae38514ad3532c67fa8c039b3e541e79915d32ba44fca7"
+            },
+            {
+              "backend": "fast_lio2",
+              "success": false,
+              "error": "",
+              "quality": {
+                "passed": false,
+                "reason": "quality thresholds failed",
+                "outside_truth_support": 0,
+                "expected_outside_truth_support": 0,
+                "metrics": {
+                  "samples": 1997,
+                  "coverage": 1.0,
+                  "duration_s": 199.60000000000002,
+                  "max_output_gap_s": 0.1000374990000239,
+                  "raw_position_rmse_m": 0.766865976846785,
+                  "ate_rmse_m": 0.6200293140913744,
+                  "ate_p95_m": 0.980169034375844,
+                  "ate_max_m": 1.1702853075883408,
+                  "attitude_rmse_deg": 7.710294979982309,
+                  "rpe_translation_rmse_m": 0.10021715401881304,
+                  "rpe_rotation_rmse_deg": 0.18141225118303492,
+                  "rpe_translation_world_rmse_m": 0.09359077895272361,
+                  "attitude_reference_valid": true,
+                  "alignment_se3": [
+                    [
+                      0.9995465825928128,
+                      -0.018130176420769514,
+                      -0.02404009005767855,
+                      0.032505147228443665
+                    ],
+                    [
+                      0.021136848896178763,
+                      0.9911070969346613,
+                      0.13137715183580342,
+                      -0.20243968476004318
+                    ],
+                    [
+                      0.02144441292667231,
+                      -0.13182571489925365,
+                      0.991040926523991,
+                      0.3838963615391171
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "alignment_scale": 1.0
+                }
+              },
+              "global_quality": null,
+              "pose_graph": null,
+              "rtk_batch": null,
+              "transport": null,
+              "capability_observations": {
+                "keyframe_point_messages": 0,
+                "confirmed_loop_edges": 0,
+                "global_pose_messages": 0,
+                "loop_closure": "not observed in this run",
+                "relocalization": "not verified by this replay; no control qualification"
+              },
+              "resource_summary": {
+                "replay": {
+                  "observed_wall_s": 200.30012484799954,
+                  "observed_cpu_s": 192.01999999999998,
+                  "mean_cpu_cores": 0.9586614094510273,
+                  "peak_combined_rss_bytes": 318275584,
+                  "process_peak_rss_bytes": {
+                    "681642": 63287296,
+                    "681643": 79253504,
+                    "681644": 175734784
+                  },
+                  "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+                }
+              },
+              "latency_source_s": {
+                "p50": 0.10402500200001441,
+                "p95": 0.1280150044000095,
+                "min": 0.07401250499998469
+              },
+              "scope": "offline replay; no realtime or flight qualification",
+              "normalized_output_count": 336,
+              "normalizer_events": [
+                {
+                  "signature": [
+                    "INITIALIZING",
+                    ""
+                  ],
+                  "source_s": null,
+                  "values": {
+                    "ready": "False",
+                    "state": "INITIALIZING",
+                    "reason": "",
+                    "samples": "0",
+                    "source_age_s": "None",
+                    "clock_s": "0.0",
+                    "pose_arrival_age_s": "None",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "READY",
+                    ""
+                  ],
+                  "source_s": 32.776,
+                  "values": {
+                    "ready": "True",
+                    "state": "READY",
+                    "reason": "",
+                    "samples": "20",
+                    "source_age_s": "0.17601250500000276",
+                    "clock_s": "32.776",
+                    "imu_age_s": "0.006000000000000227",
+                    "imu_arrival_age_s": "0.005114418017910793",
+                    "points_age_s": "0.07603749700000151",
+                    "points_arrival_age_s": "0.005381933005992323",
+                    "pose_arrival_age_s": "0.05891924400930293",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "FAILED",
+                    "localization source/output stale or simulation paused"
+                  ],
+                  "source_s": 66.668,
+                  "values": {
+                    "ready": "False",
+                    "state": "FAILED",
+                    "reason": "localization source/output stale or simulation paused",
+                    "samples": "355",
+                    "source_age_s": "0.5700250020000084",
+                    "clock_s": "66.67",
+                    "imu_age_s": "0.0040000000000048885",
+                    "imu_arrival_age_s": "0.004451104992767796",
+                    "points_age_s": "0.1700374969999956",
+                    "points_arrival_age_s": "0.08626963198184967",
+                    "pose_arrival_age_s": "0.19036885298555717",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                }
+              ],
+              "implementation_sha256": "e1cadea5b3c0d1ee50237ed7667b30875178f3a15bac32beda475d7e7e5349c1",
+              "input_counts": {
+                "/uav001/imu/data": 39989,
+                "/uav001/lidar/points": 2000
+              },
+              "playback_rate": 1.0,
+              "requested_source_duration_s": 200.0,
+              "player_exit_code": 0,
+              "run_id": "fast_lio2",
+              "source_report": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/localization-task10-final-01/fast_lio2/report.json",
+              "source_report_sha256": "b8bb9854b6db3e8125f83bbd8583d0be41475c19dbfd2b0d10784a18628a35fe",
+              "current_implementation": false,
+              "binary_sha256": "c96f191b0a60d4fb0eae38514ad3532c67fa8c039b3e541e79915d32ba44fca7"
+            },
+            {
+              "backend": "fast_lio2",
+              "success": false,
+              "error": "",
+              "quality": {
+                "passed": false,
+                "reason": "quality thresholds failed",
+                "outside_truth_support": 0,
+                "expected_outside_truth_support": 0,
+                "metrics": {
+                  "samples": 1997,
+                  "coverage": 1.0,
+                  "duration_s": 199.60000000000002,
+                  "max_output_gap_s": 0.1000374990000239,
+                  "raw_position_rmse_m": 0.766865976846785,
+                  "ate_rmse_m": 0.6200293140913744,
+                  "ate_p95_m": 0.980169034375844,
+                  "ate_max_m": 1.1702853075883408,
+                  "attitude_rmse_deg": 7.710294979982309,
+                  "rpe_translation_rmse_m": 0.10021715401881304,
+                  "rpe_rotation_rmse_deg": 0.18141225118303492,
+                  "rpe_translation_world_rmse_m": 0.09359077895272361,
+                  "attitude_reference_valid": true,
+                  "alignment_se3": [
+                    [
+                      0.9995465825928128,
+                      -0.018130176420769514,
+                      -0.02404009005767855,
+                      0.032505147228443665
+                    ],
+                    [
+                      0.021136848896178763,
+                      0.9911070969346613,
+                      0.13137715183580342,
+                      -0.20243968476004318
+                    ],
+                    [
+                      0.02144441292667231,
+                      -0.13182571489925365,
+                      0.991040926523991,
+                      0.3838963615391171
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "alignment_scale": 1.0
+                }
+              },
+              "global_quality": null,
+              "pose_graph": null,
+              "rtk_batch": null,
+              "transport": {
+                "profile": "configuration/fastdds-local.xml",
+                "profile_sha256": "fc8dfff5f4e95718ea37d919e94945b0eef851b85a3c867c9dbcf10499393d2e",
+                "ROS_LOCALHOST_ONLY": "0",
+                "RMW_IMPLEMENTATION": "rmw_fastrtps_cpp"
+              },
+              "capability_observations": {
+                "keyframe_point_messages": 0,
+                "confirmed_loop_edges": 0,
+                "global_pose_messages": 0,
+                "loop_closure": "not observed in this run",
+                "relocalization": "not verified by this replay; no control qualification"
+              },
+              "resource_summary": {
+                "replay": {
+                  "observed_wall_s": 200.29915175499627,
+                  "observed_cpu_s": 170.79,
+                  "mean_cpu_cores": 0.852674604478148,
+                  "peak_combined_rss_bytes": 520441856,
+                  "process_peak_rss_bytes": {
+                    "733517": 129515520,
+                    "733518": 147103744,
+                    "733519": 243822592
+                  },
+                  "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+                }
+              },
+              "latency_source_s": {
+                "p50": 0.10203749900000503,
+                "p95": 0.1220374990000039,
+                "min": 0.07401250499998469
+              },
+              "scope": "offline replay; no realtime or flight qualification",
+              "normalized_output_count": 1978,
+              "normalizer_events": [
+                {
+                  "signature": [
+                    "INITIALIZING",
+                    ""
+                  ],
+                  "source_s": null,
+                  "values": {
+                    "ready": "False",
+                    "state": "INITIALIZING",
+                    "reason": "",
+                    "samples": "0",
+                    "source_age_s": "None",
+                    "clock_s": "0.0",
+                    "pose_arrival_age_s": "None",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "READY",
+                    ""
+                  ],
+                  "source_s": 32.778,
+                  "values": {
+                    "ready": "True",
+                    "state": "READY",
+                    "reason": "",
+                    "samples": "20",
+                    "source_age_s": "0.17601250500000276",
+                    "clock_s": "32.776",
+                    "imu_age_s": "0.006000000000000227",
+                    "imu_arrival_age_s": "0.005908909981371835",
+                    "points_age_s": "0.07603749700000151",
+                    "points_arrival_age_s": "0.0063469209999311715",
+                    "pose_arrival_age_s": "0.06146219000220299",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "FAILED",
+                    "localization source/output stale or simulation paused"
+                  ],
+                  "source_s": 230.454,
+                  "values": {
+                    "ready": "False",
+                    "state": "FAILED",
+                    "reason": "localization source/output stale or simulation paused",
+                    "samples": "1997",
+                    "source_age_s": "0.15402500199999736",
+                    "clock_s": "230.454",
+                    "imu_age_s": "0.004000000000019099",
+                    "imu_arrival_age_s": "1.4910517240059562",
+                    "points_age_s": "0.1540250030000152",
+                    "points_arrival_age_s": "1.5663051980081946",
+                    "pose_arrival_age_s": "1.5333983410091605",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                }
+              ],
+              "implementation_sha256": "126ec041e6e335123a8d15a947de1497f49406047a465d9c0a07d09854bc25d9",
+              "input_counts": {
+                "/uav001/imu/data": 39999,
+                "/uav001/lidar/points": 2000
+              },
+              "playback_rate": 1.0,
+              "requested_source_duration_s": 200.0,
+              "player_exit_code": 0,
+              "run_id": "fast_lio2",
+              "source_report": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/localization-task10-dds-01/fast_lio2/report.json",
+              "source_report_sha256": "9999f884a4048fd394bef3d9bef2c06213c5e7d735ab63f55a8b2d1bb095d320",
+              "current_implementation": true,
               "binary_sha256": "c96f191b0a60d4fb0eae38514ad3532c67fa8c039b3e541e79915d32ba44fca7"
             }
           ]
@@ -177,10 +524,13 @@
       "cases": [
         {
           "dataset_identity": "c5cda0f867b57a7d4f0c9708274e5d2c037dff35103152e335b7728f249a3252",
+          "comparison_identity": "cbbc888a31e2b80dc5440b14e5df4ca7c29ba21a5f350b11366fc756d6d8277c",
           "dataset_sha256": {
             "metadata.yaml": "37a7676e36a5d03e055131ce22d7309704c540e7aa891589ad6904828684244c",
             "bag_0.db3": "90678bac996085595968848643933b1130c5e5ee73307c8fc2abd5c7814f57fa"
           },
+          "playback_rate": 1.0,
+          "requested_source_duration_s": 200.0,
           "runs": [
             {
               "backend": "fast_livo2",
@@ -236,6 +586,8 @@
               },
               "global_quality": null,
               "pose_graph": null,
+              "rtk_batch": null,
+              "transport": null,
               "capability_observations": {
                 "keyframe_point_messages": 0,
                 "confirmed_loop_edges": 0,
@@ -333,10 +685,540 @@
                 }
               ],
               "implementation_sha256": "a02f4ae3f139873b0ac7e712b25542f6c93380120017d2e288cd904cd3d0f7ae",
+              "input_counts": {
+                "/uav001/imu/data": 39981,
+                "/uav001/camera/camera_info": 6061,
+                "/uav001/camera/image_raw": 6061,
+                "/uav001/lidar/points": 2000
+              },
+              "playback_rate": 1.0,
+              "requested_source_duration_s": 200.0,
+              "player_exit_code": 0,
               "run_id": "fast_livo2",
               "source_report": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/localization-task7-qualified-03/fast_livo2/report.json",
               "source_report_sha256": "daafd1624ecbcb23c5bee8220e305f9e39b02a97a35ff8a8effd9624cfb15490",
+              "current_implementation": false,
+              "binary_sha256": "fef6cb4733e68fdc700350b497bfcfb9ddc5abc869a91e0d71b9bfb983b7f338"
+            },
+            {
+              "backend": "fast_livo2",
+              "success": false,
+              "error": "",
+              "quality": {
+                "passed": false,
+                "reason": "quality thresholds failed",
+                "outside_truth_support": 0,
+                "expected_outside_truth_support": 0,
+                "metrics": {
+                  "samples": 2413,
+                  "coverage": 0.7379380396140173,
+                  "duration_s": 199.452,
+                  "max_output_gap_s": 0.9239999999999924,
+                  "raw_position_rmse_m": 0.3339545662068716,
+                  "ate_rmse_m": 0.03682456130045854,
+                  "ate_p95_m": 0.06650780083681897,
+                  "ate_max_m": 0.18152759804853794,
+                  "attitude_rmse_deg": 0.3377272695951572,
+                  "rpe_translation_rmse_m": 0.02433621916821362,
+                  "rpe_rotation_rmse_deg": 0.2834471706403353,
+                  "rpe_translation_world_rmse_m": 0.024306959427034876,
+                  "attitude_reference_valid": true,
+                  "alignment_se3": [
+                    [
+                      0.9999346023991955,
+                      -0.011434884903912678,
+                      0.00018528895751880603,
+                      0.010406401707421686
+                    ],
+                    [
+                      0.011434283129483419,
+                      0.999930198542444,
+                      0.00297577085526198,
+                      -0.007713972117208888
+                    ],
+                    [
+                      -0.00021930362130988257,
+                      -0.0029734576005868273,
+                      0.9999955552180321,
+                      0.3302508169518257
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "alignment_scale": 1.0
+                }
+              },
+              "global_quality": null,
+              "pose_graph": null,
+              "rtk_batch": null,
+              "transport": null,
+              "capability_observations": {
+                "keyframe_point_messages": 0,
+                "confirmed_loop_edges": 0,
+                "global_pose_messages": 0,
+                "loop_closure": "not observed in this run",
+                "relocalization": "not verified by this replay; no control qualification"
+              },
+              "resource_summary": {
+                "replay": {
+                  "observed_wall_s": 200.287048246013,
+                  "observed_cpu_s": 275.3,
+                  "mean_cpu_cores": 1.3745272218593407,
+                  "peak_combined_rss_bytes": 1177841664,
+                  "process_peak_rss_bytes": {
+                    "683653": 24154112,
+                    "683654": 63635456,
+                    "683655": 85176320,
+                    "683656": 1007804416
+                  },
+                  "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+                }
+              },
+              "latency_source_s": {
+                "p50": 0.19400000000001683,
+                "p95": 0.2680000000000007,
+                "min": 0.0759999999999934
+              },
+              "scope": "offline replay; no realtime or flight qualification",
+              "normalized_output_count": 2,
+              "normalizer_events": [
+                {
+                  "signature": [
+                    "INITIALIZING",
+                    ""
+                  ],
+                  "source_s": null,
+                  "values": {
+                    "ready": "False",
+                    "state": "INITIALIZING",
+                    "reason": "",
+                    "samples": "0",
+                    "source_age_s": "None",
+                    "clock_s": "0.0",
+                    "pose_arrival_age_s": "None",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "READY",
+                    ""
+                  ],
+                  "source_s": 32.23,
+                  "values": {
+                    "ready": "True",
+                    "state": "READY",
+                    "reason": "",
+                    "samples": "20",
+                    "source_age_s": "0.15199999999999392",
+                    "clock_s": "32.23",
+                    "imu_age_s": "0.003999999999997783",
+                    "imu_arrival_age_s": "0.003194182994775474",
+                    "points_age_s": "0.13003749699999645",
+                    "points_arrival_age_s": "0.052864529978251085",
+                    "pose_arrival_age_s": "0.018775531993014738",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "FAILED",
+                    "visual source stale or simulation paused"
+                  ],
+                  "source_s": 32.73,
+                  "values": {
+                    "ready": "False",
+                    "state": "FAILED",
+                    "reason": "visual source stale or simulation paused",
+                    "samples": "21",
+                    "source_age_s": "0.2540000010000014",
+                    "clock_s": "32.728",
+                    "imu_age_s": "0.0020000000000024443",
+                    "imu_arrival_age_s": "0.003705880983034149",
+                    "points_age_s": "0.1280125010000006",
+                    "points_arrival_age_s": "0.04601393800112419",
+                    "pose_arrival_age_s": "0.11722934499266557",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                }
+              ],
+              "implementation_sha256": "a8daf789087402f5496c26248a04fbd0353c1954193429dec249e42a18d1c34a",
+              "input_counts": {
+                "/uav001/imu/data": 39986,
+                "/uav001/camera/camera_info": 6061,
+                "/uav001/camera/image_raw": 2933,
+                "/uav001/lidar/points": 2000
+              },
+              "playback_rate": 1.0,
+              "requested_source_duration_s": 200.0,
+              "player_exit_code": 0,
+              "run_id": "fast_livo2",
+              "source_report": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/localization-task10-final-01/fast_livo2/report.json",
+              "source_report_sha256": "4558a66741e3a082a9a62af8e6caa5a575553365feecedde86e2e530e351821b",
+              "current_implementation": false,
+              "binary_sha256": "fef6cb4733e68fdc700350b497bfcfb9ddc5abc869a91e0d71b9bfb983b7f338"
+            },
+            {
+              "backend": "fast_livo2",
+              "success": true,
+              "error": "",
+              "quality": {
+                "passed": true,
+                "reason": "quality thresholds passed",
+                "outside_truth_support": 0,
+                "expected_outside_truth_support": 0,
+                "metrics": {
+                  "samples": 3871,
+                  "coverage": 0.9994921279837481,
+                  "duration_s": 199.48600000000002,
+                  "max_output_gap_s": 0.10000000100001216,
+                  "raw_position_rmse_m": 0.26245963084336815,
+                  "ate_rmse_m": 0.013762891000293787,
+                  "ate_p95_m": 0.02644327514543334,
+                  "ate_max_m": 0.08646077302849228,
+                  "attitude_rmse_deg": 0.25319431247394586,
+                  "rpe_translation_rmse_m": 0.0175002761877632,
+                  "rpe_rotation_rmse_deg": 0.2690168898170678,
+                  "rpe_translation_world_rmse_m": 0.017494624364768056,
+                  "attitude_reference_valid": true,
+                  "alignment_se3": [
+                    [
+                      0.9996536888631354,
+                      -0.01679744188367158,
+                      -0.02025705527689392,
+                      0.03953480659301489
+                    ],
+                    [
+                      0.016897189377300663,
+                      0.9998458875004173,
+                      0.004763007416551182,
+                      0.018247997890880455
+                    ],
+                    [
+                      0.02017392707120009,
+                      -0.00510364523327776,
+                      0.9997834592909896,
+                      0.22941331281232125
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "alignment_scale": 1.0
+                }
+              },
+              "global_quality": null,
+              "pose_graph": null,
+              "rtk_batch": null,
+              "transport": {
+                "profile": "configuration/fastdds-local.xml",
+                "profile_sha256": "fc8dfff5f4e95718ea37d919e94945b0eef851b85a3c867c9dbcf10499393d2e",
+                "ROS_LOCALHOST_ONLY": "0",
+                "RMW_IMPLEMENTATION": "rmw_fastrtps_cpp"
+              },
+              "capability_observations": {
+                "keyframe_point_messages": 0,
+                "confirmed_loop_edges": 0,
+                "global_pose_messages": 0,
+                "loop_closure": "not observed in this run",
+                "relocalization": "not verified by this replay; no control qualification"
+              },
+              "resource_summary": {
+                "replay": {
+                  "observed_wall_s": 200.2953278349887,
+                  "observed_cpu_s": 303.91999999999996,
+                  "mean_cpu_cores": 1.5173594076561856,
+                  "peak_combined_rss_bytes": 1847279616,
+                  "process_peak_rss_bytes": {
+                    "727049": 90898432,
+                    "727050": 130228224,
+                    "727051": 154640384,
+                    "727052": 1473978368
+                  },
+                  "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+                }
+              },
+              "latency_source_s": {
+                "p50": 0.22399999999999665,
+                "p95": 0.27000000000001023,
+                "min": 0.1419999999999959
+              },
+              "scope": "offline replay; no realtime or flight qualification",
+              "normalized_output_count": 3852,
+              "normalizer_events": [
+                {
+                  "signature": [
+                    "INITIALIZING",
+                    ""
+                  ],
+                  "source_s": null,
+                  "values": {
+                    "ready": "False",
+                    "state": "INITIALIZING",
+                    "reason": "",
+                    "samples": "0",
+                    "source_age_s": "None",
+                    "clock_s": "0.0",
+                    "pose_arrival_age_s": "None",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "READY",
+                    ""
+                  ],
+                  "source_s": 31.93,
+                  "values": {
+                    "ready": "True",
+                    "state": "READY",
+                    "reason": "",
+                    "samples": "21",
+                    "source_age_s": "0.2140000000000022",
+                    "clock_s": "31.928",
+                    "imu_age_s": "0.0020000000000024443",
+                    "imu_arrival_age_s": "0.003842646023258567",
+                    "points_age_s": "0.1280125010000006",
+                    "points_arrival_age_s": "0.0601659830135759",
+                    "pose_arrival_age_s": "0.027334837999660522",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "FAILED",
+                    "visual source stale or simulation paused"
+                  ],
+                  "source_s": 230.398,
+                  "values": {
+                    "ready": "False",
+                    "state": "FAILED",
+                    "reason": "visual source stale or simulation paused",
+                    "samples": "3871",
+                    "source_age_s": "0.18799999999998818",
+                    "clock_s": "230.398",
+                    "imu_age_s": "0.0020000000000095497",
+                    "imu_arrival_age_s": "1.495698212995194",
+                    "points_age_s": "0.09802500300000361",
+                    "points_arrival_age_s": "1.5180900569830555",
+                    "pose_arrival_age_s": "1.476671123993583",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                }
+              ],
+              "implementation_sha256": "394e966472d8673e7e75bb7e0523ef56a541fa15285ff95bc38b2b6120105e09",
+              "input_counts": {
+                "/uav001/imu/data": 39987,
+                "/uav001/camera/camera_info": 6061,
+                "/uav001/camera/image_raw": 6061,
+                "/uav001/lidar/points": 2000
+              },
+              "playback_rate": 1.0,
+              "requested_source_duration_s": 200.0,
+              "player_exit_code": 0,
+              "run_id": "fast_livo2",
+              "source_report": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/localization-task10-dds-01/fast_livo2/report.json",
+              "source_report_sha256": "af67e375afced5e79be96c40f3d8b748eb5f6446e6660ad7922a1b1d32c50f32",
               "current_implementation": true,
+              "binary_sha256": "fef6cb4733e68fdc700350b497bfcfb9ddc5abc869a91e0d71b9bfb983b7f338"
+            }
+          ]
+        },
+        {
+          "dataset_identity": "c5cda0f867b57a7d4f0c9708274e5d2c037dff35103152e335b7728f249a3252",
+          "comparison_identity": "946cd7a1879a363c957e9b7e442a6da3a057945c89936c983ba4f5452db500c2",
+          "dataset_sha256": {
+            "metadata.yaml": "37a7676e36a5d03e055131ce22d7309704c540e7aa891589ad6904828684244c",
+            "bag_0.db3": "90678bac996085595968848643933b1130c5e5ee73307c8fc2abd5c7814f57fa"
+          },
+          "playback_rate": 0.5,
+          "requested_source_duration_s": 200.0,
+          "runs": [
+            {
+              "backend": "fast_livo2",
+              "success": false,
+              "error": "",
+              "quality": {
+                "passed": false,
+                "reason": "quality thresholds failed",
+                "outside_truth_support": 0,
+                "expected_outside_truth_support": 0,
+                "metrics": {
+                  "samples": 2264,
+                  "coverage": 0.6937531742001015,
+                  "duration_s": 199.32000000000002,
+                  "max_output_gap_s": 1.3200000000000216,
+                  "raw_position_rmse_m": 0.27289573053738814,
+                  "ate_rmse_m": 0.0244470861645969,
+                  "ate_p95_m": 0.0435979865085763,
+                  "ate_max_m": 0.1514758855550971,
+                  "attitude_rmse_deg": 0.7196037678517213,
+                  "rpe_translation_rmse_m": 0.029153518261551457,
+                  "rpe_rotation_rmse_deg": 0.378415318273464,
+                  "rpe_translation_world_rmse_m": 0.029044735801828498,
+                  "attitude_reference_valid": true,
+                  "alignment_se3": [
+                    [
+                      0.9999209848951899,
+                      -0.005319438279224354,
+                      0.01138979993799305,
+                      -0.01742670260478496
+                    ],
+                    [
+                      0.005384290882260525,
+                      0.9999694249896663,
+                      -0.005670846279985752,
+                      0.0028856457094710193
+                    ],
+                    [
+                      -0.011359285977964845,
+                      0.0057317241934298655,
+                      0.9999190537037689,
+                      0.2796620528487972
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "alignment_scale": 1.0
+                }
+              },
+              "global_quality": null,
+              "pose_graph": null,
+              "rtk_batch": null,
+              "transport": null,
+              "capability_observations": {
+                "keyframe_point_messages": 0,
+                "confirmed_loop_edges": 0,
+                "global_pose_messages": 0,
+                "loop_closure": "not observed in this run",
+                "relocalization": "not verified by this replay; no control qualification"
+              },
+              "resource_summary": {
+                "replay": {
+                  "observed_wall_s": 400.59460346697597,
+                  "observed_cpu_s": 330.41999999999996,
+                  "mean_cpu_cores": 0.8248238921352293,
+                  "peak_combined_rss_bytes": 1130786816,
+                  "process_peak_rss_bytes": {
+                    "699065": 24219648,
+                    "699066": 62914560,
+                    "699068": 84545536,
+                    "699069": 961208320
+                  },
+                  "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+                }
+              },
+              "latency_source_s": {
+                "p50": 0.17399999999999238,
+                "p95": 0.24800000000001673,
+                "min": 0.06799999999999784
+              },
+              "scope": "offline replay; no realtime or flight qualification",
+              "normalized_output_count": 2,
+              "normalizer_events": [
+                {
+                  "signature": [
+                    "INITIALIZING",
+                    ""
+                  ],
+                  "source_s": null,
+                  "values": {
+                    "ready": "False",
+                    "state": "INITIALIZING",
+                    "reason": "",
+                    "samples": "0",
+                    "source_age_s": "None",
+                    "clock_s": "0.0",
+                    "pose_arrival_age_s": "None",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "READY",
+                    ""
+                  ],
+                  "source_s": 32.426,
+                  "values": {
+                    "ready": "True",
+                    "state": "READY",
+                    "reason": "",
+                    "samples": "21",
+                    "source_age_s": "0.1820000009999987",
+                    "clock_s": "32.424",
+                    "imu_age_s": "0.003999999999997783",
+                    "imu_arrival_age_s": "0.010490170010598376",
+                    "points_age_s": "0.12402500299999986",
+                    "points_arrival_age_s": "0.10677691601449624",
+                    "pose_arrival_age_s": "0.06769758701557294",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "FAILED",
+                    "visual source stale or simulation paused"
+                  ],
+                  "source_s": 32.524,
+                  "values": {
+                    "ready": "False",
+                    "state": "FAILED",
+                    "reason": "visual source stale or simulation paused",
+                    "samples": "21",
+                    "source_age_s": "0.2820000010000001",
+                    "clock_s": "32.524",
+                    "imu_age_s": "0.003999999999997783",
+                    "imu_arrival_age_s": "0.009976127999834716",
+                    "points_age_s": "0.12401250100000283",
+                    "points_arrival_age_s": "0.12000944800092839",
+                    "pose_arrival_age_s": "0.26764931200887077",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                }
+              ],
+              "implementation_sha256": "a8daf789087402f5496c26248a04fbd0353c1954193429dec249e42a18d1c34a",
+              "input_counts": {
+                "/uav001/camera/camera_info": 6061,
+                "/uav001/imu/data": 39999,
+                "/uav001/camera/image_raw": 2612,
+                "/uav001/lidar/points": 2000
+              },
+              "playback_rate": 0.5,
+              "requested_source_duration_s": 200.0,
+              "player_exit_code": 0,
+              "run_id": "fast_livo2",
+              "source_report": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/localization-task10-half-01/fast_livo2/report.json",
+              "source_report_sha256": "a5568606f57c3abec1d3963961f0f6b5c5b88279d66d966d9d9bfa88776df596",
+              "current_implementation": false,
               "binary_sha256": "fef6cb4733e68fdc700350b497bfcfb9ddc5abc869a91e0d71b9bfb983b7f338"
             }
           ]
@@ -348,10 +1230,13 @@
       "cases": [
         {
           "dataset_identity": "ed885f34c7384ec6dd196cdbd6b33062792b0be5597765a58128ea2d3901069d",
+          "comparison_identity": "b64d06726ae43623446a800c4d0659d9ded78b776321452f6b648bad211a8fe6",
           "dataset_sha256": {
             "metadata.yaml": "f6ae5e95de1bc520ae615e11242584dad3e6c1313e695c2f1107ba56c057fe95",
             "bag_0.db3": "9a5d2800bde6e2822a1f97ad44e4266f0394aa4b043f5bd4c97096647fc82fce"
           },
+          "playback_rate": 1.0,
+          "requested_source_duration_s": null,
           "runs": [
             {
               "backend": "fast_livo2_rtk",
@@ -407,6 +1292,61 @@
               },
               "global_quality": null,
               "pose_graph": null,
+              "rtk_batch": {
+                "completed": true,
+                "backend_exit_code": null,
+                "reason": "completed",
+                "quality": {
+                  "passed": true,
+                  "reason": "quality thresholds passed",
+                  "outside_truth_support": 0,
+                  "expected_outside_truth_support": 0,
+                  "metrics": {
+                    "samples": 3847,
+                    "coverage": 0.9989790709545686,
+                    "duration_s": 198.39600000000002,
+                    "max_output_gap_s": 0.16400000000000148,
+                    "raw_position_rmse_m": 0.3460357457529349,
+                    "ate_rmse_m": 0.013815307867277821,
+                    "ate_p95_m": 0.02414704542853242,
+                    "ate_max_m": 0.05490191524207571,
+                    "attitude_rmse_deg": 0.1636048794508993,
+                    "rpe_translation_rmse_m": 0.01911890758879597,
+                    "rpe_rotation_rmse_deg": 0.10926149588252006,
+                    "rpe_translation_world_rmse_m": 0.019105811161146145,
+                    "attitude_reference_valid": true,
+                    "alignment_se3": [
+                      [
+                        0.9999999594718432,
+                        0.00019297886723604877,
+                        -0.00020932144837761124,
+                        0.009139925676601712
+                      ],
+                      [
+                        -0.00019296569091888747,
+                        0.9999999793997534,
+                        6.296613367110025e-05,
+                        0.001726757789457991
+                      ],
+                      [
+                        0.00020933359519878514,
+                        -6.292573926158833e-05,
+                        0.9999999761098972,
+                        0.3454470127005762
+                      ],
+                      [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ]
+                    ],
+                    "alignment_scale": 1.0
+                  }
+                },
+                "pose_target": "GNSS antenna before final lever-arm conversion; separate from local control pose"
+              },
+              "transport": null,
               "capability_observations": {
                 "keyframe_point_messages": 0,
                 "confirmed_loop_edges": 0,
@@ -515,10 +1455,736 @@
                 }
               ],
               "implementation_sha256": "ffd895bb79da2ba7d91624924b968046ffc978ffab97e912143aca3ad8d7abcb",
+              "input_counts": {
+                "/uav001/imu/data": 39794,
+                "/uav001/camera/image_raw": 6032,
+                "/uav001/lidar/points": 1989,
+                "/uav001/camera/camera_info": 6031,
+                "/uav001/gnss/fix": 1990
+              },
+              "playback_rate": 1.0,
+              "requested_source_duration_s": null,
+              "player_exit_code": 0,
               "run_id": "fast_livo2_rtk",
               "source_report": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/localization-task7-qualified-03/fast_livo2_rtk/report.json",
               "source_report_sha256": "3e7b8b0a582e1d99fe9db599f2bd97619a90fe581a341e78493349a63dceb21a",
+              "current_implementation": false,
+              "binary_sha256": "be7a5c78328d6d9df499b3c0b11f638a547d7dc60743559e5ec0f3e203cb219d"
+            },
+            {
+              "backend": "fast_livo2_rtk",
+              "success": false,
+              "error": "",
+              "quality": {
+                "passed": false,
+                "reason": "quality thresholds failed",
+                "outside_truth_support": 0,
+                "expected_outside_truth_support": 0,
+                "metrics": {
+                  "samples": 2092,
+                  "coverage": 0.6518631955079122,
+                  "duration_s": 198.264,
+                  "max_output_gap_s": 1.3520000000000039,
+                  "raw_position_rmse_m": 0.21636004576480666,
+                  "ate_rmse_m": 0.011303176150640408,
+                  "ate_p95_m": 0.010181595957327155,
+                  "ate_max_m": 0.17585806973320325,
+                  "attitude_rmse_deg": 0.1594445003755089,
+                  "rpe_translation_rmse_m": 0.019399386289462545,
+                  "rpe_rotation_rmse_deg": 0.17141699585265172,
+                  "rpe_translation_world_rmse_m": 0.019383040523670503,
+                  "attitude_reference_valid": true,
+                  "alignment_se3": [
+                    [
+                      0.9998866602827737,
+                      -0.00625294787427446,
+                      0.013695518662831557,
+                      0.014159722798836594
+                    ],
+                    [
+                      0.006257855657988542,
+                      0.9999803696508439,
+                      -0.000315524207570474,
+                      0.0004371133683757217
+                    ],
+                    [
+                      -0.0136932768585952,
+                      0.00040119302509915994,
+                      0.999906162203749,
+                      0.22296616455690255
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "alignment_scale": 1.0
+                }
+              },
+              "global_quality": null,
+              "pose_graph": null,
+              "rtk_batch": {
+                "completed": true,
+                "backend_exit_code": null,
+                "reason": "completed",
+                "quality": {
+                  "passed": false,
+                  "reason": "quality thresholds failed",
+                  "outside_truth_support": 0,
+                  "expected_outside_truth_support": 0,
+                  "metrics": {
+                    "samples": 2092,
+                    "coverage": 0.6518631955079122,
+                    "duration_s": 198.264,
+                    "max_output_gap_s": 1.3520000000000039,
+                    "raw_position_rmse_m": 0.3481434625979154,
+                    "ate_rmse_m": 0.03193330619272138,
+                    "ate_p95_m": 0.06155610976535017,
+                    "ate_max_m": 0.12172999457497681,
+                    "attitude_rmse_deg": 0.2349796734417333,
+                    "rpe_translation_rmse_m": 0.043049406971170885,
+                    "rpe_rotation_rmse_deg": 0.14451125503751328,
+                    "rpe_translation_world_rmse_m": 0.04304692963252705,
+                    "attitude_reference_valid": true,
+                    "alignment_se3": [
+                      [
+                        0.999999884804941,
+                        0.00032985581729346055,
+                        -0.00034869075818327877,
+                        0.009624321716151796
+                      ],
+                      [
+                        -0.00032973492360813023,
+                        0.9999998855341785,
+                        0.0003467081049798558,
+                        0.002723388661093021
+                      ],
+                      [
+                        0.0003488050819552557,
+                        -0.0003465930895199844,
+                        0.9999998791041164,
+                        0.34616913102675273
+                      ],
+                      [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ]
+                    ],
+                    "alignment_scale": 1.0
+                  }
+                },
+                "pose_target": "GNSS antenna before final lever-arm conversion; separate from local control pose"
+              },
+              "transport": null,
+              "capability_observations": {
+                "keyframe_point_messages": 0,
+                "confirmed_loop_edges": 0,
+                "global_pose_messages": 0,
+                "loop_closure": "not observed in this run",
+                "relocalization": "not verified by this replay; no control qualification"
+              },
+              "resource_summary": {
+                "replay": {
+                  "observed_wall_s": 199.81087034399388,
+                  "observed_cpu_s": 258.17,
+                  "mean_cpu_cores": 1.2920718455183904,
+                  "peak_combined_rss_bytes": 1050849280,
+                  "process_peak_rss_bytes": {
+                    "685340": 63373312,
+                    "685341": 82616320,
+                    "685342": 905392128
+                  },
+                  "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+                },
+                "rtk_batch": {
+                  "observed_wall_s": 0.0,
+                  "observed_cpu_s": 0.0,
+                  "mean_cpu_cores": null,
+                  "peak_combined_rss_bytes": 1125941248,
+                  "process_peak_rss_bytes": {
+                    "685340": 62242816,
+                    "685341": 82001920,
+                    "685342": 981696512
+                  },
+                  "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+                }
+              },
+              "latency_source_s": {
+                "p50": 0.21199999999998909,
+                "p95": 0.2819999999999965,
+                "min": 0.10200000000000387
+              },
+              "scope": "offline replay; no realtime or flight qualification",
+              "normalized_output_count": 19,
+              "normalizer_events": [
+                {
+                  "signature": [
+                    "INITIALIZING",
+                    ""
+                  ],
+                  "source_s": null,
+                  "values": {
+                    "ready": "False",
+                    "state": "INITIALIZING",
+                    "reason": "",
+                    "samples": "0",
+                    "source_age_s": "None",
+                    "clock_s": "0.0",
+                    "pose_arrival_age_s": "None",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "READY",
+                    ""
+                  ],
+                  "source_s": 31.012,
+                  "values": {
+                    "ready": "True",
+                    "state": "READY",
+                    "reason": "",
+                    "samples": "21",
+                    "source_age_s": "0.25400000000000134",
+                    "clock_s": "31.012",
+                    "imu_age_s": "0.0019999999999988916",
+                    "imu_arrival_age_s": "0.0017381040088366717",
+                    "points_age_s": "0.11201250099999882",
+                    "points_arrival_age_s": "0.012084059999324381",
+                    "pose_arrival_age_s": "0.06596855301177129",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "FAILED",
+                    "visual source stale or simulation paused"
+                  ],
+                  "source_s": 32.212,
+                  "values": {
+                    "ready": "False",
+                    "state": "FAILED",
+                    "reason": "visual source stale or simulation paused",
+                    "samples": "38",
+                    "source_age_s": "0.2660000000000018",
+                    "clock_s": "32.212",
+                    "imu_age_s": "0.0020000000000024443",
+                    "imu_arrival_age_s": "0.0014325229858513921",
+                    "points_age_s": "0.11203749700000287",
+                    "points_arrival_age_s": "0.04305758699774742",
+                    "pose_arrival_age_s": "0.1057503699848894",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                }
+              ],
+              "implementation_sha256": "38b44bebf01c5bd299aa50e5b22ffd8715fff2ded5786f3d0a7964b9bc33df3a",
+              "input_counts": {
+                "/uav001/imu/data": 39794,
+                "/uav001/camera/camera_info": 6031,
+                "/uav001/lidar/points": 1989,
+                "/uav001/gnss/fix": 1990,
+                "/uav001/camera/image_raw": 2495
+              },
+              "playback_rate": 1.0,
+              "requested_source_duration_s": null,
+              "player_exit_code": 0,
+              "run_id": "fast_livo2_rtk",
+              "source_report": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/localization-task10-final-01/fast_livo2_rtk/report.json",
+              "source_report_sha256": "3a5470533d6e1c4d2da756133f94a32b5ff73898f8f4c24c4c696244be62e4aa",
+              "current_implementation": false,
+              "binary_sha256": "be7a5c78328d6d9df499b3c0b11f638a547d7dc60743559e5ec0f3e203cb219d"
+            },
+            {
+              "backend": "fast_livo2_rtk",
+              "success": true,
+              "error": "",
+              "quality": {
+                "passed": true,
+                "reason": "quality thresholds passed",
+                "outside_truth_support": 0,
+                "expected_outside_truth_support": 0,
+                "metrics": {
+                  "samples": 3848,
+                  "coverage": 0.9994895354772844,
+                  "duration_s": 198.462,
+                  "max_output_gap_s": 0.16400000000000148,
+                  "raw_position_rmse_m": 0.2501157186900901,
+                  "ate_rmse_m": 0.007793004013450858,
+                  "ate_p95_m": 0.012384387404624156,
+                  "ate_max_m": 0.08227379140887031,
+                  "attitude_rmse_deg": 0.14074825567456734,
+                  "rpe_translation_rmse_m": 0.007155841533690932,
+                  "rpe_rotation_rmse_deg": 0.11765632924516294,
+                  "rpe_translation_world_rmse_m": 0.007138648490185047,
+                  "attitude_reference_valid": true,
+                  "alignment_se3": [
+                    [
+                      0.9995773508799406,
+                      -0.027871876900847633,
+                      -0.008263055479954755,
+                      -0.016078543645400845
+                    ],
+                    [
+                      0.02774725189481377,
+                      0.9995049349433072,
+                      -0.014831555422870438,
+                      0.008776942846397413
+                    ],
+                    [
+                      0.008672348016919414,
+                      0.014596009797199317,
+                      0.9998558630512077,
+                      0.22492874422724674
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "alignment_scale": 1.0
+                }
+              },
+              "global_quality": null,
+              "pose_graph": null,
+              "rtk_batch": {
+                "completed": true,
+                "backend_exit_code": null,
+                "reason": "completed",
+                "quality": {
+                  "passed": true,
+                  "reason": "quality thresholds passed",
+                  "outside_truth_support": 0,
+                  "expected_outside_truth_support": 0,
+                  "metrics": {
+                    "samples": 3847,
+                    "coverage": 0.9989790709545686,
+                    "duration_s": 198.39600000000002,
+                    "max_output_gap_s": 0.16400000000000148,
+                    "raw_position_rmse_m": 0.3460344409943995,
+                    "ate_rmse_m": 0.013830346219327013,
+                    "ate_p95_m": 0.02395656940075615,
+                    "ate_max_m": 0.054548870089189315,
+                    "attitude_rmse_deg": 0.17392031060621296,
+                    "rpe_translation_rmse_m": 0.019094885372313766,
+                    "rpe_rotation_rmse_deg": 0.11084270239255758,
+                    "rpe_translation_world_rmse_m": 0.019081969845221484,
+                    "attitude_reference_valid": true,
+                    "alignment_se3": [
+                      [
+                        0.99999995869165,
+                        0.00019285671914221484,
+                        -0.00021312668621215058,
+                        0.009146124934989786
+                      ],
+                      [
+                        -0.00019284390577455692,
+                        0.9999999795972158,
+                        6.013981236206847e-05,
+                        0.0017311536904807152
+                      ],
+                      [
+                        0.0002131382802304932,
+                        -6.009870969508088e-05,
+                        0.9999999754801108,
+                        0.34544155777843844
+                      ],
+                      [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ]
+                    ],
+                    "alignment_scale": 1.0
+                  }
+                },
+                "pose_target": "GNSS antenna before final lever-arm conversion; separate from local control pose"
+              },
+              "transport": {
+                "profile": "configuration/fastdds-local.xml",
+                "profile_sha256": "fc8dfff5f4e95718ea37d919e94945b0eef851b85a3c867c9dbcf10499393d2e",
+                "ROS_LOCALHOST_ONLY": "0",
+                "RMW_IMPLEMENTATION": "rmw_fastrtps_cpp"
+              },
+              "capability_observations": {
+                "keyframe_point_messages": 0,
+                "confirmed_loop_edges": 0,
+                "global_pose_messages": 0,
+                "loop_closure": "not observed in this run",
+                "relocalization": "not verified by this replay; no control qualification"
+              },
+              "resource_summary": {
+                "replay": {
+                  "observed_wall_s": 199.7867070179782,
+                  "observed_cpu_s": 266.53,
+                  "mean_cpu_cores": 1.334072741766627,
+                  "peak_combined_rss_bytes": 1794756608,
+                  "process_peak_rss_bytes": {
+                    "730771": 130822144,
+                    "730772": 155037696,
+                    "730773": 1510748160
+                  },
+                  "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+                },
+                "rtk_batch": {
+                  "observed_wall_s": 0.0,
+                  "observed_cpu_s": 0.0,
+                  "mean_cpu_cores": null,
+                  "peak_combined_rss_bytes": 1843986432,
+                  "process_peak_rss_bytes": {
+                    "730771": 129261568,
+                    "730772": 151527424,
+                    "730773": 1563197440
+                  },
+                  "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+                }
+              },
+              "latency_source_s": {
+                "p50": 0.2400000000000091,
+                "p95": 0.2820000000000107,
+                "min": 0.16200000000000614
+              },
+              "scope": "offline replay; no realtime or flight qualification",
+              "normalized_output_count": 3829,
+              "normalizer_events": [
+                {
+                  "signature": [
+                    "INITIALIZING",
+                    ""
+                  ],
+                  "source_s": null,
+                  "values": {
+                    "ready": "False",
+                    "state": "INITIALIZING",
+                    "reason": "",
+                    "samples": "0",
+                    "source_age_s": "None",
+                    "clock_s": "0.0",
+                    "pose_arrival_age_s": "None",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "READY",
+                    ""
+                  ],
+                  "source_s": 29.906,
+                  "values": {
+                    "ready": "True",
+                    "state": "READY",
+                    "reason": "",
+                    "samples": "20",
+                    "source_age_s": "0.3039999999999985",
+                    "clock_s": "29.906",
+                    "imu_age_s": "0.006000000000000227",
+                    "imu_arrival_age_s": "0.005008858977816999",
+                    "points_age_s": "0.10602500299999917",
+                    "points_arrival_age_s": "0.03036269498988986",
+                    "pose_arrival_age_s": "0.09883017299580388",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "FAILED",
+                    "localization source/output stale or simulation paused"
+                  ],
+                  "source_s": 227.362,
+                  "values": {
+                    "ready": "False",
+                    "state": "FAILED",
+                    "reason": "localization source/output stale or simulation paused",
+                    "samples": "3848",
+                    "source_age_s": "0.2539999999999907",
+                    "clock_s": "227.362",
+                    "imu_age_s": "0.001999999999981128",
+                    "imu_arrival_age_s": "1.4599159740027972",
+                    "points_age_s": "0.16201250099999243",
+                    "points_arrival_age_s": "1.5412293639965355",
+                    "pose_arrival_age_s": "1.4987247709941585",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                }
+              ],
+              "implementation_sha256": "460254859dee41057a5de9af6358119d94b485a5bae9f2c044a00da37e5ad813",
+              "input_counts": {
+                "/uav001/imu/data": 39793,
+                "/uav001/camera/image_raw": 6032,
+                "/uav001/camera/camera_info": 6031,
+                "/uav001/lidar/points": 1989,
+                "/uav001/gnss/fix": 1990
+              },
+              "playback_rate": 1.0,
+              "requested_source_duration_s": null,
+              "player_exit_code": 0,
+              "run_id": "fast_livo2_rtk",
+              "source_report": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/localization-task10-dds-01/fast_livo2_rtk/report.json",
+              "source_report_sha256": "f5cef41331cb6b60fb5bf13c40f23e271dbf40fc38f31325510a6697c15d7650",
               "current_implementation": true,
+              "binary_sha256": "be7a5c78328d6d9df499b3c0b11f638a547d7dc60743559e5ec0f3e203cb219d"
+            }
+          ]
+        },
+        {
+          "dataset_identity": "ed885f34c7384ec6dd196cdbd6b33062792b0be5597765a58128ea2d3901069d",
+          "comparison_identity": "5c975a6fd7b4794cea80e6a8c4a68f6b9d4fc1f11001503eca1b2cc1c6c0f1ed",
+          "dataset_sha256": {
+            "metadata.yaml": "f6ae5e95de1bc520ae615e11242584dad3e6c1313e695c2f1107ba56c057fe95",
+            "bag_0.db3": "9a5d2800bde6e2822a1f97ad44e4266f0394aa4b043f5bd4c97096647fc82fce"
+          },
+          "playback_rate": 0.5,
+          "requested_source_duration_s": null,
+          "runs": [
+            {
+              "backend": "fast_livo2_rtk",
+              "success": false,
+              "error": "",
+              "quality": {
+                "passed": false,
+                "reason": "quality thresholds failed",
+                "outside_truth_support": 0,
+                "expected_outside_truth_support": 0,
+                "metrics": {
+                  "samples": 2104,
+                  "coverage": 0.6850433894844309,
+                  "duration_s": 198.1,
+                  "max_output_gap_s": 1.4519999999999982,
+                  "raw_position_rmse_m": 0.21581224009850192,
+                  "ate_rmse_m": 0.00940996080675631,
+                  "ate_p95_m": 0.013786929602190238,
+                  "ate_max_m": 0.08729094817978027,
+                  "attitude_rmse_deg": 0.12400745109813797,
+                  "rpe_translation_rmse_m": 0.009336998290255576,
+                  "rpe_rotation_rmse_deg": 0.11434499615887593,
+                  "rpe_translation_world_rmse_m": 0.009337123225944089,
+                  "attitude_reference_valid": true,
+                  "alignment_se3": [
+                    [
+                      0.9991708698008289,
+                      -0.017995862708982985,
+                      -0.036520156993288616,
+                      0.022259405638210605
+                    ],
+                    [
+                      0.01817691433019875,
+                      0.9998240585491854,
+                      0.004631601415119145,
+                      0.0021066882793331597
+                    ],
+                    [
+                      0.03643038192069397,
+                      -0.005291584979507864,
+                      0.9993221834831439,
+                      0.14380269415710956
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "alignment_scale": 1.0
+                }
+              },
+              "global_quality": null,
+              "pose_graph": null,
+              "rtk_batch": {
+                "completed": true,
+                "backend_exit_code": null,
+                "reason": "completed",
+                "quality": {
+                  "passed": false,
+                  "reason": "quality thresholds failed",
+                  "outside_truth_support": 0,
+                  "expected_outside_truth_support": 0,
+                  "metrics": {
+                    "samples": 2103,
+                    "coverage": 0.6845329249617151,
+                    "duration_s": 198.034,
+                    "max_output_gap_s": 1.4519999999999982,
+                    "raw_position_rmse_m": 0.34690375703470644,
+                    "ate_rmse_m": 0.0317167410493769,
+                    "ate_p95_m": 0.05961255866172077,
+                    "ate_max_m": 0.12217496343399101,
+                    "attitude_rmse_deg": 0.5133288259749925,
+                    "rpe_translation_rmse_m": 0.040687290048174514,
+                    "rpe_rotation_rmse_deg": 0.10120199477453927,
+                    "rpe_translation_world_rmse_m": 0.04061069511517755,
+                    "attitude_reference_valid": true,
+                    "alignment_se3": [
+                      [
+                        0.9999998675179269,
+                        -0.0004142591685620969,
+                        -0.00030553800037340373,
+                        0.007772562741494515
+                      ],
+                      [
+                        0.00041383298603291335,
+                        0.9999989433016522,
+                        -0.001393606056150431,
+                        0.005591594280265528
+                      ],
+                      [
+                        0.0003061149915979666,
+                        0.001393479429819577,
+                        0.999998982253828,
+                        0.34508930444181574
+                      ],
+                      [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ]
+                    ],
+                    "alignment_scale": 1.0
+                  }
+                },
+                "pose_target": "GNSS antenna before final lever-arm conversion; separate from local control pose"
+              },
+              "transport": null,
+              "capability_observations": {
+                "keyframe_point_messages": 0,
+                "confirmed_loop_edges": 0,
+                "global_pose_messages": 0,
+                "loop_closure": "not observed in this run",
+                "relocalization": "not verified by this replay; no control qualification"
+              },
+              "resource_summary": {
+                "replay": {
+                  "observed_wall_s": 398.58525665898924,
+                  "observed_cpu_s": 319.59000000000003,
+                  "mean_cpu_cores": 0.8018108915489219,
+                  "peak_combined_rss_bytes": 1064620032,
+                  "process_peak_rss_bytes": {
+                    "703442": 63377408,
+                    "703443": 83800064,
+                    "703444": 918802432
+                  },
+                  "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+                },
+                "rtk_batch": {
+                  "observed_wall_s": 0.0,
+                  "observed_cpu_s": 0.0,
+                  "mean_cpu_cores": null,
+                  "peak_combined_rss_bytes": 1139425280,
+                  "process_peak_rss_bytes": {
+                    "703442": 62214144,
+                    "703443": 82378752,
+                    "703444": 994832384
+                  },
+                  "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+                }
+              },
+              "latency_source_s": {
+                "p50": 0.18799999999998818,
+                "p95": 0.26400000000000895,
+                "min": 0.08199999999999363
+              },
+              "scope": "offline replay; no realtime or flight qualification",
+              "normalized_output_count": 2,
+              "normalizer_events": [
+                {
+                  "signature": [
+                    "INITIALIZING",
+                    ""
+                  ],
+                  "source_s": null,
+                  "values": {
+                    "ready": "False",
+                    "state": "INITIALIZING",
+                    "reason": "",
+                    "samples": "0",
+                    "source_age_s": "None",
+                    "clock_s": "0.0",
+                    "pose_arrival_age_s": "None",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "READY",
+                    ""
+                  ],
+                  "source_s": 32.946,
+                  "values": {
+                    "ready": "True",
+                    "state": "READY",
+                    "reason": "",
+                    "samples": "20",
+                    "source_age_s": "0.17599999999999483",
+                    "clock_s": "32.946",
+                    "imu_age_s": "0.006000000000000227",
+                    "imu_arrival_age_s": "0.009642699995310977",
+                    "points_age_s": "0.1460125010000013",
+                    "points_arrival_age_s": "0.08244799298699945",
+                    "pose_arrival_age_s": "0.04717941698618233",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "FAILED",
+                    "visual source stale or simulation paused"
+                  ],
+                  "source_s": 33.196,
+                  "values": {
+                    "ready": "False",
+                    "state": "FAILED",
+                    "reason": "visual source stale or simulation paused",
+                    "samples": "21",
+                    "source_age_s": "0.259999999999998",
+                    "clock_s": "33.196",
+                    "imu_age_s": "0.006000000000000227",
+                    "imu_arrival_age_s": "0.01125166899873875",
+                    "points_age_s": "0.19602500299999548",
+                    "points_arrival_age_s": "0.10966245998861268",
+                    "pose_arrival_age_s": "0.07528122200164944",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                }
+              ],
+              "implementation_sha256": "38b44bebf01c5bd299aa50e5b22ffd8715fff2ded5786f3d0a7964b9bc33df3a",
+              "input_counts": {
+                "/uav001/imu/data": 39804,
+                "/uav001/camera/camera_info": 6031,
+                "/uav001/camera/image_raw": 2410,
+                "/uav001/lidar/points": 1989,
+                "/uav001/gnss/fix": 1990
+              },
+              "playback_rate": 0.5,
+              "requested_source_duration_s": null,
+              "player_exit_code": 0,
+              "run_id": "fast_livo2_rtk",
+              "source_report": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/localization-task10-half-01/fast_livo2_rtk/report.json",
+              "source_report_sha256": "5473eecdc3c9f8871852fb07888f7fa0d0145f587af9ed7a2c2505f2d7b603c1",
+              "current_implementation": false,
               "binary_sha256": "be7a5c78328d6d9df499b3c0b11f638a547d7dc60743559e5ec0f3e203cb219d"
             }
           ]
@@ -530,10 +2196,13 @@
       "cases": [
         {
           "dataset_identity": "2a3c536292f70b0157f64c9a11508a7ca1c015eef8e6a048032d947ee25ad9be",
+          "comparison_identity": "7d26ef23405571c77e51389844555ec0703168e5198978b334eaeb0de5291953",
           "dataset_sha256": {
             "metadata.yaml": "75337f4c78bae26f162bb12f571e3854a3555dd92a968040b3c147c4935da22f",
             "bag_0.db3": "ef2431cad11d445f08de158180a6786bff312fbde6d263bd69388f9fac7b9951"
           },
+          "playback_rate": 1.0,
+          "requested_source_duration_s": 210.0,
           "runs": [
             {
               "backend": "lio_sam",
@@ -636,6 +2305,8 @@
                 }
               },
               "pose_graph": null,
+              "rtk_batch": null,
+              "transport": null,
               "capability_observations": {
                 "keyframe_point_messages": 0,
                 "confirmed_loop_edges": 44,
@@ -735,10 +2406,452 @@
                 }
               ],
               "implementation_sha256": "aa9d2b88b2376280d166e48b6f6d9a792318716bf2c471a57e135466c9675ce3",
+              "input_counts": {
+                "/uav001/imu/data": 41857,
+                "/uav001/lidar/points": 2094
+              },
+              "playback_rate": 1.0,
+              "requested_source_duration_s": 210.0,
+              "player_exit_code": 0,
               "run_id": "lio_sam",
               "source_report": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/localization-task7-final-01/lio_sam/report.json",
               "source_report_sha256": "814a95cd7c9780e3ed01312729ca7e6c7e663a12cd705cf3b6ab0a66b7c126b2",
               "current_implementation": false,
+              "binary_sha256": "b7334e9f7d02920ac2620a8c2a0842b8db57c33396b836f34d351445dffd7da4"
+            },
+            {
+              "backend": "lio_sam",
+              "success": false,
+              "error": "",
+              "quality": {
+                "passed": false,
+                "reason": "quality thresholds failed",
+                "outside_truth_support": 0,
+                "expected_outside_truth_support": 0,
+                "metrics": {
+                  "samples": 2077,
+                  "coverage": 0.9951550387596899,
+                  "duration_s": 208.39999999999998,
+                  "max_output_gap_s": 0.20000000000000284,
+                  "raw_position_rmse_m": 0.7041589472543829,
+                  "ate_rmse_m": 0.2805624264549667,
+                  "ate_p95_m": 0.4405225779249136,
+                  "ate_max_m": 0.7840799475503986,
+                  "attitude_rmse_deg": 8.789982947383715,
+                  "rpe_translation_rmse_m": 0.09377888537442088,
+                  "rpe_rotation_rmse_deg": 0.4684754273626061,
+                  "rpe_translation_world_rmse_m": 0.09146793102875132,
+                  "attitude_reference_valid": true,
+                  "alignment_se3": [
+                    [
+                      0.995363790616847,
+                      -0.0063981623957578265,
+                      0.09596868159362544,
+                      -0.1149648617783211
+                    ],
+                    [
+                      0.01956503247138696,
+                      0.9903923287654526,
+                      -0.136895013155833,
+                      0.14503702040711058
+                    ],
+                    [
+                      -0.09417076952672027,
+                      0.13813796958294827,
+                      0.9859258428128576,
+                      0.6508980843255519
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "alignment_scale": 1.0
+                }
+              },
+              "global_quality": {
+                "passed": false,
+                "reason": "quality thresholds failed",
+                "outside_truth_support": 0,
+                "expected_outside_truth_support": 0,
+                "metrics": {
+                  "samples": 2077,
+                  "coverage": 0.9951550387596899,
+                  "duration_s": 208.39999999999998,
+                  "max_output_gap_s": 0.20000000000000284,
+                  "raw_position_rmse_m": 0.7012471109592521,
+                  "ate_rmse_m": 0.28214948601307976,
+                  "ate_p95_m": 0.4416463862989972,
+                  "ate_max_m": 0.790572031732697,
+                  "attitude_rmse_deg": 8.718713222585581,
+                  "rpe_translation_rmse_m": 0.09367623067677618,
+                  "rpe_rotation_rmse_deg": 0.5161449837032746,
+                  "rpe_translation_world_rmse_m": 0.0915264199728155,
+                  "attitude_reference_valid": true,
+                  "alignment_se3": [
+                    [
+                      0.9954278310995044,
+                      -0.00680932156623096,
+                      0.09527363860136893,
+                      -0.11524251435559119
+                    ],
+                    [
+                      0.0198557542041522,
+                      0.99041783832095,
+                      -0.13666841098308063,
+                      0.14125359135747068
+                    ],
+                    [
+                      -0.09343009203420966,
+                      0.13793526987490756,
+                      0.9860246848973994,
+                      0.6461599948417636
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "alignment_scale": 1.0
+                }
+              },
+              "pose_graph": null,
+              "rtk_batch": null,
+              "transport": null,
+              "capability_observations": {
+                "keyframe_point_messages": 0,
+                "confirmed_loop_edges": 41,
+                "global_pose_messages": 2077,
+                "loop_closure": "observed",
+                "relocalization": "not verified by this replay; no control qualification"
+              },
+              "resource_summary": {
+                "replay": {
+                  "observed_wall_s": 209.78790942399064,
+                  "observed_cpu_s": 291.15999999999997,
+                  "mean_cpu_cores": 1.3878778848572857,
+                  "peak_combined_rss_bytes": 393093120,
+                  "process_peak_rss_bytes": {
+                    "686151": 61546496,
+                    "686152": 79265792,
+                    "686153": 48041984,
+                    "686154": 28958720,
+                    "686155": 72155136,
+                    "686156": 108195840
+                  },
+                  "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+                }
+              },
+              "latency_source_s": {
+                "p50": 0.3499999999999943,
+                "p95": 0.38639999999999436,
+                "min": 0.333999999999989
+              },
+              "scope": "offline replay; no realtime or flight qualification",
+              "normalized_output_count": 84,
+              "normalizer_events": [
+                {
+                  "signature": [
+                    "INITIALIZING",
+                    ""
+                  ],
+                  "source_s": null,
+                  "values": {
+                    "ready": "False",
+                    "state": "INITIALIZING",
+                    "reason": "",
+                    "samples": "0",
+                    "source_age_s": "None",
+                    "clock_s": "0.0",
+                    "pose_arrival_age_s": "None",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "READY",
+                    ""
+                  ],
+                  "source_s": 30.106,
+                  "values": {
+                    "ready": "True",
+                    "state": "READY",
+                    "reason": "",
+                    "samples": "20",
+                    "source_age_s": "0.4039999999999999",
+                    "clock_s": "30.104",
+                    "imu_age_s": "0.003999999999997783",
+                    "imu_arrival_age_s": "0.005364091019146144",
+                    "points_age_s": "0.10401562199999859",
+                    "points_arrival_age_s": "0.07532988200546242",
+                    "pose_arrival_age_s": "0.06577502499567345",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "FAILED",
+                    "localization source/output stale or simulation paused"
+                  ],
+                  "source_s": 38.504,
+                  "values": {
+                    "ready": "False",
+                    "state": "FAILED",
+                    "reason": "localization source/output stale or simulation paused",
+                    "samples": "103",
+                    "source_age_s": "0.5020000000000024",
+                    "clock_s": "38.502",
+                    "imu_age_s": "0.0020000000000024443",
+                    "imu_arrival_age_s": "0.0036404870043043047",
+                    "points_age_s": "0.10201562200000325",
+                    "points_arrival_age_s": "0.06552999099949375",
+                    "pose_arrival_age_s": "0.14590055201551877",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                }
+              ],
+              "implementation_sha256": "aee06b41ffad618f539b3cb2b52e0ebb29183997929b14e253218daab5909152",
+              "input_counts": {
+                "/uav001/imu/data": 41857,
+                "/uav001/lidar/points": 2094
+              },
+              "playback_rate": 1.0,
+              "requested_source_duration_s": 210.0,
+              "player_exit_code": 0,
+              "run_id": "lio_sam",
+              "source_report": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/localization-task10-final-01/lio_sam/report.json",
+              "source_report_sha256": "3267c538b075523ed6cd583eabb4b9e9389f30b9c07af77062e298d12b008395",
+              "current_implementation": false,
+              "binary_sha256": "b7334e9f7d02920ac2620a8c2a0842b8db57c33396b836f34d351445dffd7da4"
+            },
+            {
+              "backend": "lio_sam",
+              "success": false,
+              "error": "",
+              "quality": {
+                "passed": false,
+                "reason": "quality thresholds failed",
+                "outside_truth_support": 1,
+                "expected_outside_truth_support": 0,
+                "metrics": {
+                  "samples": 2090,
+                  "coverage": 0.999031007751938,
+                  "duration_s": 208.89999999999998,
+                  "max_output_gap_s": 0.10000000000002274,
+                  "raw_position_rmse_m": 0.6415062788203232,
+                  "ate_rmse_m": 0.3274747117158089,
+                  "ate_p95_m": 0.5496015612331634,
+                  "ate_max_m": 1.2102294431312017,
+                  "attitude_rmse_deg": 6.916028135620845,
+                  "rpe_translation_rmse_m": 0.12829524787561056,
+                  "rpe_rotation_rmse_deg": 0.6286097656239469,
+                  "rpe_translation_world_rmse_m": 0.12935212781603844,
+                  "attitude_reference_valid": true,
+                  "alignment_se3": [
+                    [
+                      0.9990409826185613,
+                      -0.0071233240451825134,
+                      0.04320154283224156,
+                      -0.04434545683450786
+                    ],
+                    [
+                      0.012077207266375373,
+                      0.9932320838043469,
+                      -0.11551696311070125,
+                      0.13058918646848736
+                    ],
+                    [
+                      -0.04208629364987697,
+                      0.11592793432223923,
+                      0.9923655868330948,
+                      0.5495870948651127
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "alignment_scale": 1.0
+                }
+              },
+              "global_quality": {
+                "passed": false,
+                "reason": "quality thresholds failed",
+                "outside_truth_support": 1,
+                "expected_outside_truth_support": 0,
+                "metrics": {
+                  "samples": 2090,
+                  "coverage": 0.999031007751938,
+                  "duration_s": 208.89999999999998,
+                  "max_output_gap_s": 0.10000000000002274,
+                  "raw_position_rmse_m": 0.6446354275527044,
+                  "ate_rmse_m": 0.3261383305265531,
+                  "ate_p95_m": 0.55399878933581,
+                  "ate_max_m": 1.2042012766464414,
+                  "attitude_rmse_deg": 6.91856930633872,
+                  "rpe_translation_rmse_m": 0.12816664032490563,
+                  "rpe_rotation_rmse_deg": 0.6941736719524187,
+                  "rpe_translation_world_rmse_m": 0.12934559554915354,
+                  "attitude_reference_valid": true,
+                  "alignment_se3": [
+                    [
+                      0.9989911491013168,
+                      -0.00761869835454408,
+                      0.04425651875840926,
+                      -0.04253473000137087
+                    ],
+                    [
+                      0.012647805360055785,
+                      0.9933435408092581,
+                      -0.11449298210850914,
+                      0.12475845440463351
+                    ],
+                    [
+                      -0.04308963955297253,
+                      0.11493722359578615,
+                      0.9924377650992965,
+                      0.5545567663034012
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "alignment_scale": 1.0
+                }
+              },
+              "pose_graph": null,
+              "rtk_batch": null,
+              "transport": {
+                "profile": "configuration/fastdds-local.xml",
+                "profile_sha256": "fc8dfff5f4e95718ea37d919e94945b0eef851b85a3c867c9dbcf10499393d2e",
+                "ROS_LOCALHOST_ONLY": "0",
+                "RMW_IMPLEMENTATION": "rmw_fastrtps_cpp"
+              },
+              "capability_observations": {
+                "keyframe_point_messages": 0,
+                "confirmed_loop_edges": 43,
+                "global_pose_messages": 2091,
+                "loop_closure": "observed",
+                "relocalization": "not verified by this replay; no control qualification"
+              },
+              "resource_summary": {
+                "replay": {
+                  "observed_wall_s": 209.76682979697944,
+                  "observed_cpu_s": 277.53,
+                  "mean_cpu_cores": 1.3230404457587712,
+                  "peak_combined_rss_bytes": 801239040,
+                  "process_peak_rss_bytes": {
+                    "734116": 128913408,
+                    "734117": 146972672,
+                    "734118": 113999872,
+                    "734119": 95961088,
+                    "734120": 147058688,
+                    "734121": 171511808
+                  },
+                  "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+                }
+              },
+              "latency_source_s": {
+                "p50": 0.3499999999999943,
+                "p95": 0.3780000000000001,
+                "min": 0.333999999999989
+              },
+              "scope": "offline replay; no realtime or flight qualification",
+              "normalized_output_count": 980,
+              "normalizer_events": [
+                {
+                  "signature": [
+                    "INITIALIZING",
+                    ""
+                  ],
+                  "source_s": null,
+                  "values": {
+                    "ready": "False",
+                    "state": "INITIALIZING",
+                    "reason": "",
+                    "samples": "0",
+                    "source_age_s": "None",
+                    "clock_s": "0.0",
+                    "pose_arrival_age_s": "None",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "READY",
+                    ""
+                  ],
+                  "source_s": 29.474,
+                  "values": {
+                    "ready": "True",
+                    "state": "READY",
+                    "reason": "",
+                    "samples": "20",
+                    "source_age_s": "0.3739999999999988",
+                    "clock_s": "29.474",
+                    "imu_age_s": "0.004000000000001336",
+                    "imu_arrival_age_s": "0.005004669015761465",
+                    "points_age_s": "0.074015622000001",
+                    "points_arrival_age_s": "0.03496815499966033",
+                    "pose_arrival_age_s": "0.023092745017493144",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "FAILED",
+                    "continuous odometry position jump"
+                  ],
+                  "source_s": 127.56,
+                  "values": {
+                    "ready": "False",
+                    "state": "FAILED",
+                    "reason": "continuous odometry position jump",
+                    "samples": "999",
+                    "source_age_s": "0.5600000000000023",
+                    "clock_s": "127.56",
+                    "imu_age_s": "0.0",
+                    "imu_arrival_age_s": "0.0004896239843219519",
+                    "points_age_s": "0.06001562200000876",
+                    "points_arrival_age_s": "0.02580154300085269",
+                    "pose_arrival_age_s": "0.20276747600291856",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                }
+              ],
+              "implementation_sha256": "decd365a4b4df1c84bf7ec3ad7790748e0a35a3c97c8a93f32211a4e73972f2d",
+              "input_counts": {
+                "/uav001/imu/data": 41857,
+                "/uav001/lidar/points": 2094
+              },
+              "playback_rate": 1.0,
+              "requested_source_duration_s": 210.0,
+              "player_exit_code": 0,
+              "run_id": "lio_sam",
+              "source_report": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/localization-task10-dds-01/lio_sam/report.json",
+              "source_report_sha256": "d4f428b1f21cd56c662c5430388052228b64d68ad109fb45b3145119cd425d24",
+              "current_implementation": true,
               "binary_sha256": "b7334e9f7d02920ac2620a8c2a0842b8db57c33396b836f34d351445dffd7da4"
             }
           ]
@@ -750,10 +2863,13 @@
       "cases": [
         {
           "dataset_identity": "c5cda0f867b57a7d4f0c9708274e5d2c037dff35103152e335b7728f249a3252",
+          "comparison_identity": "cbbc888a31e2b80dc5440b14e5df4ca7c29ba21a5f350b11366fc756d6d8277c",
           "dataset_sha256": {
             "metadata.yaml": "37a7676e36a5d03e055131ce22d7309704c540e7aa891589ad6904828684244c",
             "bag_0.db3": "90678bac996085595968848643933b1130c5e5ee73307c8fc2abd5c7814f57fa"
           },
+          "playback_rate": 1.0,
+          "requested_source_duration_s": 200.0,
           "runs": [
             {
               "backend": "orb_slam3",
@@ -856,6 +2972,8 @@
                 }
               },
               "pose_graph": null,
+              "rtk_batch": null,
+              "transport": null,
               "capability_observations": {
                 "keyframe_point_messages": 0,
                 "confirmed_loop_edges": 0,
@@ -951,10 +3069,18 @@
                 }
               ],
               "implementation_sha256": "d079bc0a446c07b7cda62b040f02c51b6d712bdf3d432795cf86ddba6bb1b48e",
+              "input_counts": {
+                "/uav001/imu/data": 39989,
+                "/uav001/camera/camera_info": 6061,
+                "/uav001/camera/image_raw": 6061
+              },
+              "playback_rate": 1.0,
+              "requested_source_duration_s": 200.0,
+              "player_exit_code": 0,
               "run_id": "orb_slam3",
               "source_report": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/localization-task7-qualified-03/orb_slam3/report.json",
               "source_report_sha256": "16f75a9b29407ed2bb9cc554744a81f20dde7d6383fc95a94276ef074adb0c47",
-              "current_implementation": true,
+              "current_implementation": false,
               "binary_sha256": "13e61e65ec9644f48a5a8339d7bed10346b52e043903752340021993b3929bc3"
             },
             {
@@ -1111,6 +3237,8 @@
                 },
                 "scope": "optimized keyframes only; separate from online odometry and dense coverage"
               },
+              "rtk_batch": null,
+              "transport": null,
               "capability_observations": {
                 "keyframe_point_messages": 658,
                 "confirmed_loop_edges": 20,
@@ -1207,10 +3335,984 @@
                 }
               ],
               "implementation_sha256": "ef4721d9cdc257d60959287ce94a6cf51a6e9b1ba3e03fa4e4f3f2246d34ea25",
+              "input_counts": {
+                "/uav001/imu/data": 39989,
+                "/uav001/camera/camera_info": 6061,
+                "/uav001/camera/image_raw": 6061
+              },
+              "playback_rate": 1.0,
+              "requested_source_duration_s": 200.0,
+              "player_exit_code": 0,
               "run_id": "vins_fusion",
               "source_report": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/localization-task7-final-01/vins_fusion/report.json",
               "source_report_sha256": "768d9cca5d89196ac9f9d0099b77d8c3ee849cf6673ce7e04f9dff6a58f58767",
               "current_implementation": false,
+              "binary_sha256": "e979a70acc2d058587c5d95d92ea18420bdec80fe9a0346ce9785c0973902f10"
+            },
+            {
+              "backend": "orb_slam3",
+              "success": false,
+              "error": "",
+              "quality": {
+                "passed": false,
+                "reason": "quality thresholds failed",
+                "outside_truth_support": 0,
+                "expected_outside_truth_support": 0,
+                "metrics": {
+                  "samples": 989,
+                  "coverage": 0.5394665215024497,
+                  "duration_s": 101.57399999999998,
+                  "max_output_gap_s": 0.9559999999999889,
+                  "raw_position_rmse_m": 5.564945243944572,
+                  "ate_rmse_m": 0.02458927286136932,
+                  "ate_p95_m": 0.05145210138710326,
+                  "ate_max_m": 0.07187356097548202,
+                  "attitude_rmse_deg": 0.1320677479079946,
+                  "rpe_translation_rmse_m": 0.0030158598081048236,
+                  "rpe_rotation_rmse_deg": 0.0026255328992968005,
+                  "rpe_translation_world_rmse_m": 0.003014063042059002,
+                  "attitude_reference_valid": true,
+                  "alignment_se3": [
+                    [
+                      -0.0010984285172048291,
+                      0.9999962263078307,
+                      -0.002518099460015636,
+                      0.23776878393008571
+                    ],
+                    [
+                      -0.9999982901386606,
+                      -0.0010946777030805231,
+                      0.0014904363390272892,
+                      -0.059295532593591056
+                    ],
+                    [
+                      0.0014876742072463425,
+                      0.002519732292192602,
+                      0.99999571887815,
+                      0.5956675689020308
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "alignment_scale": 1.0
+                }
+              },
+              "global_quality": {
+                "passed": false,
+                "reason": "quality thresholds failed",
+                "outside_truth_support": 0,
+                "expected_outside_truth_support": 0,
+                "metrics": {
+                  "samples": 1031,
+                  "coverage": 0.5655960805661404,
+                  "duration_s": 162.328,
+                  "max_output_gap_s": 12.640000000000015,
+                  "raw_position_rmse_m": 4.818236410459572,
+                  "ate_rmse_m": 0.7212301037590593,
+                  "ate_p95_m": 0.5763971720839987,
+                  "ate_max_m": 5.475034994392592,
+                  "attitude_rmse_deg": 9.431960152444057,
+                  "rpe_translation_rmse_m": 0.08485990952219952,
+                  "rpe_rotation_rmse_deg": 0.7484745860023629,
+                  "rpe_translation_world_rmse_m": 0.0891580763181294,
+                  "attitude_reference_valid": true,
+                  "alignment_se3": [
+                    [
+                      0.0007490759493419224,
+                      0.9986228981880906,
+                      0.052457088173488195,
+                      1.4009915300643998
+                    ],
+                    [
+                      -0.9999420940949435,
+                      0.0001848569523887383,
+                      0.010759845952739055,
+                      0.4069763805837202
+                    ],
+                    [
+                      0.010735331491930698,
+                      -0.052462110540142694,
+                      0.998565210497258,
+                      0.6997093907207126
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "alignment_scale": 1.0
+                }
+              },
+              "pose_graph": null,
+              "rtk_batch": null,
+              "transport": null,
+              "capability_observations": {
+                "keyframe_point_messages": 0,
+                "confirmed_loop_edges": 0,
+                "global_pose_messages": 1031,
+                "loop_closure": "not observed in this run",
+                "relocalization": "not verified by this replay; no control qualification"
+              },
+              "resource_summary": {
+                "replay": {
+                  "observed_wall_s": 200.31063168798573,
+                  "observed_cpu_s": 175.01,
+                  "mean_cpu_cores": 0.8736930163177993,
+                  "peak_combined_rss_bytes": 839835648,
+                  "process_peak_rss_bytes": {
+                    "688785": 81059840,
+                    "688786": 760197120
+                  },
+                  "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+                }
+              },
+              "latency_source_s": {
+                "p50": 0.02400000000000091,
+                "p95": 0.030000000000001137,
+                "min": 0.013999999999995794
+              },
+              "scope": "offline replay; no realtime or flight qualification",
+              "normalized_output_count": 10,
+              "normalizer_events": [
+                {
+                  "signature": [
+                    "INITIALIZING",
+                    ""
+                  ],
+                  "source_s": null,
+                  "values": {
+                    "ready": "False",
+                    "state": "INITIALIZING",
+                    "reason": "",
+                    "samples": "0",
+                    "source_age_s": "None",
+                    "clock_s": "0.0",
+                    "pose_arrival_age_s": "None",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "READY",
+                    ""
+                  ],
+                  "source_s": 44.062,
+                  "values": {
+                    "ready": "True",
+                    "state": "READY",
+                    "reason": "",
+                    "samples": "20",
+                    "source_age_s": "0.10200000000000387",
+                    "clock_s": "44.06",
+                    "imu_age_s": "0.0",
+                    "imu_arrival_age_s": "0.0016228480089921504",
+                    "camera_age_s": "0.13600000000000279",
+                    "camera_arrival_age_s": "0.12545956499525346",
+                    "pose_arrival_age_s": "0.07996117300353944",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "FAILED",
+                    "visual source stale or simulation paused"
+                  ],
+                  "source_s": 44.762,
+                  "values": {
+                    "ready": "False",
+                    "state": "FAILED",
+                    "reason": "visual source stale or simulation paused",
+                    "samples": "29",
+                    "source_age_s": "0.34199999999999875",
+                    "clock_s": "44.762",
+                    "imu_age_s": "0.0020000000000024443",
+                    "imu_arrival_age_s": "0.0011594590032473207",
+                    "camera_age_s": "0.34199999999999875",
+                    "camera_arrival_age_s": "0.32994697900721803",
+                    "pose_arrival_age_s": "0.3174058349977713",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                }
+              ],
+              "implementation_sha256": "dbd45efa5c2b666f87fbf2d2d80cfdbf6062474b6b78baf7bf8048fef3450cfd",
+              "input_counts": {
+                "/uav001/imu/data": 39989,
+                "/uav001/camera/camera_info": 6061,
+                "/uav001/camera/image_raw": 1865
+              },
+              "playback_rate": 1.0,
+              "requested_source_duration_s": 200.0,
+              "player_exit_code": 0,
+              "run_id": "orb_slam3",
+              "source_report": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/localization-task10-final-01/orb_slam3/report.json",
+              "source_report_sha256": "5013ecc9027cb883d427ef264f615643f75d66ca1223c094b12f07ddbacbefbd",
+              "current_implementation": false,
+              "binary_sha256": "13e61e65ec9644f48a5a8339d7bed10346b52e043903752340021993b3929bc3"
+            },
+            {
+              "backend": "vins_fusion",
+              "success": false,
+              "error": "",
+              "quality": {
+                "passed": false,
+                "reason": "quality thresholds failed",
+                "outside_truth_support": 0,
+                "expected_outside_truth_support": 0,
+                "metrics": {
+                  "samples": 2211,
+                  "coverage": 0.9641764962865881,
+                  "duration_s": 192.12599999999998,
+                  "max_output_gap_s": 1.0560000000000116,
+                  "raw_position_rmse_m": 2.1099833819634934,
+                  "ate_rmse_m": 1.8863540329296857,
+                  "ate_p95_m": 4.383933234414238,
+                  "ate_max_m": 10.653354788306617,
+                  "attitude_rmse_deg": 15.629423962353055,
+                  "rpe_translation_rmse_m": 0.5001350507361838,
+                  "rpe_rotation_rmse_deg": 0.19088364700521274,
+                  "rpe_translation_world_rmse_m": 0.5037806823585358,
+                  "attitude_reference_valid": true,
+                  "alignment_se3": [
+                    [
+                      0.9960712361929791,
+                      0.05651037898641307,
+                      0.06818115205687464,
+                      -0.1528077453743668
+                    ],
+                    [
+                      -0.03727536141909347,
+                      0.9659471516154242,
+                      -0.25604032439661795,
+                      0.9208173551272549
+                    ],
+                    [
+                      -0.08032832539065321,
+                      0.2524929253521002,
+                      0.9642586182073108,
+                      0.8292231749267605
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "alignment_scale": 1.0
+                }
+              },
+              "global_quality": {
+                "passed": false,
+                "reason": "quality thresholds failed",
+                "outside_truth_support": 0,
+                "expected_outside_truth_support": 0,
+                "metrics": {
+                  "samples": 2211,
+                  "coverage": 0.9641764962865881,
+                  "duration_s": 192.12599999999998,
+                  "max_output_gap_s": 1.0560000000000116,
+                  "raw_position_rmse_m": 2.0811752091544515,
+                  "ate_rmse_m": 1.8804173356163412,
+                  "ate_p95_m": 4.388404479941009,
+                  "ate_max_m": 10.615946847939746,
+                  "attitude_rmse_deg": 15.314006981736952,
+                  "rpe_translation_rmse_m": 0.5003733175280729,
+                  "rpe_rotation_rmse_deg": 0.19259142126881962,
+                  "rpe_translation_world_rmse_m": 0.5038292289994062,
+                  "attitude_reference_valid": true,
+                  "alignment_se3": [
+                    [
+                      0.9966034061717177,
+                      0.05065501827724815,
+                      0.06492857560630105,
+                      -0.169717623920546
+                    ],
+                    [
+                      -0.032760913871710595,
+                      0.9672375331558832,
+                      -0.2517504259714624,
+                      0.8760317963689317
+                    ],
+                    [
+                      -0.07555377772965335,
+                      0.24876821255508855,
+                      0.9656117248112343,
+                      0.7760381753358898
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "alignment_scale": 1.0
+                }
+              },
+              "pose_graph": {
+                "saved": true,
+                "current_keyframes": 461,
+                "cross_session_constraints": 0,
+                "quality": {
+                  "passed": false,
+                  "reason": "quality thresholds failed",
+                  "outside_truth_support": 0,
+                  "expected_outside_truth_support": 0,
+                  "metrics": {
+                    "samples": 461,
+                    "coverage": 1.0,
+                    "duration_s": 177.67200000000003,
+                    "max_output_gap_s": 14.124000000000024,
+                    "raw_position_rmse_m": 3.119519615612517,
+                    "ate_rmse_m": 2.5024130937938396,
+                    "ate_p95_m": 5.6180663226294465,
+                    "ate_max_m": 9.321029112781765,
+                    "attitude_rmse_deg": 27.39802871294973,
+                    "rpe_translation_rmse_m": 0.631160903832136,
+                    "rpe_rotation_rmse_deg": 0.44945132541575483,
+                    "rpe_translation_world_rmse_m": 0.6406207197453165,
+                    "attitude_reference_valid": true,
+                    "alignment_se3": [
+                      [
+                        0.9787127208071917,
+                        0.1679303673673884,
+                        0.11798644772191783,
+                        0.30707590063358703
+                      ],
+                      [
+                        -0.10369221095417888,
+                        0.9007161585183793,
+                        -0.4218510722652315,
+                        1.6385493539162586
+                      ],
+                      [
+                        -0.17711390548914258,
+                        0.40063673508522174,
+                        0.8989554332571973,
+                        1.769033104924513
+                      ],
+                      [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ]
+                    ],
+                    "alignment_scale": 1.0
+                  }
+                },
+                "scope": "optimized keyframes only; separate from online odometry and dense coverage"
+              },
+              "rtk_batch": null,
+              "transport": null,
+              "capability_observations": {
+                "keyframe_point_messages": 478,
+                "confirmed_loop_edges": 19,
+                "global_pose_messages": 2211,
+                "loop_closure": "observed",
+                "relocalization": "not verified by this replay; no control qualification"
+              },
+              "resource_summary": {
+                "replay": {
+                  "observed_wall_s": 200.2720783489931,
+                  "observed_cpu_s": 198.14000000000001,
+                  "mean_cpu_cores": 0.9893540908619437,
+                  "peak_combined_rss_bytes": 792936448,
+                  "process_peak_rss_bytes": {
+                    "691319": 82640896,
+                    "691320": 124727296,
+                    "691321": 589361152
+                  },
+                  "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+                }
+              },
+              "latency_source_s": {
+                "p50": 0.038000000000010914,
+                "p95": 0.055999999999983174,
+                "min": 0.009999999999990905
+              },
+              "scope": "offline replay; no realtime or flight qualification",
+              "normalized_output_count": 38,
+              "normalizer_events": [
+                {
+                  "signature": [
+                    "INITIALIZING",
+                    ""
+                  ],
+                  "source_s": null,
+                  "values": {
+                    "ready": "False",
+                    "state": "INITIALIZING",
+                    "reason": "",
+                    "samples": "0",
+                    "source_age_s": "None",
+                    "clock_s": "0.0",
+                    "pose_arrival_age_s": "None",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "READY",
+                    ""
+                  ],
+                  "source_s": 40.262,
+                  "values": {
+                    "ready": "True",
+                    "state": "READY",
+                    "reason": "",
+                    "samples": "21",
+                    "source_age_s": "0.03399999999999892",
+                    "clock_s": "40.262",
+                    "imu_age_s": "0.0020000000000024443",
+                    "imu_arrival_age_s": "0.002302910987054929",
+                    "camera_age_s": "0.03399999999999892",
+                    "camera_arrival_age_s": "0.01975099800620228",
+                    "pose_arrival_age_s": "0.012281378993066028",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "FAILED",
+                    "visual source stale or simulation paused"
+                  ],
+                  "source_s": 43.562,
+                  "values": {
+                    "ready": "False",
+                    "state": "FAILED",
+                    "reason": "visual source stale or simulation paused",
+                    "samples": "57",
+                    "source_age_s": "0.3299999999999983",
+                    "clock_s": "43.562",
+                    "imu_age_s": "0.001999999999995339",
+                    "imu_arrival_age_s": "0.0015843269939068705",
+                    "camera_age_s": "0.3299999999999983",
+                    "camera_arrival_age_s": "0.3180583899957128",
+                    "pose_arrival_age_s": "0.29319468399626203",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                }
+              ],
+              "implementation_sha256": "9e995eb588407e1358df4b3c537d72a4443336f80979138312b74d39ddd3be3f",
+              "input_counts": {
+                "/uav001/camera/camera_info": 6061,
+                "/uav001/imu/data": 39979,
+                "/uav001/camera/image_raw": 2334
+              },
+              "playback_rate": 1.0,
+              "requested_source_duration_s": 200.0,
+              "player_exit_code": 0,
+              "run_id": "vins_fusion",
+              "source_report": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/localization-task10-final-01/vins_fusion/report.json",
+              "source_report_sha256": "37d252cf73f39e12bbb650f9d33bfe49696bcb11bf5af8c2cc0358b046da137e",
+              "current_implementation": false,
+              "binary_sha256": "e979a70acc2d058587c5d95d92ea18420bdec80fe9a0346ce9785c0973902f10"
+            },
+            {
+              "backend": "orb_slam3",
+              "success": false,
+              "error": "",
+              "quality": {
+                "passed": false,
+                "reason": "quality thresholds failed",
+                "outside_truth_support": 0,
+                "expected_outside_truth_support": 0,
+                "metrics": {
+                  "samples": 189,
+                  "coverage": 0.03199329983249581,
+                  "duration_s": 6.204000000000001,
+                  "max_output_gap_s": 0.034000000000006025,
+                  "raw_position_rmse_m": 0.5024341267869532,
+                  "ate_rmse_m": 0.008628206341498707,
+                  "ate_p95_m": 0.01738658960866944,
+                  "ate_max_m": 0.03293097004846175,
+                  "attitude_rmse_deg": 9.584790611920894,
+                  "rpe_translation_rmse_m": 0.009884799196441987,
+                  "rpe_rotation_rmse_deg": 0.014979403736372722,
+                  "rpe_translation_world_rmse_m": 0.008966206059461489,
+                  "attitude_reference_valid": true,
+                  "alignment_se3": [
+                    [
+                      -0.1622728999970124,
+                      0.9867156288813701,
+                      -0.007731341914647957,
+                      0.19153980629976783
+                    ],
+                    [
+                      -0.9861521572750431,
+                      -0.16244204690137148,
+                      -0.03341413024859776,
+                      0.003527762484460387
+                    ],
+                    [
+                      -0.03422613954767908,
+                      0.002202071691443072,
+                      0.9994116880705011,
+                      0.4648580719127293
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "alignment_scale": 1.0
+                }
+              },
+              "global_quality": {
+                "passed": false,
+                "reason": "quality thresholds failed",
+                "outside_truth_support": 0,
+                "expected_outside_truth_support": 0,
+                "metrics": {
+                  "samples": 4590,
+                  "coverage": 0.7726968174204355,
+                  "duration_s": 190.706,
+                  "max_output_gap_s": 7.029999999999994,
+                  "raw_position_rmse_m": 7.59351843529104,
+                  "ate_rmse_m": 1.619978058161393,
+                  "ate_p95_m": 4.20029903909629,
+                  "ate_max_m": 6.907779995269837,
+                  "attitude_rmse_deg": 4.627303321652414,
+                  "rpe_translation_rmse_m": 0.19489662129931368,
+                  "rpe_rotation_rmse_deg": 1.382539791135171,
+                  "rpe_translation_world_rmse_m": 0.19502569980930134,
+                  "attitude_reference_valid": true,
+                  "alignment_se3": [
+                    [
+                      -0.068918731863903,
+                      0.9975138759758276,
+                      -0.01470631272454552,
+                      6.243390903890343
+                    ],
+                    [
+                      -0.9976021971915378,
+                      -0.06881632595363275,
+                      0.007359989188809368,
+                      -1.9621882250738953
+                    ],
+                    [
+                      0.00632965693284121,
+                      0.015178291008017292,
+                      0.9998647683187898,
+                      2.431173314455572
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "alignment_scale": 1.0
+                }
+              },
+              "pose_graph": null,
+              "rtk_batch": null,
+              "transport": {
+                "profile": "configuration/fastdds-local.xml",
+                "profile_sha256": "fc8dfff5f4e95718ea37d919e94945b0eef851b85a3c867c9dbcf10499393d2e",
+                "ROS_LOCALHOST_ONLY": "0",
+                "RMW_IMPLEMENTATION": "rmw_fastrtps_cpp"
+              },
+              "capability_observations": {
+                "keyframe_point_messages": 0,
+                "confirmed_loop_edges": 0,
+                "global_pose_messages": 4590,
+                "loop_closure": "not observed in this run",
+                "relocalization": "not verified by this replay; no control qualification"
+              },
+              "resource_summary": {
+                "replay": {
+                  "observed_wall_s": 200.29341357699013,
+                  "observed_cpu_s": 366.91,
+                  "mean_cpu_cores": 1.83186253330774,
+                  "peak_combined_rss_bytes": 1069232128,
+                  "process_peak_rss_bytes": {
+                    "738280": 150560768,
+                    "738281": 921092096
+                  },
+                  "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+                }
+              },
+              "latency_source_s": {
+                "p50": 0.02400000000000091,
+                "p95": 0.027999999999998693,
+                "min": 0.018000000000000682
+              },
+              "scope": "offline replay; no realtime or flight qualification",
+              "normalized_output_count": 170,
+              "normalizer_events": [
+                {
+                  "signature": [
+                    "INITIALIZING",
+                    ""
+                  ],
+                  "source_s": null,
+                  "values": {
+                    "ready": "False",
+                    "state": "INITIALIZING",
+                    "reason": "",
+                    "samples": "0",
+                    "source_age_s": "None",
+                    "clock_s": "0.0",
+                    "pose_arrival_age_s": "None",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "READY",
+                    ""
+                  ],
+                  "source_s": 40.36,
+                  "values": {
+                    "ready": "True",
+                    "state": "READY",
+                    "reason": "",
+                    "samples": "21",
+                    "source_age_s": "0.031999999999996476",
+                    "clock_s": "40.36",
+                    "imu_age_s": "0.0",
+                    "imu_arrival_age_s": "0.0006136500160209835",
+                    "camera_age_s": "0.031999999999996476",
+                    "camera_arrival_age_s": "0.020982821995858103",
+                    "pose_arrival_age_s": "0.008589107019361109",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "FAILED",
+                    "local continuity failed: tracking frame gap; new ground-selected session required"
+                  ],
+                  "source_s": 45.962,
+                  "values": {
+                    "ready": "False",
+                    "state": "FAILED",
+                    "reason": "local continuity failed: tracking frame gap; new ground-selected session required",
+                    "samples": "189",
+                    "source_age_s": "0.08800000000000097",
+                    "clock_s": "45.96",
+                    "imu_age_s": "0.0",
+                    "imu_arrival_age_s": "0.0001744129986036569",
+                    "camera_age_s": "0.021999999999998465",
+                    "camera_arrival_age_s": "0.014560800016624853",
+                    "pose_arrival_age_s": "0.06748633302049711",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                }
+              ],
+              "implementation_sha256": "d908f74c0870f3730a7a5ac482efadac3355892ad09093d1b7837b556c8fc8c5",
+              "input_counts": {
+                "/uav001/imu/data": 39991,
+                "/uav001/camera/camera_info": 6061,
+                "/uav001/camera/image_raw": 6061
+              },
+              "playback_rate": 1.0,
+              "requested_source_duration_s": 200.0,
+              "player_exit_code": 0,
+              "run_id": "orb_slam3",
+              "source_report": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/localization-task10-dds-01/orb_slam3/report.json",
+              "source_report_sha256": "033890353738b655da107a2b09202c2f066c8e5a578964028e0bef3b249d358c",
+              "current_implementation": true,
+              "binary_sha256": "13e61e65ec9644f48a5a8339d7bed10346b52e043903752340021993b3929bc3"
+            },
+            {
+              "backend": "vins_fusion",
+              "success": false,
+              "error": "",
+              "quality": {
+                "passed": false,
+                "reason": "quality thresholds failed",
+                "outside_truth_support": 0,
+                "expected_outside_truth_support": 0,
+                "metrics": {
+                  "samples": 5543,
+                  "coverage": 0.9731993299832495,
+                  "duration_s": 192.026,
+                  "max_output_gap_s": 0.2980000000000018,
+                  "raw_position_rmse_m": 3.974542302890039,
+                  "ate_rmse_m": 3.8166899139878514,
+                  "ate_p95_m": 11.870809049992067,
+                  "ate_max_m": 15.65951774325659,
+                  "attitude_rmse_deg": 10.308627326867793,
+                  "rpe_translation_rmse_m": 2.542353245056531,
+                  "rpe_rotation_rmse_deg": 0.07612690417206142,
+                  "rpe_translation_world_rmse_m": 2.5426111959314297,
+                  "attitude_reference_valid": true,
+                  "alignment_se3": [
+                    [
+                      0.9860305627712475,
+                      0.02427026378860105,
+                      0.16478678216606976,
+                      -0.44675941595693236
+                    ],
+                    [
+                      -0.013639863697611276,
+                      0.9977699716862292,
+                      -0.06533787354643752,
+                      0.2572734255123352
+                    ],
+                    [
+                      -0.16600507040246246,
+                      0.06217747097535739,
+                      0.9841627297880056,
+                      1.1695957527352547
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "alignment_scale": 1.0
+                }
+              },
+              "global_quality": {
+                "passed": false,
+                "reason": "quality thresholds failed",
+                "outside_truth_support": 0,
+                "expected_outside_truth_support": 0,
+                "metrics": {
+                  "samples": 5543,
+                  "coverage": 0.9731993299832495,
+                  "duration_s": 192.026,
+                  "max_output_gap_s": 0.2980000000000018,
+                  "raw_position_rmse_m": 3.9834603629176466,
+                  "ate_rmse_m": 3.8261601418593756,
+                  "ate_p95_m": 11.826933607906463,
+                  "ate_max_m": 15.719701180028176,
+                  "attitude_rmse_deg": 11.030474612006998,
+                  "rpe_translation_rmse_m": 2.5426394148265805,
+                  "rpe_rotation_rmse_deg": 0.07815367619342413,
+                  "rpe_translation_world_rmse_m": 2.542905885044489,
+                  "attitude_reference_valid": true,
+                  "alignment_se3": [
+                    [
+                      0.9838871922272303,
+                      0.00783165936076748,
+                      0.17861875064750235,
+                      -0.491735854825353
+                    ],
+                    [
+                      0.00398102106830945,
+                      0.9978328392666769,
+                      -0.0656793449438704,
+                      0.1829763749107668
+                    ],
+                    [
+                      -0.1787460333615024,
+                      0.06533215129367165,
+                      0.9817237725373003,
+                      1.1722304327432411
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "alignment_scale": 1.0
+                }
+              },
+              "pose_graph": {
+                "saved": true,
+                "current_keyframes": 568,
+                "cross_session_constraints": 0,
+                "quality": {
+                  "passed": true,
+                  "reason": "quality thresholds passed",
+                  "outside_truth_support": 0,
+                  "expected_outside_truth_support": 0,
+                  "metrics": {
+                    "samples": 568,
+                    "coverage": 1.0,
+                    "duration_s": 155.992,
+                    "max_output_gap_s": 9.900000000000006,
+                    "raw_position_rmse_m": 0.2991780446500344,
+                    "ate_rmse_m": 0.21743725741249023,
+                    "ate_p95_m": 0.09477652443710988,
+                    "ate_max_m": 5.024767224389472,
+                    "attitude_rmse_deg": 0.8490235904256827,
+                    "rpe_translation_rmse_m": 0.020533670342610853,
+                    "rpe_rotation_rmse_deg": 0.012321368761868583,
+                    "rpe_translation_world_rmse_m": 0.01963514984780492,
+                    "attitude_reference_valid": true,
+                    "alignment_se3": [
+                      [
+                        0.9999555938544937,
+                        0.0027868366817024644,
+                        0.009002436359990158,
+                        0.009829112559621933
+                      ],
+                      [
+                        -0.002876130124148001,
+                        0.9999466480311536,
+                        0.009921137372714925,
+                        -0.02507989803248699
+                      ],
+                      [
+                        -0.008974307472731407,
+                        -0.009946588991651044,
+                        0.9999102595597337,
+                        0.23480486021058855
+                      ],
+                      [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                      ]
+                    ],
+                    "alignment_scale": 1.0
+                  }
+                },
+                "scope": "optimized keyframes only; separate from online odometry and dense coverage"
+              },
+              "rtk_batch": null,
+              "transport": {
+                "profile": "configuration/fastdds-local.xml",
+                "profile_sha256": "fc8dfff5f4e95718ea37d919e94945b0eef851b85a3c867c9dbcf10499393d2e",
+                "ROS_LOCALHOST_ONLY": "0",
+                "RMW_IMPLEMENTATION": "rmw_fastrtps_cpp"
+              },
+              "capability_observations": {
+                "keyframe_point_messages": 578,
+                "confirmed_loop_edges": 26,
+                "global_pose_messages": 5543,
+                "loop_closure": "observed",
+                "relocalization": "not verified by this replay; no control qualification"
+              },
+              "resource_summary": {
+                "replay": {
+                  "observed_wall_s": 200.25703656699625,
+                  "observed_cpu_s": 367.79,
+                  "mean_cpu_cores": 1.8365896465113993,
+                  "peak_combined_rss_bytes": 1076998144,
+                  "process_peak_rss_bytes": {
+                    "740103": 150413312,
+                    "740104": 256323584,
+                    "740105": 672899072
+                  },
+                  "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+                }
+              },
+              "latency_source_s": {
+                "p50": 0.07400000000001228,
+                "p95": 0.3060000000000116,
+                "min": 0.013999999999981583
+              },
+              "scope": "offline replay; no realtime or flight qualification",
+              "normalized_output_count": 599,
+              "normalizer_events": [
+                {
+                  "signature": [
+                    "INITIALIZING",
+                    ""
+                  ],
+                  "source_s": null,
+                  "values": {
+                    "ready": "False",
+                    "state": "INITIALIZING",
+                    "reason": "",
+                    "samples": "0",
+                    "source_age_s": "None",
+                    "clock_s": "0.0",
+                    "pose_arrival_age_s": "None",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "READY",
+                    ""
+                  ],
+                  "source_s": 39.034,
+                  "values": {
+                    "ready": "True",
+                    "state": "READY",
+                    "reason": "",
+                    "samples": "21",
+                    "source_age_s": "0.023999999999993804",
+                    "clock_s": "39.032",
+                    "imu_age_s": "0.001999999999995339",
+                    "imu_arrival_age_s": "0.001977353007532656",
+                    "camera_age_s": "0.023999999999993804",
+                    "camera_arrival_age_s": "0.01107985302223824",
+                    "pose_arrival_age_s": "0.0007622789999004453",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "FAILED",
+                    "localization source/output stale or simulation paused"
+                  ],
+                  "source_s": 59.34,
+                  "values": {
+                    "ready": "False",
+                    "state": "FAILED",
+                    "reason": "localization source/output stale or simulation paused",
+                    "samples": "618",
+                    "source_age_s": "0.5140000000000029",
+                    "clock_s": "59.322",
+                    "imu_age_s": "0.016000000000005343",
+                    "imu_arrival_age_s": "0.015232181001920253",
+                    "camera_age_s": "0.020000000000003126",
+                    "camera_arrival_age_s": "0.003360829025041312",
+                    "pose_arrival_age_s": "0.19221801200183108",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                }
+              ],
+              "implementation_sha256": "01417a1698575765104f1897bf8fc2e137efceee5cb14e01be79fda263feb126",
+              "input_counts": {
+                "/uav001/imu/data": 39981,
+                "/uav001/camera/camera_info": 6061,
+                "/uav001/camera/image_raw": 6061
+              },
+              "playback_rate": 1.0,
+              "requested_source_duration_s": 200.0,
+              "player_exit_code": 0,
+              "run_id": "vins_fusion",
+              "source_report": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/localization-task10-dds-01/vins_fusion/report.json",
+              "source_report_sha256": "aeb25f66896f735cffd36e8ab4f32b7fdc863cccefec872f974c5e6e8a3f56a9",
+              "current_implementation": true,
               "binary_sha256": "e979a70acc2d058587c5d95d92ea18420bdec80fe9a0346ce9785c0973902f10"
             }
           ]
@@ -1222,10 +4324,13 @@
       "cases": [
         {
           "dataset_identity": "e4909996599d7a4f502d3c08870dfd8095006150585916f76aa116ab4ba2c001",
+          "comparison_identity": "29a085033abd029db1089f42b5378ecd1c910f39761dfe39e1432401a6b5ddf6",
           "dataset_sha256": {
             "metadata.yaml": "a5c153606a5b5d1c68003d3dd9cd813b07e24ba55fb55ecbf1343dff90942df6",
             "bag_0.db3": "c180d45cc08cd8ae68420d1009baee5f4de98af7a6d9a4a865177e4857e58811"
           },
+          "playback_rate": 1.0,
+          "requested_source_duration_s": 175.0,
           "runs": [
             {
               "backend": "glim",
@@ -1279,61 +4384,17 @@
                   "alignment_scale": 1.0
                 }
               },
-              "global_quality": {
-                "passed": true,
-                "reason": "quality thresholds passed",
-                "outside_truth_support": 0,
-                "expected_outside_truth_support": 0,
-                "metrics": {
-                  "samples": 1712,
-                  "coverage": 0.9994162288382954,
-                  "duration_s": 171.09999999899998,
-                  "max_output_gap_s": 0.10000000100001216,
-                  "raw_position_rmse_m": 0.3277572894870369,
-                  "ate_rmse_m": 0.05347078593900279,
-                  "ate_p95_m": 0.09207106939154425,
-                  "ate_max_m": 0.2685802328335551,
-                  "attitude_rmse_deg": 0.2334985477060811,
-                  "rpe_translation_rmse_m": 0.03045981450910861,
-                  "rpe_rotation_rmse_deg": 0.007557692687845123,
-                  "rpe_translation_world_rmse_m": 0.03044644749056755,
-                  "attitude_reference_valid": true,
-                  "alignment_se3": [
-                    [
-                      0.9999922991003338,
-                      0.0006759020664482834,
-                      -0.0038658629599125083,
-                      0.004764217208349075
-                    ],
-                    [
-                      -0.0006742546036508784,
-                      0.9999996813361437,
-                      0.00042744396167754273,
-                      -0.0011286373373210479
-                    ],
-                    [
-                      0.0038661506382589583,
-                      -0.00042483409407617634,
-                      0.9999924361690109,
-                      0.32115178686086976
-                    ],
-                    [
-                      0.0,
-                      0.0,
-                      0.0,
-                      1.0
-                    ]
-                  ],
-                  "alignment_scale": 1.0
-                }
-              },
+              "global_quality": null,
               "pose_graph": null,
+              "rtk_batch": null,
+              "transport": null,
               "capability_observations": {
                 "keyframe_point_messages": 0,
                 "confirmed_loop_edges": 0,
-                "global_pose_messages": 1712,
                 "loop_closure": "not observed in this run",
-                "relocalization": "not verified by this replay; no control qualification"
+                "relocalization": "not verified by this replay; no control qualification",
+                "corrected_local_pose_messages": 1712,
+                "global_metric_scope": "not measured; odom_corrected is local fixed-window output; global map display uses actual private TF"
               },
               "resource_summary": {
                 "replay": {
@@ -1423,11 +4484,497 @@
                 }
               ],
               "implementation_sha256": "d5b7bdf9b2e21b7002bb6cea5d763d1e1f0797fa34945b63f6d0b3ae81f3c326",
+              "input_counts": {
+                "/uav001/imu/data": 34848,
+                "/uav001/lidar/points": 1743
+              },
+              "playback_rate": 1.0,
+              "requested_source_duration_s": 175.0,
+              "player_exit_code": 0,
               "run_id": "glim",
               "source_report": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/localization-task7-qualified-03/glim/report.json",
               "source_report_sha256": "2755a1ceb075541db07ec86aac820bb0a0be72266b7b428c9a8afcbd8f47d1e9",
+              "current_implementation": false,
+              "binary_sha256": "fa6ec356c70f5188a4c0f8b50b3b4be17ead4073f0228273bc1c391ca187f8f3",
+              "corrected_local_quality": {
+                "passed": true,
+                "reason": "quality thresholds passed",
+                "outside_truth_support": 0,
+                "expected_outside_truth_support": 0,
+                "metrics": {
+                  "samples": 1712,
+                  "coverage": 0.9994162288382954,
+                  "duration_s": 171.09999999899998,
+                  "max_output_gap_s": 0.10000000100001216,
+                  "raw_position_rmse_m": 0.3277572894870369,
+                  "ate_rmse_m": 0.05347078593900279,
+                  "ate_p95_m": 0.09207106939154425,
+                  "ate_max_m": 0.2685802328335551,
+                  "attitude_rmse_deg": 0.2334985477060811,
+                  "rpe_translation_rmse_m": 0.03045981450910861,
+                  "rpe_rotation_rmse_deg": 0.007557692687845123,
+                  "rpe_translation_world_rmse_m": 0.03044644749056755,
+                  "attitude_reference_valid": true,
+                  "alignment_se3": [
+                    [
+                      0.9999922991003338,
+                      0.0006759020664482834,
+                      -0.0038658629599125083,
+                      0.004764217208349075
+                    ],
+                    [
+                      -0.0006742546036508784,
+                      0.9999996813361437,
+                      0.00042744396167754273,
+                      -0.0011286373373210479
+                    ],
+                    [
+                      0.0038661506382589583,
+                      -0.00042483409407617634,
+                      0.9999924361690109,
+                      0.32115178686086976
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "alignment_scale": 1.0
+                }
+              }
+            },
+            {
+              "backend": "glim",
+              "success": true,
+              "error": "",
+              "quality": {
+                "passed": true,
+                "reason": "quality thresholds passed",
+                "outside_truth_support": 0,
+                "expected_outside_truth_support": 0,
+                "metrics": {
+                  "samples": 1713,
+                  "coverage": 1.0,
+                  "duration_s": 171.199999999,
+                  "max_output_gap_s": 0.10000000100001216,
+                  "raw_position_rmse_m": 0.34934626553571857,
+                  "ate_rmse_m": 0.058313293486213905,
+                  "ate_p95_m": 0.11245593723491398,
+                  "ate_max_m": 0.28947609080840586,
+                  "attitude_rmse_deg": 0.32601555021896816,
+                  "rpe_translation_rmse_m": 0.03616096650354509,
+                  "rpe_rotation_rmse_deg": 0.0073653436380317705,
+                  "rpe_translation_world_rmse_m": 0.03614447824234632,
+                  "attitude_reference_valid": true,
+                  "alignment_se3": [
+                    [
+                      0.9999839080326719,
+                      0.0006762886479826091,
+                      -0.005632611239085539,
+                      0.006572250886804243
+                    ],
+                    [
+                      -0.000677607076946099,
+                      0.9999997434738659,
+                      -0.00023216557346827926,
+                      -0.0004667110911172889
+                    ],
+                    [
+                      0.00563245278323124,
+                      0.00023597853470419539,
+                      0.9999841097686397,
+                      0.3407175966652105
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "alignment_scale": 1.0
+                }
+              },
+              "global_quality": null,
+              "pose_graph": null,
+              "rtk_batch": null,
+              "transport": null,
+              "capability_observations": {
+                "keyframe_point_messages": 0,
+                "confirmed_loop_edges": 0,
+                "loop_closure": "not observed in this run",
+                "relocalization": "not verified by this replay; no control qualification",
+                "corrected_local_pose_messages": 1712,
+                "global_metric_scope": "not measured; odom_corrected is local fixed-window output; global map display uses actual private TF"
+              },
+              "resource_summary": {
+                "replay": {
+                  "observed_wall_s": 175.45131688800757,
+                  "observed_cpu_s": 177.56,
+                  "mean_cpu_cores": 1.0120186223129828,
+                  "peak_combined_rss_bytes": 387915776,
+                  "process_peak_rss_bytes": {
+                    "680770": 80039936,
+                    "680771": 307875840
+                  },
+                  "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+                }
+              },
+              "latency_source_s": {
+                "p50": 0.01600000100000898,
+                "p95": 0.020000001000028078,
+                "min": 0.012000000000000455
+              },
+              "scope": "offline replay; no realtime or flight qualification",
+              "normalized_output_count": 1694,
+              "normalizer_events": [
+                {
+                  "signature": [
+                    "INITIALIZING",
+                    ""
+                  ],
+                  "source_s": null,
+                  "values": {
+                    "ready": "False",
+                    "state": "INITIALIZING",
+                    "reason": "",
+                    "samples": "0",
+                    "source_age_s": "None",
+                    "clock_s": "0.0",
+                    "pose_arrival_age_s": "None",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "READY",
+                    ""
+                  ],
+                  "source_s": 280.44,
+                  "values": {
+                    "ready": "True",
+                    "state": "READY",
+                    "reason": "",
+                    "samples": "20",
+                    "source_age_s": "0.03600000099999079",
+                    "clock_s": "280.436",
+                    "imu_age_s": "0.0",
+                    "imu_arrival_age_s": "0.003248288994655013",
+                    "points_age_s": "0.036000000000001364",
+                    "points_arrival_age_s": "0.025248888006899506",
+                    "pose_arrival_age_s": "0.024241047009127215",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "FAILED",
+                    "localization source/output stale or simulation paused"
+                  ],
+                  "source_s": 449.756,
+                  "values": {
+                    "ready": "False",
+                    "state": "FAILED",
+                    "reason": "localization source/output stale or simulation paused",
+                    "samples": "1713",
+                    "source_age_s": "0.0560000009999726",
+                    "clock_s": "449.756",
+                    "imu_age_s": "0.0",
+                    "imu_arrival_age_s": "1.5528703730087727",
+                    "points_age_s": "0.055999999999983174",
+                    "points_arrival_age_s": "1.5919048430223484",
+                    "pose_arrival_age_s": "1.5895104790106416",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                }
+              ],
+              "implementation_sha256": "46cb57ee13a1c0b16476d156631a3f1781c83be267c669a76e8b7e9577c8f83b",
+              "input_counts": {
+                "/uav001/imu/data": 34847,
+                "/uav001/lidar/points": 1743
+              },
+              "playback_rate": 1.0,
+              "requested_source_duration_s": 175.0,
+              "player_exit_code": 0,
+              "run_id": "glim",
+              "source_report": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/localization-task10-final-01/glim/report.json",
+              "source_report_sha256": "68ad338ef1fcf215e2bff94ecb8ee961e02e763fb98407e9c29140b8d2733bfa",
+              "current_implementation": false,
+              "binary_sha256": "fa6ec356c70f5188a4c0f8b50b3b4be17ead4073f0228273bc1c391ca187f8f3",
+              "corrected_local_quality": {
+                "passed": true,
+                "reason": "quality thresholds passed",
+                "outside_truth_support": 0,
+                "expected_outside_truth_support": 0,
+                "metrics": {
+                  "samples": 1712,
+                  "coverage": 0.9994162288382954,
+                  "duration_s": 171.09999999899998,
+                  "max_output_gap_s": 0.10000000100001216,
+                  "raw_position_rmse_m": 0.3490907389372037,
+                  "ate_rmse_m": 0.054209661763137316,
+                  "ate_p95_m": 0.11161126529014578,
+                  "ate_max_m": 0.24613432486237924,
+                  "attitude_rmse_deg": 0.31872405651797425,
+                  "rpe_translation_rmse_m": 0.029887381940649486,
+                  "rpe_rotation_rmse_deg": 0.007397253522986765,
+                  "rpe_translation_world_rmse_m": 0.029868226437728275,
+                  "attitude_reference_valid": true,
+                  "alignment_se3": [
+                    [
+                      0.9999846044525431,
+                      0.000673524266761566,
+                      -0.00550792365180422,
+                      0.006412857049042486
+                    ],
+                    [
+                      -0.0006742643619146449,
+                      0.9999997639038621,
+                      -0.00013251336560743399,
+                      -0.0005998494424809264
+                    ],
+                    [
+                      0.005507833100436871,
+                      0.00013622512211775017,
+                      0.9999848224934501,
+                      0.3412642854972112
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "alignment_scale": 1.0
+                }
+              }
+            },
+            {
+              "backend": "glim",
+              "success": true,
+              "error": "",
+              "quality": {
+                "passed": true,
+                "reason": "quality thresholds passed",
+                "outside_truth_support": 0,
+                "expected_outside_truth_support": 0,
+                "metrics": {
+                  "samples": 1713,
+                  "coverage": 1.0,
+                  "duration_s": 171.199999999,
+                  "max_output_gap_s": 0.10000000100001216,
+                  "raw_position_rmse_m": 0.3179664457168827,
+                  "ate_rmse_m": 0.05431467345798096,
+                  "ate_p95_m": 0.0846419065734286,
+                  "ate_max_m": 0.2989952036143516,
+                  "attitude_rmse_deg": 0.23382468891865735,
+                  "rpe_translation_rmse_m": 0.03681304956006493,
+                  "rpe_rotation_rmse_deg": 0.00762313287155571,
+                  "rpe_translation_world_rmse_m": 0.036817149635454814,
+                  "attitude_reference_valid": true,
+                  "alignment_se3": [
+                    [
+                      0.9999928079659673,
+                      0.0006614640610935474,
+                      -0.0037344988468473728,
+                      0.004699924234003783
+                    ],
+                    [
+                      -0.0006562291834527889,
+                      0.9999988007385798,
+                      0.0014028131243167818,
+                      -0.002174797959872743
+                    ],
+                    [
+                      0.0037354222786727953,
+                      -0.0014003523481087576,
+                      0.9999920427851929,
+                      0.3117090597034322
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "alignment_scale": 1.0
+                }
+              },
+              "global_quality": null,
+              "pose_graph": null,
+              "rtk_batch": null,
+              "transport": {
+                "profile": "configuration/fastdds-local.xml",
+                "profile_sha256": "fc8dfff5f4e95718ea37d919e94945b0eef851b85a3c867c9dbcf10499393d2e",
+                "ROS_LOCALHOST_ONLY": "0",
+                "RMW_IMPLEMENTATION": "rmw_fastrtps_cpp"
+              },
+              "capability_observations": {
+                "keyframe_point_messages": 0,
+                "confirmed_loop_edges": 0,
+                "loop_closure": "not observed in this run",
+                "relocalization": "not verified by this replay; no control qualification",
+                "corrected_local_pose_messages": 1712,
+                "global_metric_scope": "not measured; odom_corrected is local fixed-window output; global map display uses actual private TF"
+              },
+              "resource_summary": {
+                "replay": {
+                  "observed_wall_s": 175.3843604880094,
+                  "observed_cpu_s": 170.5,
+                  "mean_cpu_cores": 0.9721505356896213,
+                  "peak_combined_rss_bytes": 519528448,
+                  "process_peak_rss_bytes": {
+                    "732723": 146829312,
+                    "732724": 372699136
+                  },
+                  "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+                }
+              },
+              "latency_source_s": {
+                "p50": 0.01600000100000898,
+                "p95": 0.020000001000028078,
+                "min": 0.008000001000027623
+              },
+              "scope": "offline replay; no realtime or flight qualification",
+              "normalized_output_count": 1694,
+              "normalizer_events": [
+                {
+                  "signature": [
+                    "INITIALIZING",
+                    ""
+                  ],
+                  "source_s": null,
+                  "values": {
+                    "ready": "False",
+                    "state": "INITIALIZING",
+                    "reason": "",
+                    "samples": "0",
+                    "source_age_s": "None",
+                    "clock_s": "0.0",
+                    "pose_arrival_age_s": "None",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "READY",
+                    ""
+                  ],
+                  "source_s": 280.428,
+                  "values": {
+                    "ready": "True",
+                    "state": "READY",
+                    "reason": "",
+                    "samples": "20",
+                    "source_age_s": "0.028000001000009433",
+                    "clock_s": "280.428",
+                    "imu_age_s": "0.0",
+                    "imu_arrival_age_s": "0.0023246049822773784",
+                    "points_age_s": "0.02800000000002001",
+                    "points_arrival_age_s": "0.01256123898201622",
+                    "pose_arrival_age_s": "0.011819734994787723",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                },
+                {
+                  "signature": [
+                    "FAILED",
+                    "localization source/output stale or simulation paused"
+                  ],
+                  "source_s": 449.756,
+                  "values": {
+                    "ready": "False",
+                    "state": "FAILED",
+                    "reason": "localization source/output stale or simulation paused",
+                    "samples": "1713",
+                    "source_age_s": "0.0560000009999726",
+                    "clock_s": "449.756",
+                    "imu_age_s": "0.0",
+                    "imu_arrival_age_s": "1.5427756550197955",
+                    "points_age_s": "0.055999999999983174",
+                    "points_arrival_age_s": "1.583086094004102",
+                    "pose_arrival_age_s": "1.5816048480046447",
+                    "velocity_source": "finite differences of estimator poses; body frame",
+                    "covariance_source": "configured observation-noise floors; no accuracy claim",
+                    "global_correction": "separate; not applied to continuous odometry"
+                  }
+                }
+              ],
+              "implementation_sha256": "1c30c3feb84dd329eee09dbff2877a91418c75a8a9c7fe5a36aca23346953686",
+              "input_counts": {
+                "/uav001/imu/data": 34848,
+                "/uav001/lidar/points": 1743
+              },
+              "playback_rate": 1.0,
+              "requested_source_duration_s": 175.0,
+              "player_exit_code": 0,
+              "run_id": "glim",
+              "source_report": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/localization-task10-dds-01/glim/report.json",
+              "source_report_sha256": "5092d1fd64531d3a6cc07c12a2a50b148b2fa476f55125442a28cb6e5c94eb63",
               "current_implementation": true,
-              "binary_sha256": "fa6ec356c70f5188a4c0f8b50b3b4be17ead4073f0228273bc1c391ca187f8f3"
+              "binary_sha256": "fa6ec356c70f5188a4c0f8b50b3b4be17ead4073f0228273bc1c391ca187f8f3",
+              "corrected_local_quality": {
+                "passed": true,
+                "reason": "quality thresholds passed",
+                "outside_truth_support": 0,
+                "expected_outside_truth_support": 0,
+                "metrics": {
+                  "samples": 1712,
+                  "coverage": 0.9994162288382954,
+                  "duration_s": 171.09999999899998,
+                  "max_output_gap_s": 0.10000000100001216,
+                  "raw_position_rmse_m": 0.3176385118465109,
+                  "ate_rmse_m": 0.04994318124452262,
+                  "ate_p95_m": 0.08439759398499046,
+                  "ate_max_m": 0.25529324294010874,
+                  "attitude_rmse_deg": 0.2303617888832965,
+                  "rpe_translation_rmse_m": 0.03053793646399393,
+                  "rpe_rotation_rmse_deg": 0.007634426836104963,
+                  "rpe_translation_world_rmse_m": 0.030543115753922812,
+                  "attitude_reference_valid": true,
+                  "alignment_se3": [
+                    [
+                      0.9999931782825235,
+                      0.0006713820977547608,
+                      -0.0036321666392715724,
+                      0.004504169239825773
+                    ],
+                    [
+                      -0.0006659316381886077,
+                      0.9999986508508074,
+                      0.0015016096755476327,
+                      -0.002356421490175342
+                    ],
+                    [
+                      0.003633169892791027,
+                      -0.0014991806573102506,
+                      0.9999922762371146,
+                      0.3122229924548958
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "alignment_scale": 1.0
+                }
+              }
             }
           ]
         }
