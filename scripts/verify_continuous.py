@@ -11,6 +11,7 @@ import numpy as np
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--duration',type=float,default=600.)
     args = parser.parse_args()
     import rclpy
     from nav_msgs.msg import Odometry
@@ -45,7 +46,7 @@ def main():
     stopping = [False]
     signal.signal(signal.SIGTERM, lambda *_: stopping.__setitem__(0, True))
     try:
-        end = time.monotonic() + 600
+        end = time.monotonic() + args.duration
         while not stopping[0] and time.monotonic() < end:
             rclpy.spin_once(node, timeout_sec=.05)
     finally:

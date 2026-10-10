@@ -29,9 +29,9 @@ def prepare_sensors(root, run_dir, profile='sensors', sensor_profile=None, scene
     if profile not in ('sensors','navigation'): raise ValueError('unknown sensor profile')
     if sensor_profile is not None and sensor_profile not in ('livox','livox-rtk','mechanical'):
         raise ValueError('unknown timed sensor profile')
-    if scene is not None and sensor_profile is None:
-        raise ValueError('experiment scene requires a timed sensor profile')
     filename = 'sensors-'+sensor_profile+'.json' if sensor_profile else 'navigation-sensors.json' if profile=='navigation' else 'sensors.json'
+    if profile=='navigation' and scene=='corridor' and sensor_profile is None:
+        filename='navigation-corridor-sensors.json'
     c = json.loads((root/'configs'/filename).read_text())
     directory = run_dir/'configuration'
     directory.mkdir(exist_ok=True, parents=True)
@@ -94,7 +94,7 @@ def prepare_sensors(root, run_dir, profile='sensors', sensor_profile=None, scene
     write_xml(sdf,model_path)
     (model_dir/'model.config').write_text('<model><name>x500_sensors</name><version>0.2.0</version><sdf version="1.9">model.sdf</sdf></model>\n')
     scenario = None
-    if sensor_profile:
+    if sensor_profile or scene:
         from experiment_scenarios import generate_scene
         scenario = generate_scene(root, directory/'scene', scene or 'circle-eight')
         c['scene'] = scenario['route']['scene']

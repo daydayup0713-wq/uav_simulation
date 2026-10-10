@@ -5,6 +5,9 @@ import os
 from pathlib import Path
 import threading
 import time
+import uuid
+import hashlib
+import numpy as np
 
 import rclpy
 from rclpy.action import ActionServer, GoalResponse, CancelResponse
@@ -22,7 +25,7 @@ from px4_msgs.msg import (VehicleLocalPosition, VehicleStatus, VehicleAttitude,
                           VehicleLandDetected, VehicleCommandAck, VehicleCommand,
                           OffboardControlMode, TrajectorySetpoint, VehicleOdometry, EstimatorStatusFlags)
 from uav_lab_interfaces.action import ExecuteFlight, ExecuteTrajectory
-from uav_lab_interfaces.msg import TrajectoryReference
+from uav_lab_interfaces.msg import TrajectoryReference,CollisionSnapshot
 from uav_lab_interfaces.srv import SelectBackends
 from .controller import FlightController
 from .coordinate import ned_to_enu, enu_to_ned, px4_to_ros_quaternion, yaw_to_ned
@@ -39,7 +42,11 @@ class Bridge(Node):
         self.navigation_enabled = bool(self.get_parameter('navigation_required').value)
         self.navigation = NavigationGate()
         self.operator_generation = 0
-        self.policy = FlightController(speed=.5, tolerance=.15, acceleration=.5) if self.navigation_enabled else FlightController()
+        self.declare_parameter('flight_lower',[-10.,-10.,.2])
+        self.declare_parameter('flight_upper',[10.,10.,5.])
+        bounds=(self.get_parameter('flight_lower').value,self.get_parameter('flight_upper').value)
+        self.policy = (FlightController(speed=.5, tolerance=.15, acceleration=.5,flight_bounds=bounds)
+                       if self.navigation_enabled else FlightController(flight_bounds=bounds))
         self.declare_parameter('external_odometry', False)
         self.external_enabled = bool(self.get_parameter('external_odometry').value)
         self.external = ExternalOdometryGate()
@@ -58,12 +65,23 @@ class Bridge(Node):
         self.path.header.frame_id = 'odom'
         self.trace = None
         run_dir = os.environ.get('LAB_RUN_DIR')
+        self.run_dir=Path(run_dir) if run_dir else None
         if run_dir:
             self.trace = (Path(run_dir) / 'events.jsonl').open('a', buffering=1)
         group = ReentrantCallbackGroup()
         self.group = group
         if self.navigation_enabled:
+            from .stop_admission import StopAdmission
+            root=Path(os.environ.get('LAB_ROOT',Path.cwd()))
+            candidate=self.run_dir/'configuration/navigation.json' if self.run_dir else None
+            config_path=candidate if candidate and candidate.exists() else root/'configs/navigation.json'
+            config=json.loads(config_path.read_text())
+            self.stop_map=StopAdmission(np.asarray(config['body_halfsize_m'])+config['clearance_m'])
+            self.policy.stop_admission=self.admit_stop
             self.create_subscription(DiagnosticArray, 'navigation/diagnostics', self.navigation_callback, 10, callback_group=group)
+            from rclpy.qos import QoSProfile,ReliabilityPolicy
+            self.create_subscription(CollisionSnapshot,'navigation/collision_snapshot',self.collision_callback,
+                QoSProfile(depth=1,reliability=ReliabilityPolicy.BEST_EFFORT),callback_group=group)
         # The executor must not start a newer sample while an earlier telemetry
         # callback waits for CPU/the policy lock. Actions and control remain concurrent.
         self.telemetry_group = MutuallyExclusiveCallbackGroup()
@@ -147,6 +165,34 @@ class Bridge(Node):
                 'position': [p.x,p.y,p.z], 'quaternion': [q.x,q.y,q.z,q.w],
                 'body_velocity': [v.x,v.y,v.z], 'body_angular_velocity': [w.x,w.y,w.z],
                 'pose_covariance': list(msg.pose.covariance), 'twist_covariance': list(msg.twist.covariance)}, time.monotonic())
+
+    def collision_callback(self, msg):
+        with self.lock:
+            try:
+                self.stop_map.observe({'lower':list(msg.lower),'resolution':msg.resolution,'shape':list(msg.shape),
+                    'free':msg.free,'envelope':list(msg.envelope),'version':msg.version,
+                    'source_stamp':msg.header.stamp.sec+msg.header.stamp.nanosec/1e9,
+                    'frame':msg.header.frame_id},time.monotonic())
+            except (ValueError,TypeError,OverflowError) as error:
+                self.stop_map.snapshot=None
+                self.record('stop_map_rejected',reason=str(error))
+
+    def admit_stop(self, trajectory, now, sim):
+        self.stop_map.admit(trajectory,now,sim)
+        snapshot=self.stop_map.snapshot;artifact={}
+        if self.run_dir:
+            try:
+                directory=self.run_dir/'stop-admission';directory.mkdir(exist_ok=True)
+                path=directory/(uuid.uuid4().hex+'.npz')
+                with path.open('xb') as stream:
+                    np.savez_compressed(stream,free=snapshot.free,lower=snapshot.lower,resolution=snapshot.resolution,
+                        source_stamp=snapshot.source_stamp,envelope=snapshot.envelope,map_version=snapshot.version)
+                artifact={'map_artifact':str(path.relative_to(self.run_dir)),
+                    'map_sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
+            except OSError as error:raise ValueError('stop map archive failed: '+str(error)) from error
+        self.record('stop_admission',trajectory=trajectory.to_dict(),source_stamp=snapshot.source_stamp,
+            map_version=snapshot.version,**artifact)
+        return True
 
     def navigation_callback(self, msg):
         with self.lock:

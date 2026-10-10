@@ -20,7 +20,12 @@ class Telemetry:
     land_at: float = -math.inf
 
 class FlightController:
-    def __init__(self, speed=1., tolerance=.3, settle=2., warmup=2., acceleration=None):
+    def __init__(self, speed=1., tolerance=.3, settle=2., warmup=2., acceleration=None, flight_bounds=None):
+        bounds=np.asarray(flight_bounds if flight_bounds is not None else [[-10.,-10.,.2],[10.,10.,5.]],dtype=float)
+        if (bounds.shape!=(2,3) or not np.isfinite(bounds).all() or np.any(bounds[1]<=bounds[0])
+                or np.any(np.abs(bounds[:,:2])>500.) or bounds[0,2]<.2 or bounds[1,2]>5.):
+            raise ValueError('finite ordered lab flight bounds within +/-500m and z 0.2..5m required')
+        self.flight_lower,self.flight_upper=bounds.copy()
         self.t = Telemetry()
         self.speed, self.tolerance, self.settle, self.warmup = speed, tolerance, settle, warmup
         self.state = 'WAITING'
@@ -45,6 +50,7 @@ class FlightController:
         self.trajectory_pending = None
         self.reference = None
         self.sim_time = 0.
+        self.stop_admission = None
 
     def update(self, now, **values):
         for key, value in values.items():
@@ -140,6 +146,12 @@ class FlightController:
             from .continuous_trajectory import Trajectory
             try:
                 stop = Trajectory.stop(self.reference)
+                for segment in stop.segments:
+                    hull=segment.bezier()
+                    if np.any(hull<self.flight_lower) or np.any(hull>self.flight_upper):
+                        raise ValueError('constrained stop outside lab flight bounds')
+                if self.stop_admission is not None:
+                    self.stop_admission(stop, now, self.sim_time)
             except ValueError as error:
                 self.fail('constrained hold unavailable: '+str(error))
                 raise
@@ -194,8 +206,7 @@ class FlightController:
         # Convex hull bounds include every point between controls, not just knots.
         for segment in trajectory.segments:
             hull = segment.bezier()
-            if (np.any(np.abs(hull[:, :2]) > 10) or np.any(hull[:, 2] < .2)
-                    or np.any(hull[:, 2] > 5)):
+            if np.any(hull < self.flight_lower) or np.any(hull > self.flight_upper):
                 raise ValueError('trajectory outside lab flight bounds')
         self.serial += 1
         token = self.serial
@@ -245,8 +256,8 @@ class FlightController:
             target = (self.takeoff_origin[0], self.takeoff_origin[1], self.takeoff_origin[2]+height)
         if target is None or len(target) != 3 or not all(math.isfinite(v) for v in target):
             raise ValueError('finite target required')
-        if abs(target[0]) > 10 or abs(target[1]) > 10 or not .2 <= target[2] <= 5:
-            raise ValueError('target outside lab bounds: x/y +/-10m, z 0.2..5m')
+        if np.any(np.asarray(target)<self.flight_lower) or np.any(np.asarray(target)>self.flight_upper):
+            raise ValueError('target outside configured lab flight bounds')
         if yaw is not None and not math.isfinite(yaw):
             raise ValueError('finite yaw required')
         token = self.begin(now)

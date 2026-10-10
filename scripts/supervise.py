@@ -135,14 +135,30 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--headless', action='store_true')
     p.add_argument('--rviz', action='store_true')
+    p.add_argument('--rendering',choices=('auto','mesa-display'),default='auto')
     p.add_argument('--web',action='store_true',help='start independent local observation UI on http://127.0.0.1:8080')
     p.add_argument('--continuous', action='store_true', help='execute navigation as collision-checked C2 trajectories')
     p.add_argument('--profile', choices=('flight', 'sensors', 'localization', 'slam', 'navigation'), default='flight')
     p.add_argument('--sensor-profile',choices=('livox','livox-rtk','mechanical'))
     p.add_argument('--scene',choices=('circle-eight','helix','multi-room','corridor','dense','outdoor-rtk'))
+    p.add_argument('--localization-backend',choices=('glim','fast_lio2','fast_livo2','fast_livo2_rtk','orb_slam3','lio_sam','vins_fusion'))
+    p.add_argument('--planner-backend',choices=('astar','ego','fast_planner','gcopter'),default='astar')
+    p.add_argument('--qualification',action='store_true',help='explicit supervised simulation qualification from valid replay evidence')
     options = p.parse_args()
-    if (options.scene and not options.sensor_profile) or (options.sensor_profile and options.profile!='sensors'):
-        p.error('timed sensor scenes currently require --profile sensors; backend contracts gate later closed loop')
+    selected=options.localization_backend is not None
+    if (options.scene and options.profile not in ('sensors','navigation')) or (options.sensor_profile and options.profile not in ('sensors','navigation')):
+        p.error('experiment scenes require sensors or navigation profile')
+    if options.sensor_profile and options.profile=='navigation' and not selected:
+        p.error('timed navigation requires an explicitly qualified localization backend')
+    if (selected or options.qualification or options.planner_backend!='astar') and (not selected or options.profile!='navigation' or not options.continuous):
+        p.error('backend pairs require --profile navigation --continuous and --localization-backend')
+    selection=None
+    if selected:
+        from experiment_configuration import binding
+        calibration_file=ROOT/'configs'/('sensors-'+options.sensor_profile+'.json' if options.sensor_profile else 'navigation-sensors.json')
+        try:selection=binding(ROOT,options.localization_backend,options.planner_backend,
+                              json.loads(calibration_file.read_text()),options.qualification)
+        except (ValueError,OSError,KeyError) as error:p.error(str(error))
     runtime = ROOT / '.runtime'
     runtime.mkdir(exist_ok=True)
     lock = (runtime / 'lab.lock').open('w')
@@ -161,6 +177,7 @@ def main():
                 'environment': {k: env.get(k) for k in ('ROS_DOMAIN_ID','GZ_PARTITION','RMW_IMPLEMENTATION')},
                 'headless': options.headless, 'profile': options.profile, 'sensor_profile':options.sensor_profile,
                 'scene':options.scene, 'web':options.web, 'continuous_trajectory': options.continuous,
+                'backend_selection':selection,
                 'parameters': {'COM_RC_IN_MODE': 4, 'COM_OF_LOSS_T': 1, 'COM_OBL_RC_ACT': 4,
                                'COM_DL_LOSS_T': 300, 'NAV_DLL_ACT': 0, 'UXRCE_DDS_SYNCT': 0,
                                'UXRCE_DDS_PTCFG': 1,
@@ -170,6 +187,8 @@ def main():
             EKF2_EV_CTRL=11, EKF2_HGT_REF=3, EKF2_BARO_CTRL=0, EKF2_MAG_TYPE=5, EKF2_EV_DELAY=0)
     snapshots = run_dir/'configuration'
     snapshots.mkdir()
+    from control_provenance import snapshot
+    metadata['control_implementation']=snapshot(ROOT,snapshots/'control-source')
     # Keep larger image payloads on bounded local SHM. UDP discovery remains
     # restricted to loopback by the archived profile, even though ROS's generic
     # localhost flag is disabled to avoid its transport override.
@@ -181,7 +200,7 @@ def main():
         env.update(FASTRTPS_DEFAULT_PROFILES_FILE=str(dds),ROS_LOCALHOST_ONLY='0')
         metadata['dds_profile']='configuration/fastdds-local.xml'
     localization = options.profile in ('localization', 'slam', 'navigation')
-    if localization and not (ROOT/'.deps/slam/install/build-manifest.json').is_file():
+    if localization and not selected and not (ROOT/'.deps/slam/install/build-manifest.json').is_file():
         raise RuntimeError('private CPU localization backend missing; run bootstrap_slam.py')
     sensor = prepare_sensors(ROOT, run_dir, 'navigation' if options.profile == 'navigation' else 'sensors',
                              sensor_profile=options.sensor_profile,scene=options.scene) if options.profile != 'flight' else None
@@ -193,8 +212,9 @@ def main():
     files = ['simulation/worlds/lab.sdf', 'configs/px4-start.sh', 'configs/lab.rviz', 'dependencies/lock.json']
     if sensor:
         files += ['simulation/worlds/room.sdf', 'configs/sensors.json', 'configs/sensors.rviz', 'configs/recording-qos.yaml']
-    if options.sensor_profile:
-        files += ['configs/sensors-'+options.sensor_profile+'.json','scripts/experiment_scenarios.py','configs/fastdds-local.xml']
+    if options.sensor_profile or options.scene:
+        files += ['scripts/experiment_scenarios.py','configs/fastdds-local.xml']
+        if options.sensor_profile:files += ['configs/sensors-'+options.sensor_profile+'.json']
     if options.profile == 'navigation':
             files += ['simulation/worlds/navigation.sdf', 'configs/navigation-sensors.json', 'configs/navigation.json']
     for relative in files:
@@ -223,17 +243,22 @@ def main():
         check_port(8888)
         agent_env = {**env, 'LD_LIBRARY_PATH': str(ROOT/'.deps/agent-install/lib')+':'+str(ROOT/'.deps/agent-install/lib64')}
         manager.start('agent', [ROOT/'.deps/agent-install/bin/MicroXRCEAgent', 'udp4', '-p', '8888'], env=agent_env)
+        from rendering_configuration import configure
+        renderer=configure(options.rendering,options.headless,sensor,env)
+        metadata['rendering']={'mode':renderer['mode'],'headless_egl':renderer['headless_egl'],
+            'environment':{k:v for k,v in renderer['environment'].items() if k in ('DISPLAY','__GLX_VENDOR_LIBRARY_NAME','__EGL_VENDOR_LIBRARY_FILENAMES')},'scope':renderer['scope']}
+        (run_dir/'manifest.json').write_text(json.dumps(metadata,indent=2)+'\n')
         gz_command = ['gz', 'sim', '-r', '-s', world_path]
-        if sensor and options.headless:
+        if renderer['headless_egl']:
             gz_command.append('--headless-rendering')
-        manager.start('gazebo', gz_command, env=env)
+        manager.start('gazebo', gz_command, env=renderer['environment'])
         def world_ready():
             result = subprocess.run(['gz', 'service', '-i', '-s', '/world/lab/scene/info'], env=env,
                                     capture_output=True, text=True, timeout=3)
             return 'Service providers' in result.stdout
         wait_for(manager, world_ready, 'Gazebo scene', 45)
         if not options.headless:
-            manager.start('gazebo-gui', ['gz', 'sim', '-g'], env=env)
+            manager.start('gazebo-gui', ['gz', 'sim', '-g'], env=renderer['environment'])
         manager.start('clock', ['ros2', 'run', 'ros_gz_bridge', 'parameter_bridge',
                               '/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock'], env=env)
         px4_env = {**env, 'PX4_SYS_AUTOSTART': '4001', 'PX4_SIM_MODEL': 'gz_x500',
@@ -246,6 +271,13 @@ def main():
             bridge_command += ['--ros-args','-p','external_odometry:=true']
         if options.profile == 'navigation':
             bridge_command += ['-p','navigation_required:=true']
+            if sensor['calibration'].get('route_file'):
+                route=json.loads((snapshots/sensor['calibration']['route_file']).read_text())
+                bounds=route['flight_bounds'];lower=list(bounds['lower']);upper=list(bounds['upper'])
+                lower[2],upper[2]=.2,5.
+                bridge_command += ['-p','flight_lower:='+json.dumps(lower),'-p','flight_upper:='+json.dumps(upper)]
+                metadata['flight_bounds']={'frame':'odom','lower':lower,'upper':upper}
+                (run_dir/'manifest.json').write_text(json.dumps(metadata,indent=2)+'\n')
         manager.start('bridge', bridge_command, env=env)
         if sensor:
             manager.start('sensor-bridge', ['ros2','run','ros_gz_bridge','parameter_bridge',
@@ -267,11 +299,19 @@ def main():
             if result.returncode:
                 raise RuntimeError('sensor data readiness failed: '+result.stdout.strip()+' '+result.stderr.strip())
         if localization:
-            slam_config = prepare_slam(ROOT, snapshots/'slam', sensor['calibration'])
-            manager.start('lio', ['ros2','run','glim_ros','glim_rosnode','--ros-args',
-                                  '-p','config_path:='+str(slam_config), '-p','use_sim_time:=true',
-                                  '-r','/tf:=/uav001/localization/raw_tf'], env=env)
-            manager.start('localization', ['ros2','run','uav_lab_localization','localization'], env=env)
+            if selected:
+                from experiment_configuration import prepare_backend
+                commands=prepare_backend(ROOT,sensor['calibration'],snapshots/'selected-localization',run_dir.name,selection)
+                for name,command in commands:manager.start(name,command,env=env)
+                metadata['snapshot_sha256']={str(path.relative_to(snapshots)):hashlib.sha256(path.read_bytes()).hexdigest()
+                    for path in snapshots.rglob('*') if path.is_file()}
+                (run_dir/'manifest.json').write_text(json.dumps(metadata,indent=2)+'\n')
+            else:
+                slam_config = prepare_slam(ROOT, snapshots/'slam', sensor['calibration'])
+                manager.start('lio', ['ros2','run','glim_ros','glim_rosnode','--ros-args',
+                                      '-p','config_path:='+str(slam_config), '-p','use_sim_time:=true',
+                                      '-r','/tf:=/uav001/localization/raw_tf'], env=env)
+                manager.start('localization', ['ros2','run','uav_lab_localization','localization'], env=env)
             def lio_ready():
                 result = subprocess.run(['ros2','run','uav_lab_localization','slamctl','status','--timeout','2'],
                                         env=env, capture_output=True, text=True, timeout=5)
@@ -283,6 +323,9 @@ def main():
             navigation_command = ['ros2','run','uav_lab_navigation','navigation']
             if options.continuous:
                 navigation_command += ['--ros-args', '-p', 'continuous_trajectory:=true']
+            if selected:
+                navigation_command += ['-p','planner_backend:='+options.planner_backend,
+                    '-p','rolling_map:=true','-p','input_cloud_topic:=/uav001/lidar/points']
             manager.start('navigation', navigation_command, env=env)
             def navigation_ready():
                 result = subprocess.run(['ros2','run','uav_lab_navigation','navctl','--timeout','2','status'],
@@ -307,7 +350,9 @@ def main():
         print('LAB READY '+str(run_dir), flush=True)
         failure_started = None
         while True:
-            control_components = ('bridge','agent','clock','lio','localization','navigation')
+            control_components = ('bridge','agent','clock','lio','localization','navigation',
+                                  'sensors','sensor-bridge','timed-sensors','backend-input','backend-camera','backend-normalizer')
+            control_components+=tuple(name for name,_ in manager.processes if name.startswith('backend-core-'))
             broken = [name for name, process in manager.processes if name in control_components and process.poll() is not None]
             if broken and failure_started is None:
                 failure_started = time.monotonic()

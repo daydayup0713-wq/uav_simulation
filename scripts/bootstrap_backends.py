@@ -59,6 +59,11 @@ def colcon(name,sources,prefix,jobs):
          '--merge-install','--parallel-workers','1','--cmake-args','-DCMAKE_BUILD_TYPE=Release','-DBUILD_TESTING=OFF'],env,cwd=base)
 
 def manifest(backend,prefix,binary,repositories,jobs=1):
+    # The lock also contains copied message/patch origins. Keep them in the
+    # source inventory even if a specific builder compiles only a subset.
+    lock=json.loads((ROOT/'dependencies/backends.lock.json').read_text())
+    repositories=lock['backends'][backend]['repositories']
+    verify_sources(ROOT,lock,repositories)
     output=prefix/(backend+'-build-manifest.json')
     runtime={}
     for path in [binary,*prefix.rglob('*.so*'),*prefix.glob('lib/lio_sam/lio_sam_*'),

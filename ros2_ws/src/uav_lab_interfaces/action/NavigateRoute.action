@@ -1,0 +1,9 @@
+geometry_msgs/PoseStamped[] controls
+---
+bool success
+string reason
+---
+string phase
+geometry_msgs/PoseStamped current_pose
+uint32 current_control
+uint32 replans

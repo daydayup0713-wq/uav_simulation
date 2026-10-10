@@ -51,7 +51,8 @@ def definition(name):
     lower[2], upper[2] = -.2, 5.
     boxes.insert(0, [[float(lower[0]-2), float(lower[1]-2), -.2], [float(upper[0]+2), float(upper[1]+2), 0.]])
     if name != 'outdoor-rtk':
-        boxes.extend([[[lower[0]-.2,lower[1],0],[lower[0],upper[1],5]],
+        boxes.extend([[[lower[0],lower[1],5.],[upper[0],upper[1],5.2]],
+                      [[lower[0]-.2,lower[1],0],[lower[0],upper[1],5]],
                       [[upper[0],lower[1],0],[upper[0]+.2,upper[1],5]],
                       [[lower[0],lower[1]-.2,0],[upper[0],lower[1],5]],
                       [[lower[0],upper[1],0],[upper[0],upper[1]+.2,5]]])

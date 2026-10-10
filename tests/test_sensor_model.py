@@ -56,3 +56,10 @@ def test_navigation_profile_has_archived_wide_lidar_and_physical_divider(tmp_pat
     world=ET.parse(result['world']).getroot().find('world')
     assert world.find("model[@name='navigation_divider']/link/collision/geometry/box/size") is not None
     assert result['calibration']['lidar']['vertical_samples']==64
+
+
+def test_complex_scene_can_keep_synchronous_baseline_sensor_contract(tmp_path):
+    result=module().prepare_sensors(ROOT,tmp_path,profile='navigation',scene='circle-eight')
+    lidar=ET.parse(result['model']).getroot().find(".//sensor[@name='lab_lidar']")
+    assert lidar is not None and result['calibration']['lidar'].get('measurement_time')!='per_beam'
+    assert (tmp_path/'configuration/scene/route.json').exists()

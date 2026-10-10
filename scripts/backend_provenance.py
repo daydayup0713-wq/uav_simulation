@@ -7,6 +7,7 @@ ADAPTER_FILES=[
     'scripts/bootstrap_backends.py','scripts/backend_env.sh','scripts/backend_configs.py','scripts/replay_backend.py',
     'scripts/backend_provenance.py','scripts/backend_launch.py','scripts/live_backend.py',
     'scripts/vins_map.py',
+    'configs/fastdds-local.xml',
     'localization/interfaces/livox_ros_driver2/CMakeLists.txt','localization/interfaces/livox_ros_driver2/package.xml',
     'localization/interfaces/livox_ros_driver2/msg/CustomMsg.msg','localization/interfaces/livox_ros_driver2/msg/CustomPoint.msg',
     *['ros2_ws/src/uav_lab_experiments/uav_lab_experiments/'+name+'.py' for name in

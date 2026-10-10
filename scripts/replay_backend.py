@@ -113,6 +113,16 @@ def log_tail(path,limit=20000):
         stream.seek(max(0,Path(path).stat().st_size-limit));return stream.read().decode(errors='replace')
 
 
+def configure_replay_transport(configuration,environment):
+    """Own the large-sensor transport before either observer or child initializes ROS."""
+    profile=Path(configuration).resolve()/'fastdds-local.xml'
+    profile.write_bytes((ROOT/'configs/fastdds-local.xml').read_bytes())
+    transport={'ROS_LOCALHOST_ONLY':'0','RMW_IMPLEMENTATION':'rmw_fastrtps_cpp',
+        'FASTRTPS_DEFAULT_PROFILES_FILE':str(profile)}
+    os.environ.update(transport)
+    return dict(environment,**transport)
+
+
 def main():
     global OWNED_OUTPUT
     parser=argparse.ArgumentParser(description=__doc__)
@@ -142,6 +152,7 @@ def main():
         import shutil
         shutil.copytree(args.public_config,output/'configuration');config=output/'configuration/parameters.yaml'
     else:config=write_config(args.backend,metadata['calibration'],output/'configuration',output.name)
+    env=configure_replay_transport(output/'configuration',env)
     map_snapshot=None
     if args.vins_map:
         map_snapshot=snapshot_vins_map(args.vins_map,output/'configuration/pose_graph')
@@ -272,6 +283,9 @@ def main():
             'loop_closure':'observed' if node and node.loop_edges else 'not observed in this run',
             'relocalization':'cross-session constraints observed' if pose_graph and pose_graph.get('cross_session_constraints',0)>0 else 'not verified by this replay; no control qualification'},
         'playback_rate':args.rate,'player_exit_code':exit_code,'requested_source_duration_s':args.duration or None,
+        'transport':{'profile':'configuration/fastdds-local.xml',
+            'profile_sha256':file_hash(output/'configuration/fastdds-local.xml'),
+            'ROS_LOCALHOST_ONLY':env['ROS_LOCALHOST_ONLY'],'RMW_IMPLEMENTATION':env['RMW_IMPLEMENTATION']},
         'latency_source_s':{'p50':float(np.median(latency)),'p95':float(np.quantile(latency,.95)),'min':float(latency.min())} if len(latency) else None,
         'runtime_s':time.monotonic()-start,'resources':resources,'resource_summary':resource_summary(resources),
         'implementation_sha256':provenance['implementation_sha256'],

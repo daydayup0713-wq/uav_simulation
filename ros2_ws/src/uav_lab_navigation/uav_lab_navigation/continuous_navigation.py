@@ -25,9 +25,17 @@ def reference(node):
     return msg, state
 
 
-def checked_curve(node, goal, initial):
+def replan_join(curve,elapsed,source_ns,lead):
+    if not math.isfinite(lead) or not .2<=lead<=2.:raise ValueError('bounded solver scheduling lead required (0.2..2 seconds)')
+    if not math.isfinite(elapsed) or not 0<=elapsed<=curve.duration:raise ValueError('valid reference elapsed time required')
+    joined=elapsed+lead
+    if joined>=curve.duration:return None
+    return joined,curve.sample(joined),source_ns+round(lead*1e9)
+
+
+def checked_curve(node, goal, initial, planning_timeout=None):
     if getattr(node,'planner_backend','astar')!='astar':
-        curve,collision=node.make_curve(goal,initial)
+        curve,collision=node.make_curve(goal,initial,planning_timeout=planning_timeout)
         if not curve.collision_free(collision):raise RuntimeError('NO_SAFE_CONTINUOUS_TRAJECTORY')
         node.record('continuous_plan',trajectory=curve.to_dict(),backend=node.planner_backend,
                     map_version=collision.version,**node.archive_plan(collision))
@@ -116,13 +124,15 @@ def navigate_continuous(node, handle):
                         raise RuntimeError('continuous replan limit exceeded')
                     # Keep the active curve only when the entire scheduling prefix
                     # remains admissible. Otherwise stop inside observed free space.
-                    join_elapsed = min(curve.duration, elapsed + .6)
-                    if join_elapsed > elapsed and curve.collision_free(updated, start_time=elapsed, end_time=join_elapsed):
-                        initial = curve.sample(join_elapsed)
-                        replacement, collision = checked_curve(node, handle.request.goal, initial)
+                    stamp_ns = msg.header.stamp.sec * 10**9 + msg.header.stamp.nanosec
+                    lead=getattr(node,'replan_lead_s',.6)
+                    join=replan_join(curve,elapsed,stamp_ns,lead)
+                    if join is not None and curve.collision_free(updated, start_time=elapsed, end_time=join[0]):
+                        join_elapsed,initial,start_ns=join
+                        replacement, collision = checked_curve(node, handle.request.goal, initial,planning_timeout=lead-.3)
                         node.check_motion(epoch)
-                        stamp_ns = msg.header.stamp.sec * 10**9 + msg.header.stamp.nanosec
-                        start_ns = stamp_ns + int(round((join_elapsed - elapsed) * 1e9))
+                        if start_ns-node.get_clock().now().nanoseconds<150_000_000:
+                            raise RuntimeError('native planning exceeded reserved scheduling window; constrained hold')
                         request = trajectory_goal(replacement, uuid.uuid4().hex, start_ns,
                                                   replaces=request.trajectory_id, epoch=epoch)
                         leg = submit(request)

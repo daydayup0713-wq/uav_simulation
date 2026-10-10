@@ -64,9 +64,37 @@ class Operator:
         finally:
             self.node.destroy_client(client)
 
-    def flight(self, operation, height=2., target=(0., 0., 2.), yaw=0.):
+    def prepare_action(self):
+        """Confirm the cold client's request/reply path using rejected no-op goals.
+
+        DDS request discovery can precede reply discovery. Never retry a real
+        flight command to work around that window; operation 255 is rejected
+        by the flight adapter before execution in every vehicle state.
+        """
+        if getattr(self, '_action_ready', False):
+            return
         if not self.action.wait_for_server(timeout_sec=5):
             raise RuntimeError('flight action unavailable')
+        errors = []
+        for _ in range(3):
+            probe = self.action_type.Goal()
+            probe.operation = 255
+            try:
+                handle = self.wait(self.action.send_goal_async(probe), 1.)
+            except RuntimeError as error:
+                errors.append(str(error))
+                continue
+            if handle.accepted:
+                try:
+                    self.wait(handle.cancel_goal_async(), 1.)
+                finally:
+                    raise RuntimeError('action discovery probe unexpectedly accepted; no flight goal submitted')
+            self._action_ready = True
+            return
+        raise RuntimeError('action discovery unconfirmed; no flight goal submitted: '+ '; '.join(errors))
+
+    def flight(self, operation, height=2., target=(0., 0., 2.), yaw=0.):
+        self.prepare_action()
         goal = self.action_type.Goal()
         goal.operation = {'TAKEOFF': 0, 'GOTO': 1, 'LAND': 2}[operation]
         goal.height_m = float(height)
