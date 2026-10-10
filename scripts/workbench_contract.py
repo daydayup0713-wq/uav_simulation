@@ -15,7 +15,10 @@ def authorize(command,state,now,mode):
     if any(state.get(key) not in ('True','False') for key in ('armed','landed','offboard')):
         raise ValueError('unknown flight state flags prohibit commands')
     armed,landed,offboard=[state.get(key)=='True' for key in ('armed','landed','offboard')]
-    if command in ('select','stop'):
+    if command=='stop':
+        if armed or not landed or state.get('phase') not in ('READY','FAILSAFE'):
+            raise ValueError('disarmed landed stable ground state required')
+    elif command=='select':
         if armed or not landed or state.get('phase')!='READY':raise ValueError('idle disarmed landed ground state required')
     elif command=='arm':
         if armed or not landed or state.get('phase')!='READY':raise ValueError('idle disarmed ground state required')

@@ -1,0 +1,223 @@
+{
+  "schema": 1,
+  "scope": "normal simulation and fault qualification of this exact implementation/pair/input group only",
+  "source_revision": "183f634bea197855918fc40c57ff19328e47a1b2",
+  "pair": {
+    "localization": "glim",
+    "planning": "fast_planner",
+    "input_group": "synchronous_lidar_imu"
+  },
+  "control_implementation_sha256": "1a280030d81a9e934c0ab22d26872837584a57e142c2d45af7e9b88f29025eff",
+  "backend_implementations": {
+    "glim": "1c30c3feb84dd329eee09dbff2877a91418c75a8a9c7fe5a36aca23346953686",
+    "fast_planner": "90387c140d48d62966a7e16be88046d46f3239e15facf0e5f260fbb6e877c58a"
+  },
+  "normal_run_id": "20261010T031951Z-99424de7",
+  "runs": 3,
+  "resources": {
+    "closed_loop": {
+      "observed_wall_s": 515.6004617970029,
+      "observed_cpu_s": 1320.8700000000001,
+      "mean_cpu_cores": 2.5618091872850957,
+      "peak_combined_rss_bytes": 1134772224,
+      "process_peak_rss_bytes": {
+        "798210": 153276416,
+        "798212": 667725824,
+        "798615": 25706496,
+        "798618": 180805632,
+        "798642": 11452416,
+        "798806": 56582144,
+        "798842": 90222592,
+        "798864": 89939968,
+        "798929": 52772864,
+        "798974": 16330752,
+        "799014": 39440384,
+        "799073": 39530496,
+        "799092": 39374848,
+        "799149": 106962944,
+        "799188": 75268096,
+        "799221": 38522880,
+        "799248": 38518784,
+        "799401": 89710592,
+        "799453": 49266688,
+        "799502": 38023168,
+        "799520": 90918912,
+        "799537": 90603520,
+        "799584": 34168832,
+        "799601": 31203328,
+        "799618": 0,
+        "799635": 108679168,
+        "799656": 38465536,
+        "799748": 38248448,
+        "799764": 38912000,
+        "799966": 75341824,
+        "800063": 39460864,
+        "800082": 37933056,
+        "800121": 38440960,
+        "800151": 39428096,
+        "800173": 16457728,
+        "800239": 33525760,
+        "800265": 89939968,
+        "800303": 37924864,
+        "800341": 38412288,
+        "800432": 0,
+        "801208": 87629824,
+        "801402": 99131392,
+        "801480": 38113280,
+        "801499": 39133184,
+        "801512": 0,
+        "801536": 23638016,
+        "801548": 62828544,
+        "801732": 89702400,
+        "801769": 38772736,
+        "801848": 39190528,
+        "801860": 9580544,
+        "801872": 39022592,
+        "801937": 39563264,
+        "801949": 90460160,
+        "801989": 38350848,
+        "802011": 38039552,
+        "802025": 39497728,
+        "802058": 105152512,
+        "802191": 37175296,
+        "802251": 0,
+        "802280": 39481344,
+        "802302": 39624704,
+        "802327": 90894336,
+        "802341": 39649280,
+        "802365": 87568384,
+        "802391": 39313408,
+        "802428": 89559040,
+        "802468": 39333888,
+        "802525": 39624704,
+        "802578": 29966336,
+        "802602": 39424000,
+        "802614": 39493632,
+        "802675": 39841792
+      },
+      "scope": "sampled owned navigation, localization, camera parameter and native planner processes; excludes flight bridge, PX4, Gazebo, rendering, recorder and browser; 0.5s sampling may miss short-lived children"
+    }
+  },
+  "normal": {
+    "continuous": {
+      "passed": true,
+      "failed_checks": [],
+      "tracking_p95_m": 0.04192799618027195,
+      "tracking_maximum_m": 0.07434427563867801,
+      "tracking_samples": 2114,
+      "reference_samples": 22448,
+      "reference_rate_hz": 50.32849923549673,
+      "reference_max_speed_mps": 0.48989030739252176,
+      "reference_max_acceleration_mps2": 0.3616628909645229,
+      "reference_max_finite_difference_jerk_mps3": 0.6200564233627732,
+      "heartbeat_samples": 9630,
+      "setpoint_samples": 24071,
+      "heartbeat_rate_hz": 19.985221052441993,
+      "setpoint_rate_hz": 50.01237671267933,
+      "rate_scope": "only within each trajectory observation window",
+      "tracking_source": "PX4 normalized odometry versus time-aligned commanded reference"
+    },
+    "geometry": {
+      "passed": true,
+      "failed_checks": [],
+      "source": "Gazebo truth and physical scene geometry; evaluator only; no fitted control alignment",
+      "body_scope": "attitude-rotated conservative full-body envelope",
+      "min_body_clearance_m": 0.7042359194929508,
+      "airborne_samples": 11326,
+      "truth_tracking_p95_m": 0.0352530526570623,
+      "truth_tracking_samples": 10758,
+      "covered_controls": 141,
+      "expected_controls": 141,
+      "successful_runs": 3,
+      "expected_runs": 3,
+      "handoffs": 138,
+      "minimum_handoff_speed_mps": 0.1946905731987648
+    },
+    "handoffs": {
+      "passed": true,
+      "failed_checks": [],
+      "accepted_curves": 141,
+      "joins": 138,
+      "maximum_join_error": 4.246603069191224e-15
+    }
+  },
+  "faults": {
+    "hold": {
+      "passed": true,
+      "reason": "",
+      "case": "hold",
+      "run_id": "20261010T032902Z-f6ea6bae",
+      "fault_started_at": 183075.396365483,
+      "motion_returncode": 1,
+      "constrained_stop_confirmed": true,
+      "final": {
+        "armed": false,
+        "landed": true,
+        "offboard": true
+      }
+    },
+    "land": {
+      "passed": true,
+      "reason": "",
+      "case": "land",
+      "run_id": "20261010T032955Z-42a02d8f",
+      "fault_started_at": 183132.582159356,
+      "motion_returncode": 1,
+      "final": {
+        "armed": false,
+        "landed": true,
+        "offboard": true
+      }
+    },
+    "localization_exit": {
+      "passed": true,
+      "reason": "",
+      "case": "localization_exit",
+      "run_id": "20261010T033049Z-0ef89d04",
+      "fault_started_at": 183182.647120157,
+      "motion_returncode": 1,
+      "failsafe_landing_observed": true,
+      "recovery_arm_rejected": true,
+      "final": {
+        "armed": false,
+        "landed": true,
+        "offboard": true
+      }
+    },
+    "source_stale": {
+      "passed": true,
+      "reason": "",
+      "case": "source_stale",
+      "run_id": "20261010T033140Z-68b94c9e",
+      "fault_started_at": 183233.8120401,
+      "motion_returncode": 1,
+      "failsafe_landing_observed": true,
+      "source_process_resumed": true,
+      "recovery_arm_rejected": true,
+      "final": {
+        "armed": false,
+        "landed": true,
+        "offboard": true
+      }
+    },
+    "web_disconnect": {
+      "passed": true,
+      "reason": "",
+      "case": "web_disconnect",
+      "run_id": "20261010T033234Z-ee48f643",
+      "fault_started_at": 183288.297048657,
+      "motion_returncode": 0,
+      "web_process_exit_flight_continued": true,
+      "final": {
+        "armed": false,
+        "landed": true,
+        "offboard": true
+      }
+    }
+  },
+  "witness": {
+    "path": ".runtime/pair-evidence/l1-glim-fast-transport1-20261010.json",
+    "sha256": "bf2b63704275a632b74273c112d1bb1bc2c4d87ef982e119268b34b802bdd5e0",
+    "artifact_count": 1686
+  }
+}

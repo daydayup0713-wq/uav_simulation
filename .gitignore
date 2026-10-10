@@ -1,4 +1,6 @@
 .deps/
+!/tests/fixtures/backend-configs/.deps/
+!/tests/fixtures/backend-configs/.deps/**
 .runtime/
 .superpowers/
 ros2_ws/build/

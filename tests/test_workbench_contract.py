@@ -42,3 +42,14 @@ def test_rendering_choice_is_explicit_and_validated():
     assert configuration(selected)==selected
     selected['rendering']='arbitrary-shell'
     with pytest.raises(ValueError):configuration(selected)
+
+
+def test_fresh_landed_failsafe_allows_owned_shutdown_but_never_rearms():
+    failed=state(phase='FAILSAFE')
+    assert api().authorize('stop',failed,10.1,'live')
+    for command in ('select','arm','takeoff'):
+        with pytest.raises(ValueError):api().authorize(command,failed,10.1,'live')
+    for unsafe in (state(armed='True',landed='False',phase='FAILSAFE'),
+                   state(phase='WARMUP'),state(phase='ARMING')):
+        with pytest.raises(ValueError):api().authorize('stop',unsafe,10.1,'live')
+    with pytest.raises(ValueError,match='fresh'):api().authorize('stop',failed,12.,'live')

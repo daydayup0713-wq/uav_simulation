@@ -3,6 +3,8 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+pytestmark = pytest.mark.usefixtures('pinned_backend_config_root')
+
 
 def test_livo_camera_and_lidar_extrinsics_come_from_declared_rig():
     from backend_configs import simulation_parameters

@@ -1,6 +1,7 @@
 import sys
 import os
 import json
+import shutil
 import pytest
 from pathlib import Path
 
@@ -21,3 +22,25 @@ def select_test_domain(runtime, environment):
 @pytest.fixture
 def isolated_ros_domain():
     return select_test_domain(ROOT/'.runtime', os.environ)
+
+
+@pytest.fixture
+def pinned_backend_config_root(tmp_path, monkeypatch):
+    """Config-only tests use real installed templates, or audited fixture copies.
+
+    This does not mark a backend installed or bypass its production build gate.
+    Native tests still read their actual pinned private dependency checkout.
+    """
+    fixtures = ROOT/'tests/fixtures/backend-configs'
+    manifest = json.loads((fixtures/'provenance.json').read_text())
+    required = [ROOT/'.deps'/repository/name
+        for repository, data in manifest['repositories'].items()
+        for name in data['files']]
+    if all(path.is_file() for path in required):
+        return ROOT
+    import backend_configs
+    destination = tmp_path/'config-only-checkout'
+    shutil.copytree(fixtures/'.deps', destination/'.deps')
+    (destination/'configs').symlink_to(ROOT/'configs', target_is_directory=True)
+    monkeypatch.setattr(backend_configs, 'ROOT', destination)
+    return destination

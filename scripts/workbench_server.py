@@ -219,7 +219,8 @@ class Workbench:
             elif command=='goto':
                 target=payload.get('target');yaw=float(payload.get('yaw',0.))
                 if not isinstance(target,list) or len(target)!=3 or not all(isinstance(x,(int,float)) and math.isfinite(x) for x in target) or not math.isfinite(yaw):raise ValueError('finite ENU target required')
-                args=['ros2','run','uav_lab_navigation','navctl','--timeout','120','goto','--x',str(target[0]),'--y',str(target[1]),'--z',str(target[2]),'--yaw',str(yaw)]
+                args=['/usr/bin/python3',str(self.root/'scripts/workbench_goto.py'),
+                    *map(str,target),'--yaw',str(yaw),'--timeout','120']
             elif command=='route':
                 route=active[0]/'configuration/scene/route.json'
                 if not route.is_file():raise ValueError('active experiment has no archived route')

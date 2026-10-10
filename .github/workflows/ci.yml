@@ -12,8 +12,9 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get update && sudo apt-get install -y python3-pytest python3-numpy python3-scipy python3-psutil python3-yaml python3-websockets
-      - run: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python3 -m pytest -q
+      - run: sudo apt-get update && sudo apt-get install -y python3-pip python3-pytest python3-numpy python3-scipy python3-psutil python3-yaml python3-opencv
+      - run: /usr/bin/python3 -m pip install --user -r dependencies/observation-requirements.txt
+      - run: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 /usr/bin/python3 -m pytest -q
   web:
     runs-on: ubuntu-22.04
     steps:

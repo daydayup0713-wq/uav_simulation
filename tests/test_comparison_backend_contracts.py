@@ -8,6 +8,8 @@ from scipy.spatial.transform import Rotation
 from backend_configs import simulation_parameters
 from uav_lab_experiments.backend_contract import input_topics
 
+pytestmark = pytest.mark.usefixtures('pinned_backend_config_root')
+
 
 def rig(name):
     return json.loads(Path('configs/sensors-' + name + '.json').read_text())

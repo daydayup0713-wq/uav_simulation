@@ -169,3 +169,32 @@ def test_cli_timeout_before_ack_cancels_late_navigation(rig):
         assert len(control['goals'])<=1
         assert control['cancelled']==len(control['goals'])
     finally:client.destroy_node()
+
+
+def test_web_goto_uses_an_executable_cli_and_preserves_goal_yaw(rig,monkeypatch,tmp_path,isolated_ros_domain):
+    """Execute the real command parser and real DDS action, no Popen/CLI fake."""
+    import math
+    from pathlib import Path
+    from workbench_server import Workbench
+    nav,control,_=rig
+    run=tmp_path/'web-command-run'
+    app=Workbench(Path(__file__).resolve().parents[2],watch=False)
+    active=(run,{'supervisor_pid':1,'environment':{'ROS_DOMAIN_ID':isolated_ros_domain}})
+    monkeypatch.setattr(app,'active_run',lambda:active)
+    app.ingest({'kind':'telemetry','run_id':run.name,'diagnostics':{'uav001/flight':{
+        'age_s':0.,'message':'HOLDING','values':{'armed':'True','landed':'False','offboard':'True'}}}},time.monotonic())
+    def refresh():
+        nav.flight_at=time.monotonic();nav.current_at=time.monotonic()
+    timer=nav.create_timer(.05,refresh)
+    try:
+        job=app.request('goto',{'target':[1.,1.,2.],'yaw':.3})
+        deadline=time.monotonic()+20
+        while app.jobs[job['id']]['state']=='RUNNING' and time.monotonic()<deadline:time.sleep(.05)
+        result=app.jobs[job['id']]
+        assert result['state']=='SUCCEEDED',result
+        assert result['result']['success'] is True
+        assert len(control['goals'])==2
+        orientation=control['goals'][-1].target.pose.orientation
+        assert orientation.z==pytest.approx(math.sin(.15))
+        assert orientation.w==pytest.approx(math.cos(.15))
+    finally:nav.destroy_timer(timer);app.close()
