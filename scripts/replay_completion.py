@@ -13,8 +13,11 @@ def recorded_window(messages,backend,calibration,duration=0.):
         raise ValueError('recorded replay source window missing')
     if any(b<a for a,b in zip(clocks,clocks[1:])) or any(b<=a for a,b in zip(stamps,stamps[1:])):
         raise ValueError('recorded replay source timestamps regressed or duplicated')
-    end=min(clocks[-1],clocks[0]+duration) if duration else clocks[-1]
-    selected=[t for t in stamps if t<=end+offset+1e-6]
+    recording_end=max(clocks[-1],stamps[-1])
+    end=min(recording_end,clocks[0]+duration) if duration else recording_end
+    # Stamps already represent measurement end. Adding the scan duration here
+    # would include data not yet available when the owned player is stopped.
+    selected=[t for t in stamps if t<=end+1e-6]
     if not selected:raise ValueError('recorded replay source window empty')
     return {'primary_topic':primary,'source_start_s':clocks[0],'source_end_s':end,
             'requested_duration_s':duration or None,'expected_stamps':selected,
