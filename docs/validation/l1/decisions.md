@@ -75,3 +75,5 @@
 36. Final: Ruling: no GPU driver repair or unproven host-stall workaround in this fix pass — strict freshness gates retain rejected runs and no established implementation cause supports relaxing them — cost if wrong: host stalls may continue to reject otherwise valid runs.
 
 37. Final: Ruling: raw display/replay clouds remain observational and are not claimed to be per-beam deskewed navigation geometry — the approved raw layer shows measurements with limitations, while measured algorithm/map admission has separate contracts — cost if wrong: using display clouds for geometric measurement without deskewing yields error.
+
+38. Final: Ruling: require two matching complete hashes for each new artifact attestation while reusing that attestation only within one refresh — remote policy race test failed and deterministic coarse-metadata reproduction certified rewritten bytes; timestamp/size identity alone is insufficient — cost if wrong: background and ground qualification reads each unique artifact twice, increasing refresh I/O; no airborne control loop or gate threshold is changed. Deterministic content-race test RED→GREEN; focused registry17passed.

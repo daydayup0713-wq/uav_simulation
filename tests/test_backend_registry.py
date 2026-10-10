@@ -141,16 +141,16 @@ def shared_artifact_pair(registry):
     return Path(evidence['artifacts'][0]['path'])
 
 
-def test_catalog_refresh_hashes_shared_libraries_once_per_pass_and_never_reuses_a_previous_pass(registry,monkeypatch):
+def test_catalog_refresh_attests_shared_libraries_once_per_pass_and_never_reuses_a_previous_pass(registry,monkeypatch):
     import uav_lab_experiments.registry as module
     shared=shared_artifact_pair(registry);original=module.digest;calls=[]
     def measured(path):
         calls.append(Path(path).resolve());return original(path)
     monkeypatch.setattr(module,'digest',measured)
     assert all(row['stage']=='installed' for row in registry.list())
-    assert calls==[shared.resolve()]
-    assert all(row['stage']=='installed' for row in registry.list())
     assert calls==[shared.resolve(),shared.resolve()]
+    assert all(row['stage']=='installed' for row in registry.list())
+    assert calls==[shared.resolve()]*4
     stamp=shared.stat();shared.write_bytes(b'x'*stamp.st_size)
     import os
     os.utime(shared,ns=(stamp.st_atime_ns,stamp.st_mtime_ns))
@@ -166,5 +166,23 @@ def test_artifact_changed_while_reading_is_never_certified_or_cached(registry,mo
         if not changed:
             changed=True;shared.write_bytes(b'x'*shared.stat().st_size)
         return value
+    monkeypatch.setattr(module,'digest',racing)
+    assert all(row['stage']=='configured' for row in registry.list())
+
+
+def test_content_race_is_rejected_even_when_filesystem_metadata_is_unchanged(registry,monkeypatch):
+    import uav_lab_experiments.registry as module
+    shared=shared_artifact_pair(registry);stamp=shared.stat();original_stat=Path.stat
+    original=module.digest;changed=False
+    # Model coarse filesystem timestamps while actually replacing the bytes.
+    def coarse_stat(path,*args,**kwargs):
+        return stamp if path==shared else original_stat(path,*args,**kwargs)
+    def racing(path):
+        nonlocal changed
+        value=original(path)
+        if not changed:
+            changed=True;shared.write_bytes(b'x'*stamp.st_size)
+        return value
+    monkeypatch.setattr(Path,'stat',coarse_stat)
     monkeypatch.setattr(module,'digest',racing)
     assert all(row['stage']=='configured' for row in registry.list())

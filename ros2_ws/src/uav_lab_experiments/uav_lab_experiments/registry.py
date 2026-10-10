@@ -27,8 +27,9 @@ def artifact_digest(path, verified):
     """Attest shared artifacts once in this pass; detect concurrent replacement.
 
     A new list/describe operation always has a new cache. Stat identity merely
-    avoids reading the same library repeatedly during one operation; the first
-    attestation still hashes its complete contents.
+    avoids re-attesting the same library for every backend. Each new attestation
+    requires two matching complete hashes: coarse timestamps alone cannot detect
+    an in-place rewrite during a read.
     """
     path=Path(path).resolve()
     def identity(value):
@@ -37,6 +38,8 @@ def artifact_digest(path, verified):
     value=verified.get(key)
     if value is None:
         value=digest(path)
+        if digest(path)!=value:
+            raise ValueError('artifact changed during verification')
     if identity(path.stat())!=key:
         raise ValueError('artifact changed during verification')
     verified[key]=value
