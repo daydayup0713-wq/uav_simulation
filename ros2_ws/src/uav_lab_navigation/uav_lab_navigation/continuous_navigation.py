@@ -68,6 +68,7 @@ def checked_curve(node, goal, initial, planning_timeout=None):
 
 def navigate_continuous(node, handle):
     legs, leg, replans = [], None, 0
+    handoff = None
     epoch = node.accepted_epoch
     try:
         node.check_motion(epoch)
@@ -115,6 +116,16 @@ def navigate_continuous(node, handle):
             msg, state = reference(node)
             with node.map_lock:
                 updated = node.grid.snapshot(node.envelope) if node.grid.version != checked else None
+            # Acceptance reserves a future switch; the previous owner still flies
+            # its prefix until the reference confirms the replacement is active.
+            if handoff is not None and msg.trajectory_id == handoff[0]:
+                if updated is not None:
+                    if (not handoff[1].collision_free(updated, start_time=min(msg.elapsed, handoff[2]),
+                                                     end_time=handoff[2]) or not curve.collision_free(updated)):
+                        raise RuntimeError('pending navigation handoff unsafe; constrained hold')
+                    checked = updated.version
+            elif handoff is not None and msg.trajectory_id == request.trajectory_id:
+                handoff = None
             if updated is not None and msg.trajectory_id == request.trajectory_id:
                 checked = updated.version
                 elapsed = min(curve.duration, msg.elapsed)
@@ -133,6 +144,7 @@ def navigate_continuous(node, handle):
                         node.check_motion(epoch)
                         if start_ns-node.get_clock().now().nanoseconds<150_000_000:
                             raise RuntimeError('native planning exceeded reserved scheduling window; constrained hold')
+                        handoff = (request.trajectory_id, curve, join_elapsed)
                         request = trajectory_goal(replacement, uuid.uuid4().hex, start_ns,
                                                   replaces=request.trajectory_id, epoch=epoch)
                         leg = submit(request)

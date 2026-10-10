@@ -17,7 +17,8 @@ from uav_lab_tools.datasets import load_dataset,file_hash,check_replay_domain
 from uav_lab_localization.benchmark import read_dataset
 from backend_configs import write_config
 from backend_launch import core_commands
-from backend_provenance import save_provenance,verify_runtime_artifacts
+from backend_provenance import save_provenance,verified_private_build
+from replay_completion import recorded_window,replay_completion
 from bootstrap_backends import verify_sources
 from vins_map import snapshot_vins_map,graph_body_trajectory
 from uav_lab_experiments.benchmark_report import resource_summary
@@ -166,16 +167,19 @@ def main():
     truth=np.asarray(truth);np.savetxt(output/'truth.tum',truth,fmt='%.9f')
     (output/'calibration.json').write_text(json.dumps(metadata['calibration'],indent=2)+'\n')
     prefix=ROOT/'.deps/backends'/args.backend/'install'
-    source=json.loads((prefix/(args.backend+'-build-manifest.json')).read_text())
-    verify_runtime_artifacts(source)
+    source=verified_private_build(prefix,args.backend,ROOT)
     binary=Path(source['binary']).resolve()
     if not binary.is_relative_to(prefix.resolve()):raise ValueError('backend binary outside private prefix')
     if file_hash(binary)!=source['binary_sha256']:raise ValueError('backend binary changed since build')
     (output/'build-manifest.json').write_text(json.dumps(source,indent=2)+'\n')
+    primary='/uav001/camera/image_raw' if args.backend in ('orb_slam3','vins_fusion') else '/uav001/lidar/points'
+    window=recorded_window(read_dataset(dataset,[primary,'/clock']),args.backend,metadata['calibration'],args.duration)
+    (output/'recorded-source-window.json').write_text(json.dumps(window,indent=2)+'\n')
+    expected=window['quality_expected_stamps']
     import yaml
     qos={t:{'reliability':'reliable','durability':'volatile','history':'keep_last','depth':512 if t.endswith('/data') else 8} for t in input_topics(args.backend)}
     (output/'playback-qos.yaml').write_text(yaml.safe_dump(qos))
-    children=[];logs=[];node=None;error='';resources=[];exit_code=None;start=time.monotonic();batch=None
+    children=[];logs=[];node=None;error='';resources=[];exit_code=None;start=time.monotonic();batch=None;intentional_stop=False
     def launch(command,name,stdin=None):
         log=(output/(name+'.log')).open('w');logs.append(log)
         child=subprocess.Popen([str(v) for v in command],stdout=log,stderr=subprocess.STDOUT,stdin=stdin,env=env,start_new_session=True,cwd=ROOT)
@@ -223,13 +227,16 @@ def main():
             if first_clock is None and node.clock is not None:first_clock=node.clock
             for child in children[:-1]:
                 if child.poll() is not None:raise RuntimeError('owned backend dependency exited '+str(child.args[0])+': '+str(child.returncode))
-            if args.duration and first_clock is not None and node.clock-first_clock>=args.duration:stop_owned(player);break
+            if args.duration and node.clock is not None and node.clock>=window['source_end_s']:
+                intentional_stop=True;stop_owned(player);break
             if time.monotonic()>deadline:raise RuntimeError('playback timeout')
             if time.monotonic()-last_resource>=.5:
                 last_resource=time.monotonic();resource_sample('replay',playback_start)
         exit_code=player.returncode
         drain=time.monotonic()+3
         while time.monotonic()<drain:rclpy.spin_once(node,timeout_sec=.05)
+        completion=replay_completion(window,node.expected,exit_code,intentional_stop)
+        if not completion['completed']:raise RuntimeError(completion['reason'])
         if args.backend=='fast_livo2_rtk':
             backend.stdin.write(b'\n');backend.stdin.flush()
             (output/'rtk-batch-trigger.json').write_text(json.dumps({'after_replay':True,'source_s':node.clock})+'\n')
@@ -247,7 +254,7 @@ def main():
                 global_truth=truth.copy()
                 from scipy.spatial.transform import Rotation
                 global_truth[:,1:4]+=Rotation.from_quat(truth[:,4:]).apply(metadata['calibration']['gnss']['xyz'])
-                try:batch['quality']=trajectory_report(np.loadtxt(optimized,ndmin=2),global_truth,[t for t in node.expected if t>=node.expected[0]+3.])
+                try:batch['quality']=trajectory_report(np.loadtxt(optimized,ndmin=2),global_truth,expected)
                 except (OSError,ValueError) as failure:batch.update(completed=False,reason=str(failure))
                 batch['pose_target']='GNSS antenna before final lever-arm conversion; separate from local control pose'
     except (ValueError,RuntimeError,KeyboardInterrupt) as failure:error=str(failure) or 'interrupted'
@@ -256,7 +263,7 @@ def main():
         for log in logs:log.close()
         if node:node.destroy_node()
         if rclpy.ok():rclpy.shutdown()
-    expected=[t for t in node.expected if t>=node.expected[0]+3] if node and node.expected else []
+    completion=replay_completion(window,node.expected if node else [],exit_code,intentional_stop)
     quality=trajectory_report(node.rows if node else [],truth,expected,not args.position_only)
     global_quality=trajectory_report(node.global_rows,truth,expected,not args.position_only) if node and node.global_rows else None
     pose_graph=None
@@ -270,7 +277,7 @@ def main():
                 'scope':'optimized keyframes only; separate from online odometry and dense coverage'}
         except (OSError,ValueError) as failure:pose_graph={'saved':False,'reason':str(failure)}
     latency=np.asarray(node.latencies if node else [])
-    report={'schema':1,'backend':args.backend,'success':not error and not (node and node.failures) and quality['passed'] and (batch is None or batch.get('completed',False) and batch.get('quality',{}).get('passed',False)),
+    report={'schema':1,'backend':args.backend,'success':completion['completed'] and not error and not (node and node.failures) and quality['passed'] and (batch is None or batch.get('completed',False) and batch.get('quality',{}).get('passed',False)),
         'error':error,'quality':quality,'dataset':str(dataset),'dataset_sha256':metadata['bag_sha256'],
         'input_topics':input_topics(args.backend),'input_group':consumed_input_group(args.backend,metadata['calibration']),
         'input_counts':node.counts if node else {},'invalid_poses':node.failures if node else [],
@@ -283,6 +290,7 @@ def main():
             'loop_closure':'observed' if node and node.loop_edges else 'not observed in this run',
             'relocalization':'cross-session constraints observed' if pose_graph and pose_graph.get('cross_session_constraints',0)>0 else 'not verified by this replay; no control qualification'},
         'playback_rate':args.rate,'player_exit_code':exit_code,'requested_source_duration_s':args.duration or None,
+        'replay_completion':completion,'recorded_source_window':'recorded-source-window.json',
         'transport':{'profile':'configuration/fastdds-local.xml',
             'profile_sha256':file_hash(output/'configuration/fastdds-local.xml'),
             'ROS_LOCALHOST_ONLY':env['ROS_LOCALHOST_ONLY'],'RMW_IMPLEMENTATION':env['RMW_IMPLEMENTATION']},

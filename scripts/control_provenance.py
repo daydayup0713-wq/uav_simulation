@@ -9,7 +9,7 @@ def control_files(root):
         'scripts/experiment_configuration.py','scripts/rendering_configuration.py','scripts/control_provenance.py','scripts/env.sh','scripts/start_lab.sh',
         'configs/navigation.json','configs/navigation-sensors.json','configs/navigation-corridor-sensors.json','configs/sensors.json',
         'configs/sensors-livox.json','configs/sensors-livox-rtk.json','configs/sensors-mechanical.json',
-        'configs/fastdds-local.xml',
+        'configs/fastdds-local.xml','scripts/qualify_pair.py',
         'configs/px4-start.sh','dependencies/lock.json','dependencies/backends.lock.json',
         'dependencies/planners.lock.json',
         'ros2_ws/src/uav_lab_experiments/uav_lab_experiments/registry.py']

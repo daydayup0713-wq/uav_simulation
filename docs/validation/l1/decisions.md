@@ -1,6 +1,6 @@
 # L1 执行取舍
 
-按执行顺序保留全部决定、依据与判断错误时的代价。最终审查的追加决定和延后项另行记录。
+按执行顺序保留全部决定、依据与判断错误时的代价。
 
 1. Ruling: reuse existing native checkout on a separate feat/l1-workbench branch — user-approved native development and 4.7GB private dependencies make an extra worktree needless; protected v0.4.0 remains recoverable — cost if wrong: concurrent manual work needs coordination.
 
@@ -63,3 +63,15 @@
 30. Task10: Ruling: clean policy config tests use hashed, licensed pinned YAML copies only when private sources are absent, while native tests prefer installed sources and production still requires pinned dependencies — real clean CI failed without downloaded templates; test templates avoid unnecessary algorithm builds without conferring installation or flight qualification — cost if wrong: fixtures could drift from patched sources; lock/ref/patch/file-hash equality is tested, actual config builders run with no algorithm trees.
 
 31. Task10: Ruling: Web TAKEOFF submits from fresh armed Offboard HOLDING even if PX4 transiently clears landed; authoritative bridge retains captured ground-arm origin/0.3m bound — real UI run20261010T041258Z-124785a4 armed successfully then wrongly disabled takeoff at0.23m, native controller explicitly handles this condition already — cost if wrong: request may be refused after transient UI enablement; actual native guard still rejects missing/moved origins and clears it after first use, no control source/threshold relaxed. Contract test RED→GREEN; original actual UI LAND succeeded and safe STOP requested.
+
+32. Final: Ruling: restore official SHA256-verified GitHub CLI2.101.0 under project-private .deps/tools and repair only this repository GitHub credential-helper path — previous global helper referenced a vanished /tmp binary and blocked the authorized push; existing account/destination/global settings stay unchanged — cost if wrong: removing the private tool breaks this repo future pushes until rebuilt; no broader authorization or new credentials are granted. Official archive SHA256 9bca2d1c16825f109907a23307628a2f0698fbf99662b73a5cf0b020293072b8.
+
+33. Final: Ruling: do not require every algorithm and complex scene to pass — the approved experiment platform retains genuine failures and withholds control qualification — cost if wrong: users must tune or replace failed candidates before these combinations can fly.
+
+34. Final: Ruling: official large RTK benchmark remains unmeasured — the human explicitly selected local simulation data only — cost if wrong: results cannot establish performance on the official field dataset.
+
+35. Final: Ruling: physical aircraft and real-time RTK are not flight-qualified — missing hardware measurements and a latched RTK watchdog failure remain explicit — cost if wrong: real deployment requires additional controlled hardware validation.
+
+36. Final: Ruling: no GPU driver repair or unproven host-stall workaround in this fix pass — strict freshness gates retain rejected runs and no established implementation cause supports relaxing them — cost if wrong: host stalls may continue to reject otherwise valid runs.
+
+37. Final: Ruling: raw display/replay clouds remain observational and are not claimed to be per-beam deskewed navigation geometry — the approved raw layer shows measurements with limitations, while measured algorithm/map admission has separate contracts — cost if wrong: using display clouds for geometric measurement without deskewing yields error.

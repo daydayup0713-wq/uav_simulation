@@ -21,12 +21,17 @@ def test_changed_linked_core_or_vocabulary_invalidates_build(tmp_path):
         verify_runtime_artifacts(manifest)
 
 
-def test_live_preflight_verifies_linked_libraries_as_well_as_the_executable(tmp_path):
+def test_live_preflight_verifies_linked_libraries_as_well_as_the_executable(tmp_path,monkeypatch):
     from backend_provenance import verified_private_build
+    import backend_provenance
+    monkeypatch.setattr(backend_provenance,'ROOT',tmp_path)
+    interface=tmp_path/'localization/interfaces/livox_ros_driver2';interface.mkdir(parents=True)
+    (interface/'CustomMsg.msg').write_text('source interface')
     binary=tmp_path/'node';binary.write_bytes(b'fixed executable')
     library=tmp_path/'core.so';library.write_bytes(b'fixed core')
     manifest={'binary':str(binary),'binary_sha256':hashlib.sha256(binary.read_bytes()).hexdigest(),
-              'runtime_artifacts':{str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in (binary,library)}}
+              'runtime_artifacts':{str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in (binary,library)},
+              'compiled_platform_inputs':backend_provenance.compiled_platform_inputs(tmp_path,'fast_livo2')}
     (tmp_path/'fast_livo2-build-manifest.json').write_text(json.dumps(manifest))
     assert verified_private_build(tmp_path,'fast_livo2')['binary']==str(binary)
     library.write_bytes(b'replaced core')
@@ -48,6 +53,25 @@ def test_build_manifest_covers_every_locked_input_origin_including_copied_messag
         if 'rev-parse' in args:return 'a'*40+'\n'
         return b''
     monkeypatch.setattr(module.subprocess,'check_output',output)
-    module.manifest('fast_livo2',prefix,binary,['fast_livo2'])
+    interface=tmp_path/'localization/interfaces/livox_ros_driver2';interface.mkdir(parents=True)
+    (interface/'CustomMsg.msg').write_text('source interface')
+    from backend_provenance import compiled_platform_inputs
+    module.manifest('fast_livo2',prefix,binary,['fast_livo2'],compiled_inputs=compiled_platform_inputs(tmp_path,'fast_livo2'))
     result=json.loads((prefix/'fast_livo2-build-manifest.json').read_text())
     assert set(result['repositories'])=={'fast_livo2','livox-driver2'}
+
+
+def test_changed_compiled_platform_adapter_requires_a_new_private_build(tmp_path,monkeypatch):
+    import backend_provenance as module
+    monkeypatch.setattr(module,'ROOT',tmp_path,raising=False)
+    adapter=tmp_path/'localization/visual_adapters/adapter.cpp';adapter.parent.mkdir(parents=True)
+    adapter.write_bytes(b'original compiled adapter')
+    binary=tmp_path/'install/node';binary.parent.mkdir();binary.write_bytes(b'unchanged executable')
+    manifest={'binary':str(binary),'binary_sha256':hashlib.sha256(binary.read_bytes()).hexdigest(),
+        'runtime_artifacts':{str(binary):hashlib.sha256(binary.read_bytes()).hexdigest()},
+        'compiled_platform_inputs':{'localization/visual_adapters/adapter.cpp':hashlib.sha256(adapter.read_bytes()).hexdigest()}}
+    (binary.parent/'orb_slam3-build-manifest.json').write_text(json.dumps(manifest))
+    assert module.verified_private_build(binary.parent,'orb_slam3')['binary']==str(binary)
+    adapter.write_bytes(b'changed adapter without rebuilding')
+    with pytest.raises(ValueError,match='compiled platform input'):
+        module.verified_private_build(binary.parent,'orb_slam3')

@@ -58,17 +58,20 @@ def colcon(name,sources,prefix,jobs):
     run(['colcon','build','--base-paths',*sources,'--build-base',base/'build','--install-base',prefix,
          '--merge-install','--parallel-workers','1','--cmake-args','-DCMAKE_BUILD_TYPE=Release','-DBUILD_TESTING=OFF'],env,cwd=base)
 
-def manifest(backend,prefix,binary,repositories,jobs=1):
+def manifest(backend,prefix,binary,repositories,jobs=1,*,compiled_inputs):
     # The lock also contains copied message/patch origins. Keep them in the
     # source inventory even if a specific builder compiles only a subset.
     lock=json.loads((ROOT/'dependencies/backends.lock.json').read_text())
     repositories=lock['backends'][backend]['repositories']
     verify_sources(ROOT,lock,repositories)
+    from backend_provenance import compiled_platform_inputs
+    if compiled_inputs!=compiled_platform_inputs(ROOT,backend):
+        raise ValueError('compiled platform inputs changed during build')
     output=prefix/(backend+'-build-manifest.json')
     runtime={}
     for path in [binary,*prefix.rglob('*.so*'),*prefix.glob('lib/lio_sam/lio_sam_*'),
                  *prefix.glob('lib/vins_fusion/vins_fusion_node'),*prefix.glob('lib/loop_fusion/loop_fusion_node'),
-                 *(ROOT/'.deps/backends/common/install').rglob('*.so*'),
+                 *((ROOT/'.deps/backends/common/install').rglob('*.so*') if backend in ('fast_lio2','fast_livo2','fast_livo2_rtk') else []),
                  *prefix.glob('share/loop_fusion/support_files/*')]:
         if path.is_file():runtime[str(path.resolve())]=sha(path)
     if backend=='orb_slam3':
@@ -88,7 +91,7 @@ def manifest(backend,prefix,binary,repositories,jobs=1):
                 path=Path(match[1]).resolve();linked[str(path)]=sha(path)
     runtime.update(linked)
     output.write_text(json.dumps({'schema':1,'backend':backend,'binary':str(binary),'binary_sha256':sha(binary),
-        'runtime_artifacts':runtime,'linked_runtime_artifacts':linked,
+        'runtime_artifacts':runtime,'linked_runtime_artifacts':linked,'compiled_platform_inputs':compiled_inputs,
         'repositories':{name:{'ref':subprocess.check_output(['git','-C',str(ROOT/'.deps'/name),'rev-parse','HEAD'],text=True).strip(),
             'tree_sha256':source_tree(ROOT/'.deps'/name),
             'diff_sha256':hashlib.sha256(subprocess.check_output(['git','-C',str(ROOT/'.deps'/name),'diff','--binary'])).hexdigest()} for name in repositories},
@@ -101,6 +104,9 @@ def main():
     if not 1<=args.jobs<=2:parser.error('one or two jobs on this machine')
     lock=json.loads((ROOT/'dependencies/backends.lock.json').read_text())
     prepare_sources(ROOT,lock,lock['backends'][args.backend]['repositories'])
+    from backend_provenance import compiled_platform_inputs
+    # Capture before invoking the build system, never attest edited sources to an old binary.
+    compiled_inputs=compiled_platform_inputs(ROOT,args.backend)
     prefix=ROOT/'.deps/backends'/args.backend/'install'
     if args.backend=='glim':
         os.environ['CMAKE_PREFIX_PATH']=str(prefix)+':'+os.environ.get('CMAKE_PREFIX_PATH','')
@@ -108,16 +114,16 @@ def main():
             native('workbench-'+name,ROOT/'.deps'/name,prefix,args.jobs,
                    ['-DBUILD_WITH_CUDA=OFF','-DBUILD_WITH_VIEWER=OFF','-DBUILD_WITH_OPENCV=OFF',
                     '-DBUILD_WITH_CV_BRIDGE=OFF','-DBUILD_WITH_MARCH_NATIVE=OFF','-DBUILD_WITH_TBB=ON','-DBUILD_TESTING=OFF'])
-        manifest(args.backend,prefix,prefix/'lib/glim_ros/glim_rosnode',['glim','glim_ros2','gtsam_points'],args.jobs);return
+        manifest(args.backend,prefix,prefix/'lib/glim_ros/glim_rosnode',['glim','glim_ros2','gtsam_points'],args.jobs,compiled_inputs=compiled_inputs);return
     if args.backend=='lio_sam':
         colcon(args.backend,[ROOT/'.deps/lio_sam'],prefix,args.jobs)
-        manifest(args.backend,prefix,prefix/'lib/lio_sam/lio_sam_mapOptimization',['lio_sam'],args.jobs);return
+        manifest(args.backend,prefix,prefix/'lib/lio_sam/lio_sam_mapOptimization',['lio_sam'],args.jobs,compiled_inputs=compiled_inputs);return
     if args.backend=='vins_fusion':
         native(args.backend,ROOT/'localization/visual_adapters',prefix,args.jobs,
                ['-DBACKEND=vins_fusion','-DUPSTREAM='+str(ROOT/'.deps/vins_fusion')])
         source=ROOT/'.deps/vins-fusion-ros2'
         colcon('vins_fusion_loop',[source/'camera_models',source/'loop_fusion'],prefix,args.jobs)
-        manifest(args.backend,prefix,prefix/'lib/vins_fusion/vins_fusion_node',['vins_fusion','vins-fusion-ros2'],args.jobs);return
+        manifest(args.backend,prefix,prefix/'lib/vins_fusion/vins_fusion_node',['vins_fusion','vins-fusion-ros2'],args.jobs,compiled_inputs=compiled_inputs);return
     if args.backend=='orb_slam3':
         native('pangolin',ROOT/'.deps/pangolin',prefix,args.jobs,
                ['-DBUILD_EXAMPLES=OFF','-DBUILD_TOOLS=OFF','-DBUILD_PANGOLIN_PYTHON=OFF','-DBUILD_TESTS=OFF'])
@@ -132,20 +138,20 @@ def main():
                 with archive.extractfile(member) as stream:(vocabulary/'ORBvoc.txt').write_bytes(stream.read())
         native('orb_adapter',ROOT/'localization/visual_adapters',prefix,args.jobs,
                ['-DBACKEND=orb_slam3','-DUPSTREAM='+str(ROOT/'.deps/orb_slam3')])
-        manifest(args.backend,prefix,prefix/'lib/orb_slam3/orb_slam3_node',['orb_slam3','pangolin'],args.jobs);return
+        manifest(args.backend,prefix,prefix/'lib/orb_slam3/orb_slam3_node',['orb_slam3','pangolin'],args.jobs,compiled_inputs=compiled_inputs);return
     common=ROOT/'.deps/backends/common/install'
     colcon('common',[ROOT/'localization/interfaces/livox_ros_driver2'],common,args.jobs)
     os.environ['CMAKE_PREFIX_PATH']=str(common)+':'+os.environ.get('CMAKE_PREFIX_PATH','')
     if args.backend=='fast_lio2':
         prefix=ROOT/'.deps/backends/fast_lio2/install'
         colcon('fast_lio2',[ROOT/'.deps/fast_lio2'],prefix,args.jobs)
-        manifest(args.backend,prefix,prefix/'lib/fast_lio/fastlio_mapping',['fast_lio2','livox-driver2'],args.jobs);return
+        manifest(args.backend,prefix,prefix/'lib/fast_lio/fastlio_mapping',['fast_lio2','livox-driver2'],args.jobs,compiled_inputs=compiled_inputs);return
     if args.backend=='fast_livo2':
         native('sophus-modern',ROOT/'.deps/sophus-modern',prefix,args.jobs,['-DBUILD_SOPHUS_TESTS=OFF','-DBUILD_SOPHUS_EXAMPLES=OFF'])
         os.environ['CMAKE_PREFIX_PATH']=str(prefix)+':'+os.environ['CMAKE_PREFIX_PATH']
         native('vikit-modern',ROOT/'.deps/vikit-modern/vikit_common',prefix,args.jobs,target='vikit_common')
         colcon(args.backend,[ROOT/'.deps/vikit-modern/vikit_ros',ROOT/'.deps/fast_livo2'],prefix,args.jobs)
-        manifest(args.backend,prefix,prefix/'lib/fast_livo2/fastlivo_mapping',['fast_livo2','sophus-modern','vikit-modern','intel-robotics'],args.jobs);return
+        manifest(args.backend,prefix,prefix/'lib/fast_livo2/fastlivo_mapping',['fast_livo2','sophus-modern','vikit-modern','intel-robotics'],args.jobs,compiled_inputs=compiled_inputs);return
     native('sophus-legacy',ROOT/'.deps/sophus-legacy',prefix,args.jobs,target='Sophus')
     config=prefix/'lib/cmake/Sophus';config.mkdir(parents=True,exist_ok=True)
     (config/'SophusConfig.cmake').write_text('set(Sophus_INCLUDE_DIRS "'+str(prefix/'include')+'")\nset(Sophus_LIBRARIES "'+str(prefix/'lib/libSophus.so')+'")\nif(NOT TARGET Sophus::Sophus)\nadd_library(Sophus::Sophus INTERFACE IMPORTED)\nset_target_properties(Sophus::Sophus PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "'+str(prefix/'include')+'" INTERFACE_LINK_LIBRARIES "'+str(prefix/'lib/libSophus.so')+'")\nendif()\n')
@@ -153,6 +159,6 @@ def main():
     os.environ['CMAKE_PREFIX_PATH']=str(prefix)+':'+os.environ['CMAKE_PREFIX_PATH']
     source=ROOT/'.deps/fast_livo2_rtk_ros2'
     colcon(args.backend,[source/'src',source/'thirdparty'],prefix,args.jobs)
-    manifest(args.backend,prefix,prefix/'lib/fast_livo/fastlivo_mapping',['fast_livo2_rtk_ros2','sophus-legacy','geographiclib'],args.jobs)
+    manifest(args.backend,prefix,prefix/'lib/fast_livo/fastlivo_mapping',['fast_livo2_rtk_ros2','sophus-legacy','geographiclib'],args.jobs,compiled_inputs=compiled_inputs)
 
 if __name__=='__main__':main()

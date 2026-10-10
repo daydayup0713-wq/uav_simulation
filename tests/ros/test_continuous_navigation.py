@@ -108,3 +108,66 @@ def test_continuous_navigation_sends_one_collision_checked_curve(monkeypatch, tm
         for node in (client_node, adapter, nav):
             node.destroy_node()
         rclpy.shutdown()
+
+
+def test_pending_goto_handoff_rechecks_old_prefix_and_cancels_both_owners(monkeypatch):
+    """A new obstacle appears after acceptance, while the old reference owns flight."""
+    from concurrent.futures import Future
+    from types import SimpleNamespace
+    from uav_lab_bridge.continuous_trajectory import State, Trajectory
+    from uav_lab_navigation.occupancy import CollisionMap
+    import uav_lab_navigation.continuous_navigation as module
+
+    curve=Trajectory.generate([[0.,0.,2.],[3.,0.,2.]],initial=State(np.array([0.,0.,2.])))
+    join=curve.sample(3.6)
+    replacement=Trajectory.generate([join.position,join.position+[1.,1.,0.]],initial=join)
+    lower=np.array([-.1,-.1,1.9]);free=np.ones((500,300,20),dtype=bool)
+    original=CollisionMap(.01,lower,free.copy(),1)
+    far=free.copy();far[tuple(np.floor((curve.sample(curve.duration).position-lower)/.01).astype(int))]=False
+    changed=CollisionMap(.01,lower,far.copy(),2)
+    near=far.copy();near[tuple(np.floor((curve.sample(3.3).position-lower)/.01).astype(int))]=False
+    pending_map=CollisionMap(.01,lower,near,3)
+    assert curve.collision_free(original)
+    assert not curve.collision_free(changed,start_time=3.)
+    assert curve.collision_free(changed,start_time=3.,end_time=3.6)
+    assert replacement.collision_free(pending_map)
+    assert not curve.collision_free(pending_map,start_time=3.1,end_time=3.6)
+
+    ref=TrajectoryReference(position=[0.,0.,2.],velocity=[0.,0.,0.],acceleration=[0.,0.,0.])
+    ref.header.stamp.sec=10
+    results=[];owners=[];stopped=[];records=[];plans=iter([(curve,original),(replacement,changed)])
+    node=SimpleNamespace(accepted_epoch=0,acceptance_timeout_s=1.,replan_lead_s=.6,
+        config={'max_replans':3},reference=ref,reference_at=time.monotonic(),
+        map_lock=threading.Lock(),motion_lock=threading.Lock(),envelope=np.zeros(3),busy=True,
+        current=pose([0,0,2]).pose,check_motion=lambda epoch:None,
+        future_result=lambda future,*args:future.result(),stop_leg=lambda owner:stopped.append(owner),
+        record=lambda name,**kwargs:records.append((name,kwargs)),
+        get_clock=lambda:SimpleNamespace(now=lambda:SimpleNamespace(nanoseconds=10_000_000_000)))
+    node.grid=SimpleNamespace(version=2,snapshot=lambda envelope:changed if node.grid.version==2 else pending_map)
+    def submit(request):
+        result=Future();results.append(result)
+        owner=SimpleNamespace(accepted=True,get_result_async=lambda:result);owners.append(owner)
+        if len(owners)==1:
+            ref.trajectory_id=request.trajectory_id;ref.elapsed=3.
+            state=curve.sample(3.)
+            ref.position=state.position.tolist();ref.velocity=state.velocity.tolist();ref.acceleration=state.acceleration.tolist()
+        else:
+            assert request.replaces_id==ref.trajectory_id
+            node.grid.version=3;ref.elapsed=3.1
+        accepted=Future();accepted.set_result(owner);return accepted
+    node.trajectory_client=SimpleNamespace(wait_for_server=lambda **kwargs:True,send_goal_async=submit)
+    monkeypatch.setattr(module,'checked_curve',lambda *args,**kwargs:next(plans))
+    monkeypatch.setattr(module.time,'sleep',lambda duration:None)
+    outcome=[]
+    def feedback(msg):
+        if len(results)==2:
+            # Allow exactly one further map update before the result completes.
+            if outcome:results[-1].set_result(SimpleNamespace(result=ExecuteTrajectory.Result(success=True)))
+            else:outcome.append('waiting')
+    handle=SimpleNamespace(request=Navigate.Goal(goal=pose([3,0,2])),is_cancel_requested=False,
+        publish_feedback=feedback,succeed=lambda:outcome.append('success'),abort=lambda:outcome.append('aborted'))
+    result=module.navigate_continuous(node,handle)
+    assert not result.success, 'old executing prefix became blocked before replacement activation'
+    assert 'handoff unsafe' in result.reason
+    assert len(stopped)==2 and all(owner in stopped for owner in owners)
+    assert outcome[-1]=='aborted' and not node.busy

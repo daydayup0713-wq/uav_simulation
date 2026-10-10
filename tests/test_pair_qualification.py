@@ -12,7 +12,12 @@ def test_native_pair_revalidation_rejects_changed_estimator_source_and_binary(tm
     source=directory/'provenance.json';source.write_text(json.dumps({'implementation_sha256':'a'*64}))
     binary=tmp_path/'native';binary.write_bytes(b'actual executable')
     from uav_lab_experiments.registry import digest
-    (directory/'build-manifest.json').write_text(json.dumps({'runtime_artifacts':{str(binary):digest(binary)}}))
+    prefix=tmp_path/'.deps/backends/glim/install';prefix.mkdir(parents=True)
+    binary=prefix/'native';binary.write_bytes(b'actual executable')
+    build={'binary':str(binary),'binary_sha256':digest(binary),'runtime_artifacts':{str(binary):digest(binary)},
+           'compiled_platform_inputs':{},'repositories':{}}
+    (directory/'build-manifest.json').write_text(json.dumps(build))
+    (prefix/'glim-build-manifest.json').write_text(json.dumps(build))
     selection={'localization':'glim','planning':'astar'}
     assert mod.identity_checks(tmp_path,run,selection)=={'glim':'a'*64,'astar':'b'*64}
     source.write_text(json.dumps({'implementation_sha256':'c'*64}))

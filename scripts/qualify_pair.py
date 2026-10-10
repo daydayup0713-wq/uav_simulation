@@ -26,8 +26,9 @@ def identity_checks(root,run,selection):
     recorded=json.loads((directory/'provenance.json').read_text())
     if recorded['implementation_sha256']!=expected[names[0]]:
         raise ValueError('native localization implementation changed')
-    from backend_provenance import verify_runtime_artifacts
-    verify_runtime_artifacts(json.loads((directory/'build-manifest.json').read_text()))
+    from backend_provenance import verified_private_build,verify_measured_build
+    current=verified_private_build(root/'.deps/backends'/names[0]/'install',names[0],root)
+    verify_measured_build(current,json.loads((directory/'build-manifest.json').read_text()))
     if names[1]!='astar':
         from uav_lab_navigation.native_provenance import verified_build
         build=verified_build(root,names[1])
@@ -82,6 +83,8 @@ def fault_checks(root,directories,pair):
         report=json.loads(path.read_text());run=Path(root)/'.runtime'/report['run_id']
         manifest=json.loads((run/'manifest.json').read_text());selection=manifest['backend_selection']
         identity_checks(root,run,selection)
+        if consumed_input_group(selection['localization'],manifest['calibration'])!=pair['input_group']:
+            raise ValueError('fault input group differs from normal pair input group')
         if (not report['passed'] or not matches(root,manifest['control_implementation'])
                 or selection['localization']!=pair['localization'] or selection['planning']!=pair['planning']
                 or report['final']['armed'] is not False or report['final']['landed'] is not True):

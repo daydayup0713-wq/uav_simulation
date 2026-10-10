@@ -9,6 +9,12 @@ def qualification_checks(stage,report):
     if report.get('debug_core'):raise ValueError('diagnostic run cannot qualify a backend')
     if stage=='replay_passed' and not report.get('scope','').startswith('offline replay;'):
         raise ValueError('recorded replay evidence required')
+    if stage=='replay_passed':
+        completion=report.get('replay_completion',{})
+        intentional=completion.get('intentional_duration_stop') is True and completion.get('mode')=='duration'
+        valid_exit=report.get('player_exit_code') in (0,130,-2) if intentional else report.get('player_exit_code')==0
+        if completion.get('completed') is not True or not valid_exit or completion.get('expected_count',0)<=0:
+            raise ValueError('recorded replay completion or player exit gate failed')
     if stage=='realtime_passed':
         if not report.get('scope','').startswith('real-time localization from measured'):
             raise ValueError('actual live sensor evidence required')
