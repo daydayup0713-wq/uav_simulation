@@ -3,6 +3,565 @@
   "scope": "Actual repeated PX4 runs and failed attempts, each with its own scene/source; historical passes do not qualify current control",
   "rows": [
     {
+      "localization": "glim",
+      "planning": "fast_planner",
+      "qualification_run": true,
+      "sensor_profile": null,
+      "scene": "circle-eight",
+      "backend": "glim + fast_planner",
+      "run_id": "20261010T031951Z-99424de7",
+      "report_id": "task9-default-fast-transport-01",
+      "runs": 3,
+      "passed": true,
+      "reason": "",
+      "current_implementation": true,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-default-fast-transport-01/acceptance.json",
+          "sha256": "143d54e90e7dcff5bbd2b8ecaa08c8a77b356c97bd820d688df04eedb3f5bd1b"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-default-fast-transport-01/tracking.json",
+          "sha256": "81ffb0dd2fa7e0c708d0a760776b7e07cd5ad409dd2f5b390f9b92f4d6007161"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-default-fast-transport-01/geometry.json",
+          "sha256": "41c2a5cf160e52390739b910717a1376b1734a76a55532086db6be3ac24a1879"
+        }
+      ],
+      "resources": {
+        "closed_loop": {
+          "observed_wall_s": 515.6004617970029,
+          "observed_cpu_s": 1320.8700000000001,
+          "mean_cpu_cores": 2.5618091872850957,
+          "peak_combined_rss_bytes": 1134772224,
+          "process_peak_rss_bytes": {
+            "798210": 153276416,
+            "798212": 667725824,
+            "798615": 25706496,
+            "798618": 180805632,
+            "798642": 11452416,
+            "798806": 56582144,
+            "798842": 90222592,
+            "798864": 89939968,
+            "798929": 52772864,
+            "798974": 16330752,
+            "799014": 39440384,
+            "799073": 39530496,
+            "799092": 39374848,
+            "799149": 106962944,
+            "799188": 75268096,
+            "799221": 38522880,
+            "799248": 38518784,
+            "799401": 89710592,
+            "799453": 49266688,
+            "799502": 38023168,
+            "799520": 90918912,
+            "799537": 90603520,
+            "799584": 34168832,
+            "799601": 31203328,
+            "799618": 0,
+            "799635": 108679168,
+            "799656": 38465536,
+            "799748": 38248448,
+            "799764": 38912000,
+            "799966": 75341824,
+            "800063": 39460864,
+            "800082": 37933056,
+            "800121": 38440960,
+            "800151": 39428096,
+            "800173": 16457728,
+            "800239": 33525760,
+            "800265": 89939968,
+            "800303": 37924864,
+            "800341": 38412288,
+            "800432": 0,
+            "801208": 87629824,
+            "801402": 99131392,
+            "801480": 38113280,
+            "801499": 39133184,
+            "801512": 0,
+            "801536": 23638016,
+            "801548": 62828544,
+            "801732": 89702400,
+            "801769": 38772736,
+            "801848": 39190528,
+            "801860": 9580544,
+            "801872": 39022592,
+            "801937": 39563264,
+            "801949": 90460160,
+            "801989": 38350848,
+            "802011": 38039552,
+            "802025": 39497728,
+            "802058": 105152512,
+            "802191": 37175296,
+            "802251": 0,
+            "802280": 39481344,
+            "802302": 39624704,
+            "802327": 90894336,
+            "802341": 39649280,
+            "802365": 87568384,
+            "802391": 39313408,
+            "802428": 89559040,
+            "802468": 39333888,
+            "802525": 39624704,
+            "802578": 29966336,
+            "802602": 39424000,
+            "802614": 39493632,
+            "802675": 39841792
+          },
+          "scope": "sampled owned navigation, localization, camera parameter and native planner processes; excludes flight bridge, PX4, Gazebo, rendering, recorder and browser; 0.5s sampling may miss short-lived children"
+        }
+      },
+      "tracking_p95_m": 0.04192799618027195,
+      "minimum_body_clearance_m": 0.7042359194929508,
+      "handoffs": 138,
+      "successful_runs": 3,
+      "analytic_maxima": {
+        "speed": 0.4898998538047018,
+        "acceleration": 0.36210401876953463,
+        "jerk": 0.6200564233627763
+      },
+      "success_rate": 1.0,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
+      "localization": "glim",
+      "planning": "fast_planner",
+      "qualification_run": true,
+      "sensor_profile": null,
+      "scene": "circle-eight",
+      "backend": "glim + fast_planner",
+      "run_id": "20261010T030520Z-d65138ee",
+      "report_id": "task9-default-fast-budget-03",
+      "runs": 3,
+      "passed": false,
+      "reason": "command failed: nav --timeout 3300 route-demo /home/pine/workspace/ai/UAV/uav_simulation/.runtime/20261010T030520Z-d65138ee/configuration/scene/route.json --runs 3: {\"success\": false, \"reason\": \"validated external localization and no GNSS fusion required\"}\n[ros2run]: Process exited with failure 1\n; evaluator failed; see tracking/geometry report and observer.log; evaluator failed; see tracking/geometry report and observer.log",
+      "current_implementation": false,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-default-fast-budget-03/acceptance.json",
+          "sha256": "e68f110d66e900ff961a85576815725312549e5024560ef212ccf89fd3866065"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-default-fast-budget-03/tracking.json",
+          "sha256": "0cb874f00caee9351a288f2283ce90adb678c5f3c5424b440974822e567dfd12"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-default-fast-budget-03/geometry.json",
+          "sha256": "3d692daf035543a922b6c57bc665173f06d2d6a572b3af93c89a25c4f0e839d8"
+        }
+      ],
+      "resources": {
+        "closed_loop": {
+          "observed_wall_s": 3.4231848680065013,
+          "observed_cpu_s": 7.840000000000002,
+          "mean_cpu_cores": 2.2902648563545567,
+          "peak_combined_rss_bytes": 488800256,
+          "process_peak_rss_bytes": {
+            "789053": 148168704,
+            "789054": 204988416,
+            "789402": 25722880,
+            "789405": 98725888,
+            "789433": 11460608
+          },
+          "scope": "sampled owned navigation, localization, camera parameter and native planner processes; excludes flight bridge, PX4, Gazebo, rendering, recorder and browser; 0.5s sampling may miss short-lived children"
+        }
+      },
+      "tracking_p95_m": null,
+      "minimum_body_clearance_m": null,
+      "handoffs": 0,
+      "successful_runs": 0,
+      "analytic_maxima": {
+        "speed": 0.0,
+        "acceleration": 0.0,
+        "jerk": 0.0
+      },
+      "success_rate": 0.0,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
+      "localization": "glim",
+      "planning": "fast_planner",
+      "qualification_run": true,
+      "sensor_profile": null,
+      "scene": "circle-eight",
+      "backend": "glim + fast_planner",
+      "run_id": "20261010T030429Z-bdfc3c66",
+      "report_id": "task9-default-fast-budget-02",
+      "runs": 3,
+      "passed": false,
+      "reason": "supervisor exited during startup",
+      "current_implementation": false,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-default-fast-budget-02/acceptance.json",
+          "sha256": "1504901c9b0b963231e671b46ac2025b3bccb679c395864f3454c12a864870e1"
+        }
+      ],
+      "resources": {},
+      "tracking_p95_m": null,
+      "minimum_body_clearance_m": null,
+      "handoffs": null,
+      "successful_runs": null,
+      "analytic_maxima": null,
+      "success_rate": 0.0,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
+      "localization": "glim",
+      "planning": "fast_planner",
+      "qualification_run": true,
+      "sensor_profile": null,
+      "scene": "circle-eight",
+      "backend": "glim + fast_planner",
+      "run_id": "20261010T025657Z-c7b72672",
+      "report_id": "task9-default-fast-budget-01",
+      "runs": 3,
+      "passed": false,
+      "reason": "command failed: nav --timeout 3300 route-demo /home/pine/workspace/ai/UAV/uav_simulation/.runtime/20261010T025657Z-c7b72672/configuration/scene/route.json --runs 3: {\"success\": false, \"reason\": \"navigation map/heartbeat expired or invalid; restart lab\"}\n[ros2run]: Process exited with failure 1\n; evaluator failed; see tracking/geometry report and observer.log; evaluator failed; see tracking/geometry report and observer.log",
+      "current_implementation": false,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-default-fast-budget-01/acceptance.json",
+          "sha256": "f8fe3d269ba7f48b9b3d2dfc2742084f32c76bbae5c75b376f4853945774f8e1"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-default-fast-budget-01/tracking.json",
+          "sha256": "0cb874f00caee9351a288f2283ce90adb678c5f3c5424b440974822e567dfd12"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-default-fast-budget-01/geometry.json",
+          "sha256": "3d692daf035543a922b6c57bc665173f06d2d6a572b3af93c89a25c4f0e839d8"
+        }
+      ],
+      "resources": {
+        "closed_loop": {
+          "observed_wall_s": 5.627646242995979,
+          "observed_cpu_s": 12.850000000000001,
+          "mean_cpu_cores": 2.283370248439616,
+          "peak_combined_rss_bytes": 493142016,
+          "process_peak_rss_bytes": {
+            "783675": 148975616,
+            "783676": 206704640,
+            "784055": 25821184,
+            "784057": 101527552,
+            "784082": 11599872
+          },
+          "scope": "sampled owned navigation, localization, camera parameter and native planner processes; excludes flight bridge, PX4, Gazebo, rendering, recorder and browser; 0.5s sampling may miss short-lived children"
+        }
+      },
+      "tracking_p95_m": null,
+      "minimum_body_clearance_m": null,
+      "handoffs": 0,
+      "successful_runs": 0,
+      "analytic_maxima": {
+        "speed": 0.0,
+        "acceleration": 0.0,
+        "jerk": 0.0
+      },
+      "success_rate": 0.0,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
+      "localization": "glim",
+      "planning": "fast_planner",
+      "qualification_run": true,
+      "sensor_profile": null,
+      "scene": "circle-eight",
+      "backend": "glim + fast_planner",
+      "run_id": "20261010T023353Z-4dbe2992",
+      "report_id": "task9-default-fast-dds-02",
+      "runs": 3,
+      "passed": true,
+      "reason": "",
+      "current_implementation": false,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-default-fast-dds-02/acceptance.json",
+          "sha256": "95b69d71a68956162712737d62c27f2a217388206ce4f95fd24f32aa50ee0614"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-default-fast-dds-02/tracking.json",
+          "sha256": "f7a198e5fe9245b4fd3a96f4fc2729b4d158c3c7990a8896164f6ba200d8a09a"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-default-fast-dds-02/geometry.json",
+          "sha256": "619802d786c4728e0f99dca259c25c6878af4b6b6526500c510a7781553b2b4f"
+        }
+      ],
+      "resources": {
+        "closed_loop": {
+          "observed_wall_s": 508.5855230920133,
+          "observed_cpu_s": 1390.69,
+          "mean_cpu_cores": 2.734427027228607,
+          "peak_combined_rss_bytes": 1047769088,
+          "process_peak_rss_bytes": {
+            "761716": 153505792,
+            "761717": 665980928,
+            "762102": 25776128,
+            "762105": 112427008,
+            "762129": 11546624,
+            "762317": 54722560,
+            "762452": 37900288,
+            "762506": 38064128,
+            "762564": 19304448,
+            "762628": 39366656,
+            "762662": 39100416,
+            "762684": 22745088,
+            "763465": 23261184,
+            "763508": 21979136,
+            "763592": 16728064,
+            "763608": 37867520,
+            "763676": 39108608,
+            "763742": 38273024,
+            "763759": 39399424,
+            "763882": 38068224,
+            "763985": 23748608,
+            "764013": 38408192,
+            "764032": 39198720,
+            "764049": 39276544,
+            "764336": 37847040,
+            "764930": 0,
+            "764966": 41668608,
+            "765000": 39985152,
+            "765100": 39469056,
+            "765136": 0,
+            "765198": 24686592,
+            "765266": 37863424,
+            "765287": 0,
+            "765320": 38551552,
+            "765336": 40501248,
+            "765352": 39313408,
+            "765452": 22044672,
+            "765468": 28880896,
+            "765501": 22515712,
+            "765521": 39108608,
+            "765542": 32980992,
+            "765577": 37695488,
+            "766545": 39063552,
+            "766661": 38936576,
+            "766695": 39485440,
+            "766798": 38789120,
+            "766880": 38424576,
+            "766953": 38146048,
+            "766971": 32907264,
+            "767046": 41754624,
+            "767072": 42889216,
+            "767089": 23318528,
+            "767145": 17870848,
+            "767283": 0,
+            "767321": 38072320,
+            "767405": 21630976,
+            "767422": 37777408,
+            "767440": 22663168,
+            "767457": 22634496,
+            "767679": 37818368,
+            "767722": 37920768
+          },
+          "scope": "sampled owned navigation, localization, camera parameter and native planner processes; excludes flight bridge, PX4, Gazebo, rendering, recorder and browser; 0.5s sampling may miss short-lived children"
+        }
+      },
+      "tracking_p95_m": 0.04248474785018315,
+      "minimum_body_clearance_m": 0.7049338254435351,
+      "handoffs": 138,
+      "successful_runs": 3,
+      "analytic_maxima": {
+        "speed": 0.48782552140406593,
+        "acceleration": 0.3596974484501477,
+        "jerk": 0.6125996724032774
+      },
+      "success_rate": 1.0,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
+      "localization": "glim",
+      "planning": "fast_planner",
+      "qualification_run": true,
+      "sensor_profile": null,
+      "scene": "circle-eight",
+      "backend": "glim + fast_planner",
+      "run_id": "20261010T023054Z-6ac5e044",
+      "report_id": "task9-default-fast-dds-01",
+      "runs": 3,
+      "passed": false,
+      "reason": "command failed: nav --timeout 3300 route-demo /home/pine/workspace/ai/UAV/uav_simulation/.runtime/20261010T023054Z-6ac5e044/configuration/scene/route.json --runs 3: {\"success\": false, \"reason\": \"validated external localization and no GNSS fusion required\"}\n[ros2run]: Process exited with failure 1\n; evaluator failed; see tracking/geometry report and observer.log; evaluator failed; see tracking/geometry report and observer.log",
+      "current_implementation": false,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-default-fast-dds-01/acceptance.json",
+          "sha256": "0b59d703891c2345278536638f327ef1baf457e41e24c542111027d06a8ecd9b"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-default-fast-dds-01/tracking.json",
+          "sha256": "0cb874f00caee9351a288f2283ce90adb678c5f3c5424b440974822e567dfd12"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-default-fast-dds-01/geometry.json",
+          "sha256": "3d692daf035543a922b6c57bc665173f06d2d6a572b3af93c89a25c4f0e839d8"
+        }
+      ],
+      "resources": {
+        "closed_loop": {
+          "observed_wall_s": 3.758042060013395,
+          "observed_cpu_s": 7.42,
+          "mean_cpu_cores": 1.9744323989746813,
+          "peak_combined_rss_bytes": 490885120,
+          "process_peak_rss_bytes": {
+            "758516": 148062208,
+            "758517": 207130624,
+            "758983": 25669632,
+            "758987": 98680832,
+            "759027": 11636736
+          },
+          "scope": "sampled owned navigation, localization, camera parameter and native planner processes; excludes flight bridge, PX4, Gazebo, rendering, recorder and browser; 0.5s sampling may miss short-lived children"
+        }
+      },
+      "tracking_p95_m": null,
+      "minimum_body_clearance_m": null,
+      "handoffs": 0,
+      "successful_runs": 0,
+      "analytic_maxima": {
+        "speed": 0.0,
+        "acceleration": 0.0,
+        "jerk": 0.0
+      },
+      "success_rate": 0.0,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
+      "localization": "glim",
+      "planning": "fast_planner",
+      "qualification_run": true,
+      "sensor_profile": null,
+      "scene": "circle-eight",
+      "backend": "glim + fast_planner",
+      "run_id": "20261009T235915Z-ca2d8d48",
+      "report_id": "task9-default-fast-mesa-01",
+      "runs": 3,
+      "passed": true,
+      "reason": "",
+      "current_implementation": false,
+      "qualified": false,
+      "source_verified": true,
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-default-fast-mesa-01/acceptance.json",
+          "sha256": "9e14583d796edd3778de6c6aa0c59d053f8085c09e87d7a51b8d8f40ffb4ad51"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-default-fast-mesa-01/tracking.json",
+          "sha256": "0afdba8eb05d2b3bd3fae109af76abc7f0ed64c3b35e8253fdccfcfe720e1a4b"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/task9-default-fast-mesa-01/geometry.json",
+          "sha256": "1588068010a46fbed802525d4d96c3424c1a4886a59276060a63547bc2ca8e8b"
+        }
+      ],
+      "resources": {
+        "closed_loop": {
+          "observed_wall_s": 501.7593181489792,
+          "observed_cpu_s": 1088.3600000000001,
+          "mean_cpu_cores": 2.16908776904239,
+          "peak_combined_rss_bytes": 1048055808,
+          "process_peak_rss_bytes": {
+            "651347": 153923584,
+            "651348": 674529280,
+            "651754": 25735168,
+            "651756": 112082944,
+            "651793": 11636736,
+            "652150": 58654720,
+            "652153": 35737600,
+            "652169": 0,
+            "652205": 21569536,
+            "652226": 39227392,
+            "652264": 20639744,
+            "652288": 24088576,
+            "652357": 0,
+            "652399": 42180608,
+            "652457": 39170048,
+            "652495": 38301696,
+            "652543": 42422272,
+            "652614": 23072768,
+            "652648": 22310912,
+            "652669": 23302144,
+            "652685": 39464960,
+            "652721": 23719936,
+            "652756": 39321600,
+            "652772": 39292928,
+            "652808": 11956224,
+            "652859": 20852736,
+            "652894": 23437312,
+            "652911": 39022592,
+            "652943": 41058304,
+            "652978": 39604224,
+            "652996": 25284608,
+            "653014": 0,
+            "653107": 39153664,
+            "653127": 39075840,
+            "653167": 25657344,
+            "653202": 22708224,
+            "653219": 22114304,
+            "653279": 0,
+            "653320": 41177088,
+            "653338": 23842816,
+            "653355": 39424000,
+            "654293": 22646784,
+            "654355": 24350720,
+            "654372": 38928384,
+            "654393": 37740544,
+            "654504": 39157760,
+            "654563": 39108608,
+            "654721": 42639360,
+            "654742": 23207936,
+            "654760": 22990848,
+            "654980": 22548480,
+            "655151": 37904384,
+            "655163": 41000960,
+            "655206": 22392832,
+            "655311": 37777408,
+            "655382": 39399424,
+            "655395": 39333888,
+            "655686": 39428096,
+            "655718": 39129088,
+            "655766": 38686720,
+            "655910": 0,
+            "656184": 39510016,
+            "656218": 39280640,
+            "656316": 39206912,
+            "656377": 39473152,
+            "656394": 21065728,
+            "656499": 38088704,
+            "656552": 39444480
+          },
+          "scope": "sampled owned navigation, localization, camera parameter and native planner processes; excludes flight bridge, PX4, Gazebo, rendering, recorder and browser; 0.5s sampling may miss short-lived children"
+        }
+      },
+      "tracking_p95_m": 0.039860064166099655,
+      "minimum_body_clearance_m": 0.7056687696438204,
+      "handoffs": 138,
+      "successful_runs": 3,
+      "analytic_maxima": {
+        "speed": 0.4847393656911578,
+        "acceleration": 0.35890124404335194,
+        "jerk": 0.6168565172411468
+      },
+      "success_rate": 1.0,
+      "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
+    },
+    {
       "localization": "fast_livo2",
       "planning": "ego",
       "qualification_run": true,
@@ -14,7 +573,7 @@
       "runs": 3,
       "passed": false,
       "reason": "supervisor exited during startup",
-      "current_implementation": true,
+      "current_implementation": false,
       "qualified": false,
       "source_verified": true,
       "artifacts": [
@@ -26,7 +585,10 @@
       "resources": {},
       "tracking_p95_m": null,
       "minimum_body_clearance_m": null,
-      "handoff_limits": null,
+      "handoffs": null,
+      "successful_runs": null,
+      "analytic_maxima": null,
+      "success_rate": 0.0,
       "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
     },
     {
@@ -41,7 +603,7 @@
       "runs": 1,
       "passed": false,
       "reason": "command failed: nav --timeout 3300 route-demo /home/pine/workspace/ai/UAV/uav_simulation/.runtime/20261009T164345Z-9194bc30/configuration/scene/route.json --runs 1: {\"success\": false, \"reason\": \"route failed: {'success': False, 'reason': 'START_BLOCKED_OR_UNOBSERVED'}\"}\n[ros2run]: Process exited with failure 1\n; evaluator failed; see tracking/geometry report and observer.log; evaluator failed; see tracking/geometry report and observer.log",
-      "current_implementation": true,
+      "current_implementation": false,
       "qualified": false,
       "source_verified": true,
       "artifacts": [
@@ -77,7 +639,14 @@
       },
       "tracking_p95_m": null,
       "minimum_body_clearance_m": 0.7116972906971276,
-      "handoff_limits": 0,
+      "handoffs": 0,
+      "successful_runs": 0,
+      "analytic_maxima": {
+        "speed": 0.0,
+        "acceleration": 0.0,
+        "jerk": 0.0
+      },
+      "success_rate": 0.0,
       "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
     },
     {
@@ -92,7 +661,7 @@
       "runs": 1,
       "passed": false,
       "reason": "command failed: nav --timeout 3300 route-demo /home/pine/workspace/ai/UAV/uav_simulation/.runtime/20261009T164234Z-285d686d/configuration/scene/route.json --runs 1: {\"success\": false, \"reason\": \"route failed: {'success': False, 'reason': 'GOAL_BLOCKED_OR_UNOBSERVED'}\"}\n[ros2run]: Process exited with failure 1\n; evaluator failed; see tracking/geometry report and observer.log",
-      "current_implementation": true,
+      "current_implementation": false,
       "qualified": false,
       "source_verified": true,
       "artifacts": [
@@ -134,7 +703,14 @@
       },
       "tracking_p95_m": 0.05225643802597525,
       "minimum_body_clearance_m": 0.7069438898295373,
-      "handoff_limits": 8,
+      "handoffs": 8,
+      "successful_runs": 0,
+      "analytic_maxima": {
+        "speed": 0.38538180743486056,
+        "acceleration": 0.34261161074681495,
+        "jerk": 0.5183111517534786
+      },
+      "success_rate": 0.0,
       "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
     },
     {
@@ -149,7 +725,7 @@
       "runs": 1,
       "passed": false,
       "reason": "command failed: nav --timeout 3300 route-demo /home/pine/workspace/ai/UAV/uav_simulation/.runtime/20261009T164134Z-a6287ccc/configuration/scene/route.json --runs 1: {\"success\": false, \"reason\": \"route failed: {'success': False, 'reason': 'distant route has no observed admissible local target'}\"}\n[ros2run]: Process exited with failure 1\n; evaluator failed; see tracking/geometry report and observer.log",
-      "current_implementation": true,
+      "current_implementation": false,
       "qualified": false,
       "source_verified": true,
       "artifacts": [
@@ -186,7 +762,14 @@
       },
       "tracking_p95_m": 0.04827932968272755,
       "minimum_body_clearance_m": 0.7038370486040451,
-      "handoff_limits": 0,
+      "handoffs": 0,
+      "successful_runs": 0,
+      "analytic_maxima": {
+        "speed": 0.4502669773298232,
+        "acceleration": 0.21250276495339251,
+        "jerk": 0.2685281712816952
+      },
+      "success_rate": 0.0,
       "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
     },
     {
@@ -201,7 +784,7 @@
       "runs": 1,
       "passed": false,
       "reason": "command failed: nav --timeout 3300 route-demo /home/pine/workspace/ai/UAV/uav_simulation/.runtime/20261009T163922Z-a3bb49cd/configuration/scene/route.json --runs 1: {\"success\": false, \"reason\": \"route failed: {'success': False, 'reason': 'GOAL_BLOCKED_OR_UNOBSERVED'}\"}\n[ros2run]: Process exited with failure 1\n; evaluator failed; see tracking/geometry report and observer.log",
-      "current_implementation": true,
+      "current_implementation": false,
       "qualified": false,
       "source_verified": true,
       "artifacts": [
@@ -245,7 +828,14 @@
       },
       "tracking_p95_m": 0.043158247409005236,
       "minimum_body_clearance_m": 0.7074280985973365,
-      "handoff_limits": 31,
+      "handoffs": 31,
+      "successful_runs": 0,
+      "analytic_maxima": {
+        "speed": 0.3105077600664505,
+        "acceleration": 0.34796082094918906,
+        "jerk": 0.5075895031877993
+      },
+      "success_rate": 0.0,
       "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
     },
     {
@@ -260,7 +850,7 @@
       "runs": 1,
       "passed": true,
       "reason": "",
-      "current_implementation": true,
+      "current_implementation": false,
       "qualified": false,
       "source_verified": true,
       "artifacts": [
@@ -311,7 +901,14 @@
       },
       "tracking_p95_m": 0.03212590804345252,
       "minimum_body_clearance_m": 0.6884988498494238,
-      "handoff_limits": 31,
+      "handoffs": 31,
+      "successful_runs": 1,
+      "analytic_maxima": {
+        "speed": 0.3287688492838641,
+        "acceleration": 0.2389920150612628,
+        "jerk": 0.42816037633417403
+      },
+      "success_rate": 1.0,
       "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
     },
     {
@@ -326,7 +923,7 @@
       "runs": 3,
       "passed": false,
       "reason": "command failed: nav --timeout 3300 route-demo /home/pine/workspace/ai/UAV/uav_simulation/.runtime/20261009T163311Z-b69f88dc/configuration/scene/route.json --runs 3: {\"success\": false, \"reason\": \"route failed: {'success': False, 'reason': 'native trajectory cannot meet derivative limits'}\"}\n[ros2run]: Process exited with failure 1\n; evaluator failed; see tracking/geometry report and observer.log",
-      "current_implementation": true,
+      "current_implementation": false,
       "qualified": false,
       "source_verified": true,
       "artifacts": [
@@ -370,7 +967,14 @@
       },
       "tracking_p95_m": 0.04635448934263643,
       "minimum_body_clearance_m": 0.6972239770602091,
-      "handoff_limits": 51,
+      "handoffs": 51,
+      "successful_runs": 1,
+      "analytic_maxima": {
+        "speed": 0.4520494054464851,
+        "acceleration": 0.44771784070316734,
+        "jerk": 0.998273780828358
+      },
+      "success_rate": 0.3333333333333333,
       "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
     },
     {
@@ -385,7 +989,7 @@
       "runs": 3,
       "passed": true,
       "reason": "",
-      "current_implementation": true,
+      "current_implementation": false,
       "qualified": false,
       "source_verified": true,
       "artifacts": [
@@ -473,7 +1077,14 @@
       },
       "tracking_p95_m": 0.04047205294888423,
       "minimum_body_clearance_m": 0.7168929993730278,
-      "handoff_limits": 138,
+      "handoffs": 138,
+      "successful_runs": 3,
+      "analytic_maxima": {
+        "speed": 0.48470913181690267,
+        "acceleration": 0.35887511309938475,
+        "jerk": 0.616797234287398
+      },
+      "success_rate": 1.0,
       "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
     },
     {
@@ -488,7 +1099,7 @@
       "runs": 3,
       "passed": true,
       "reason": "",
-      "current_implementation": true,
+      "current_implementation": false,
       "qualified": false,
       "source_verified": true,
       "artifacts": [
@@ -524,7 +1135,14 @@
       },
       "tracking_p95_m": 0.04510162841540152,
       "minimum_body_clearance_m": 0.7027839170332095,
-      "handoff_limits": 138,
+      "handoffs": 138,
+      "successful_runs": 3,
+      "analytic_maxima": {
+        "speed": 0.4950495049504952,
+        "acceleration": 0.3443076130845334,
+        "jerk": 0.9722668055038969
+      },
+      "success_rate": 1.0,
       "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
     },
     {
@@ -539,7 +1157,7 @@
       "runs": 3,
       "passed": false,
       "reason": "command failed: nav --timeout 3300 route-demo /home/pine/workspace/ai/UAV/uav_simulation/.runtime/20261009T160937Z-a89d1be9/configuration/scene/route.json --runs 3: {\"success\": false, \"reason\": \"route failed: {'success': False, 'reason': 'navigation source failed; restart lab'}; landing failed: flight goal rejected\"}\n[ros2run]: Process exited with failure 1\n; evaluator failed; see tracking/geometry report and observer.log",
-      "current_implementation": true,
+      "current_implementation": false,
       "qualified": false,
       "source_verified": true,
       "artifacts": [
@@ -588,7 +1206,14 @@
       },
       "tracking_p95_m": 0.04279880283827164,
       "minimum_body_clearance_m": 0.7225071842537361,
-      "handoff_limits": 42,
+      "handoffs": 42,
+      "successful_runs": 0,
+      "analytic_maxima": {
+        "speed": 0.4720922595483012,
+        "acceleration": 0.3614015979055434,
+        "jerk": 0.6633996860122401
+      },
+      "success_rate": 0.0,
       "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
     },
     {
@@ -640,7 +1265,14 @@
       },
       "tracking_p95_m": 0.047791671975869934,
       "minimum_body_clearance_m": 0.702894096440497,
-      "handoff_limits": 0,
+      "handoffs": 0,
+      "successful_runs": 0,
+      "analytic_maxima": {
+        "speed": 0.44985929097083416,
+        "acceleration": 0.21284439675868558,
+        "jerk": 0.2688762022114904
+      },
+      "success_rate": 0.0,
       "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
     },
     {
@@ -667,7 +1299,10 @@
       "resources": {},
       "tracking_p95_m": null,
       "minimum_body_clearance_m": null,
-      "handoff_limits": null,
+      "handoffs": null,
+      "successful_runs": null,
+      "analytic_maxima": null,
+      "success_rate": 0.0,
       "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
     },
     {
@@ -718,7 +1353,14 @@
       },
       "tracking_p95_m": null,
       "minimum_body_clearance_m": 0.7138425466719474,
-      "handoff_limits": 0,
+      "handoffs": 0,
+      "successful_runs": 0,
+      "analytic_maxima": {
+        "speed": 0.0,
+        "acceleration": 0.0,
+        "jerk": 0.0
+      },
+      "success_rate": 0.0,
       "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
     },
     {
@@ -776,7 +1418,14 @@
       },
       "tracking_p95_m": 0.049631648259087634,
       "minimum_body_clearance_m": 0.7026400025515378,
-      "handoff_limits": 8,
+      "handoffs": 8,
+      "successful_runs": 0,
+      "analytic_maxima": {
+        "speed": 0.38584190690544595,
+        "acceleration": 0.34280255504198626,
+        "jerk": 0.5175030221214711
+      },
+      "success_rate": 0.0,
       "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
     },
     {
@@ -828,7 +1477,14 @@
       },
       "tracking_p95_m": 0.04541028588370696,
       "minimum_body_clearance_m": 0.7242008646322411,
-      "handoff_limits": 0,
+      "handoffs": 0,
+      "successful_runs": 0,
+      "analytic_maxima": {
+        "speed": 0.44996436599366957,
+        "acceleration": 0.21326596909264936,
+        "jerk": 0.26931312393686363
+      },
+      "success_rate": 0.0,
       "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
     },
     {
@@ -863,7 +1519,14 @@
       "resources": null,
       "tracking_p95_m": 0.04293998442168597,
       "minimum_body_clearance_m": 0.704859396152216,
-      "handoff_limits": 31,
+      "handoffs": 31,
+      "successful_runs": 0,
+      "analytic_maxima": {
+        "speed": 0.31077164751558894,
+        "acceleration": 0.34683310768672165,
+        "jerk": 0.5047994974879734
+      },
+      "success_rate": 0.0,
       "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
     },
     {
@@ -898,7 +1561,14 @@
       "resources": null,
       "tracking_p95_m": 0.03158977037772169,
       "minimum_body_clearance_m": 0.6923667441240084,
-      "handoff_limits": 31,
+      "handoffs": 31,
+      "successful_runs": 1,
+      "analytic_maxima": {
+        "speed": 0.3286384277404016,
+        "acceleration": 0.23887472671657553,
+        "jerk": 0.42661576283242836
+      },
+      "success_rate": 1.0,
       "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
     },
     {
@@ -933,7 +1603,14 @@
       "resources": null,
       "tracking_p95_m": 0.05696114950808375,
       "minimum_body_clearance_m": 0.7055180927390807,
-      "handoff_limits": 5,
+      "handoffs": 5,
+      "successful_runs": 0,
+      "analytic_maxima": {
+        "speed": 0.4520563630325121,
+        "acceleration": 0.3422138209222974,
+        "jerk": 0.9636133525778459
+      },
+      "success_rate": 0.0,
       "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
     },
     {
@@ -968,7 +1645,14 @@
       "resources": null,
       "tracking_p95_m": 0.040425646710362875,
       "minimum_body_clearance_m": 0.7213093008357306,
-      "handoff_limits": 138,
+      "handoffs": 138,
+      "successful_runs": 3,
+      "analytic_maxima": {
+        "speed": 0.49178968647948307,
+        "acceleration": 0.3632553981685662,
+        "jerk": 0.621106978816543
+      },
+      "success_rate": 1.0,
       "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
     },
     {
@@ -1003,7 +1687,14 @@
       "resources": null,
       "tracking_p95_m": 0.04493730619623463,
       "minimum_body_clearance_m": 0.7087152781096147,
-      "handoff_limits": 138,
+      "handoffs": 138,
+      "successful_runs": 3,
+      "analytic_maxima": {
+        "speed": 0.4950495049504955,
+        "acceleration": 0.3431153274055722,
+        "jerk": 0.9967893328966133
+      },
+      "success_rate": 1.0,
       "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
     },
     {
@@ -1038,7 +1729,14 @@
       "resources": null,
       "tracking_p95_m": 0.04118791455517527,
       "minimum_body_clearance_m": 0.7121053989809186,
-      "handoff_limits": 138,
+      "handoffs": 138,
+      "successful_runs": 3,
+      "analytic_maxima": {
+        "speed": 0.4778020495943072,
+        "acceleration": 0.36435044996784927,
+        "jerk": 0.6665254653556959
+      },
+      "success_rate": 1.0,
       "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
     },
     {
@@ -1073,7 +1771,10 @@
       "resources": null,
       "tracking_p95_m": 0.04175351651653797,
       "minimum_body_clearance_m": 0.7092325966517148,
-      "handoff_limits": 46,
+      "handoffs": 46,
+      "successful_runs": 1,
+      "analytic_maxima": null,
+      "success_rate": 1.0,
       "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
     },
     {
@@ -1108,7 +1809,10 @@
       "resources": null,
       "tracking_p95_m": null,
       "minimum_body_clearance_m": 0.7171527103844186,
-      "handoff_limits": 0,
+      "handoffs": 0,
+      "successful_runs": 0,
+      "analytic_maxima": null,
+      "success_rate": 0.0,
       "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
     },
     {
@@ -1143,7 +1847,10 @@
       "resources": null,
       "tracking_p95_m": 0.04707106361510486,
       "minimum_body_clearance_m": 0.6841714599334577,
-      "handoff_limits": null,
+      "handoffs": null,
+      "successful_runs": null,
+      "analytic_maxima": null,
+      "success_rate": 0.0,
       "scope": "Acceptance outcome; pair control qualification requires separate independent raw-evidence revalidation"
     }
   ]

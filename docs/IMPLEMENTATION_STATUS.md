@@ -59,3 +59,15 @@ Gazebo GUI 与 RViz 启动通过，RViz 报告 OpenGL 4.6。没有做界面截�
 一次独立审查的6项Important全部失败复现、一次修复完成，无延后项。ff2eddb最终187项回归通过；原生连续3轮绕障/返回/落地通过，3次障碍内目标拒绝，独立最小机体净距0.6682m。15条执行计划和3拒绝查询的不可覆盖地图/哈希逐条回放通过，30帧实际雷达离线基准通过。导航退出后8.0971秒确认PX4失控降落、落地解除武装，即时恢复数据后仍拒绝重新解锁。
 
 完整[实验04](experiments/04-navigation.md)、[验收及来源](validation/V0.4-local.md)、[审查修复](validation/V0.4-review.md)、[执行取舍](validation/V0.4-decisions.md)。增量[PR #4](https://github.com/daydayup0713-wq/uav_simulation/pull/4)基于待审查的V0.3分支；最终提交CI门禁通过后创建v0.4.0，不自动合并旧PR。当前范围为静态已观测空间，动态障碍、自主探索、完整起降避障、实机标定另行验收。下一阶段V0.5为巡检点与任务执行、姿态/采集动作、暂停和恢复。
+
+## L1 多算法实验台升级（2026-10-10）
+
+`feat/l1-workbench` 从 V0.4 基线 `e295a54` 增量建设，保留旧 CLI/Gazebo/RViz 与原飞行门禁。七种定位方法和四条规划路线均锁定上游版本并实际运行；算法质量失败也保留报告。新增时间参数化 C2 轨迹、50Hz 执行、20Hz 心跳、观测空间内全曲线碰撞检查和受地图约束的 HOLD，以及六个复杂场景和三个独立传感器配置。
+
+React/TypeScript/Three.js 本地实验台提供原始单帧、配准累积、实际全局优化地图、障碍体素四图层，轨迹、机体、视角/着色、文件回放、分组报告和监督器管理的控制入口。实际 Web 起飞、航点、HOLD、LAND 和停机流程通过；实际 47 控制点航线成功，底层仍只有飞控适配器发布 PX4 控制指令。
+
+当前唯一闭环许可为 `GLIM + FAST-Planner + synchronous_lidar_imu` 的准确实现组合：圆形/八字连续三轮、141 控制点/138 次 C2 衔接，跟踪 P95 0.041928m、最小实际机体净距 0.704236m；HOLD、LAND、定位退出、源数据过期、Web 断连五项均实际通过。其他后端不能从安装、回放或历史成功自动获得许可。FAST-LIVO2 和 RTK 前端当前回放通过；FAST-LIO2、LIO-SAM、ORB-SLAM3、VINS-Fusion 当前质量失败；RTK 的 EOF 优化通过但地面实时看门狗失败。EGO、GCOPTER 和其余复杂场景的实飞失败保持可追溯。
+
+代码提交 `1f8e6ed` 的本机 ROS/Python 482 通过、1 条件跳过；前端 13 通过及生产构建通过。[干净 CI](https://github.com/daydayup0713-wq/uav_simulation/actions/runs/38023700201) 已完整通过源码/容器构建、三次飞行、断桥降落和原生算法 CPU 门禁。完整结果见 [L1 验收](validation/l1/acceptance.md)、[当前组合证明摘要](validation/l1/current-pair.json)、[Web 操作证据](validation/l1/web-controls.json) 与 [全部执行取舍](validation/l1/decisions.md)。增量审查入口为 [PR #5](https://github.com/daydayup0713-wq/uav_simulation/pull/5)，基于待审查的 V0.4 分支，未自动合并旧 PR。
+
+本机默认 NVIDIA EGL 路径因驱动/用户库不匹配失败，显式 Mesa 显示渲染通过；这需要 DISPLAY。主机偶发时钟/接收停顿的原因仍未证明，门禁继续拒绝有问题的运行。本轮提供真机参数模板与部署检查，15 个实际测量项尚缺，未授予真实机体试飞资格。实际算法阶段、模拟近似与资源范围分别记录，当前结论不能外推为真机精度或整机性能。
