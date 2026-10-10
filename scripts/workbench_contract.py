@@ -27,7 +27,9 @@ def authorize(command,state,now,mode):
     elif command in ('takeoff','goto','route'):
         if not armed or not offboard:raise ValueError('explicit armed Offboard state required')
         if state.get('phase')!='HOLDING':raise ValueError('idle hover required; duplicate motion rejected')
-        if command=='takeoff' and not landed:raise ValueError('takeoff requires explicit ground arm')
+        # PX4 may clear landed while spooling at the ground hold setpoint.
+        # The bridge alone verifies its saved ground-arm origin and 0.3m
+        # displacement bound; submit TAKEOFF to that authoritative check.
         if command!='takeoff' and landed:raise ValueError('airborne hover required')
     elif command=='hold':
         if not armed or not offboard or state.get('phase') not in ('HOLDING','MOVING'):raise ValueError('armed Offboard hover or motion required')

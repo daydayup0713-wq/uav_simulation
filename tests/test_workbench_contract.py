@@ -53,3 +53,13 @@ def test_fresh_landed_failsafe_allows_owned_shutdown_but_never_rearms():
                    state(phase='WARMUP'),state(phase='ARMING')):
         with pytest.raises(ValueError):api().authorize('stop',unsafe,10.1,'live')
     with pytest.raises(ValueError,match='fresh'):api().authorize('stop',failed,12.,'live')
+
+
+def test_takeoff_submission_defers_transient_landed_flag_to_bridge_origin_guard():
+    # PX4 changes landed after Offboard arming at the ground hold setpoint.
+    # The bridge owns the ground-arm origin and its 0.3m takeoff constraint.
+    armed=state(armed='True',landed='False',phase='HOLDING')
+    assert api().authorize('takeoff',armed,10.1,'live')
+    for unsafe in (dict(armed,armed='False'),dict(armed,offboard='False'),
+                   dict(armed,phase='MOVING'),dict(armed,phase='FAILSAFE')):
+        with pytest.raises(ValueError):api().authorize('takeoff',unsafe,10.1,'live')
