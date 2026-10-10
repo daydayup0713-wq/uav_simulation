@@ -11,6 +11,7 @@ import rosbag2_py
 from rclpy.serialization import serialize_message
 from sensor_msgs.msg import PointCloud2, PointField, Imu
 from nav_msgs.msg import Odometry
+from rosgraph_msgs.msg import Clock
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'ros2_ws/src/uav_lab_tools'))
@@ -35,7 +36,7 @@ def generate(destination):
     writer=rosbag2_py.SequentialWriter()
     writer.open(rosbag2_py.StorageOptions(uri=str(destination/'bag'),storage_id='sqlite3'),rosbag2_py.ConverterOptions('',''))
     topics={'/uav001/imu/data':'sensor_msgs/msg/Imu','/uav001/lidar/points':'sensor_msgs/msg/PointCloud2',
-            '/uav001/ground_truth/odometry':'nav_msgs/msg/Odometry'}
+            '/uav001/ground_truth/odometry':'nav_msgs/msg/Odometry','/clock':'rosgraph_msgs/msg/Clock'}
     for name,kind in topics.items():writer.create_topic(rosbag2_py.TopicMetadata(name=name,type=kind,serialization_format='cdr'))
     rng=np.random.default_rng(1234)
     wall=rng.uniform([-4,-4,-.25],[6,6,4],(2400,3))
@@ -50,6 +51,8 @@ def generate(destination):
         acc=r.inv().apply((after-2*p+before)/(dt*dt)+[0,0,9.80665])
         omega=(rb.inv()*ra).as_rotvec()/(2*dt)
         imu=Imu();ns=header(imu,t,'imu_link');imu.orientation_covariance[0]=-1.
+        clock=Clock();clock.clock.sec=ns//10**9;clock.clock.nanosec=ns%10**9
+        writer.write('/clock',serialize_message(clock),ns)
         imu.linear_acceleration.x,imu.linear_acceleration.y,imu.linear_acceleration.z=map(float,acc)
         imu.angular_velocity.x,imu.angular_velocity.y,imu.angular_velocity.z=map(float,omega)
         writer.write('/uav001/imu/data',serialize_message(imu),ns)
