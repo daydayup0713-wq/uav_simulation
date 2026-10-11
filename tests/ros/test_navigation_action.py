@@ -171,6 +171,26 @@ def test_cli_timeout_before_ack_cancels_late_navigation(rig):
     finally:client.destroy_node()
 
 
+def test_cli_confirms_rejected_probe_before_one_real_navigation_request(rig):
+    from uav_lab_navigation.cli import Navigator
+    nav, control, _ = rig
+    original = nav.navigation_goal
+    frames = []
+    def observe(request):
+        frames.append(request.goal.header.frame_id)
+        return original(request)
+    nav.server.register_goal_callback(observe)
+    client = rclpy.create_node('cold_navigation_cli')
+    operator = Navigator(client, 8.)
+    try:
+        assert operator.goto([1, 1, 2])['success']
+        assert frames == ['', 'odom']
+        assert len(control['goals']) == 2  # Two legacy legs, one real Navigate goal.
+    finally:
+        operator.destroy()
+        client.destroy_node()
+
+
 def test_web_goto_uses_an_executable_cli_and_preserves_goal_yaw(rig,monkeypatch,tmp_path,isolated_ros_domain):
     """Execute the real command parser and real DDS action, no Popen/CLI fake."""
     import math

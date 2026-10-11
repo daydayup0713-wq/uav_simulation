@@ -66,8 +66,8 @@ Gazebo GUI 与 RViz 启动通过，RViz 报告 OpenGL 4.6。没有做界面截�
 
 React/TypeScript/Three.js 本地实验台提供原始单帧、配准累积、实际全局优化地图、障碍体素四图层，轨迹、机体、视角/着色、文件回放、分组报告和监督器管理的控制入口。实际 Web 起飞、航点、HOLD、LAND 和停机流程通过；实际 47 控制点航线成功，底层仍只有飞控适配器发布 PX4 控制指令。
 
-当前唯一闭环许可为 `GLIM + FAST-Planner + synchronous_lidar_imu` 的准确实现组合：圆形/八字连续三轮、141 控制点/138 次 C2 衔接，跟踪 P95 0.041928m、最小实际机体净距 0.704236m；HOLD、LAND、定位退出、源数据过期、Web 断连五项均实际通过。其他后端不能从安装、回放或历史成功自动获得许可。FAST-LIVO2 和 RTK 前端当前回放通过；FAST-LIO2、LIO-SAM、ORB-SLAM3、VINS-Fusion 当前质量失败；RTK 的 EOF 优化通过但地面实时看门狗失败。EGO、GCOPTER 和其余复杂场景的实飞失败保持可追溯。
+最终审查后的七种方法均完成回放：GLIM、FAST-LIVO2、RTK 前端通过，另外四种保留质量失败。`2454643` 的三轮正常闭环完成 141 控制点/138 次衔接（P95 0.040397m、最小机体净距 0.701791m），但定位退出故障的冷启动 DDS 接受回复丢失，整套故障未通过，不能继承旧控制资格。客户端无运动拒绝探测已通过五项 RED→GREEN 回归，新控制实现的正常/故障复验尚待完成。RTK EOF 优化通过，但地面实时看门狗失败；EGO、GCOPTER 和其余复杂场景的失败保留。
 
-代码提交 `1f8e6ed` 的本机 ROS/Python 482 通过、1 条件跳过；前端 13 通过及生产构建通过。[干净 CI](https://github.com/daydayup0713-wq/uav_simulation/actions/runs/38023700201) 已完整通过源码/容器构建、三次飞行、断桥降落和原生算法 CPU 门禁。完整结果见 [L1 验收](validation/l1/acceptance.md)、[当前组合证明摘要](validation/l1/current-pair.json)、[Web 操作证据](validation/l1/web-controls.json) 与 [全部执行取舍](validation/l1/decisions.md)。增量审查入口为 [PR #5](https://github.com/daydayup0713-wq/uav_simulation/pull/5)，基于待审查的 V0.4 分支，未自动合并旧 PR。
+审查修复代码 `2454643` 的本机 ROS/Python 501 通过、1 条件跳过；前端 13 通过及生产构建通过。[干净 CI](https://github.com/daydayup0713-wq/uav_simulation/actions/runs/38063440951) 已完整通过源码/容器构建、三次飞行、断桥降落和原生算法 CPU 门禁。完整结果见 [L1 验收](validation/l1/acceptance.md)、[当前组合证明摘要](validation/l1/current-pair.json)、[Web 操作证据](validation/l1/web-controls.json) 与 [全部执行取舍](validation/l1/decisions.md)。增量审查入口为 [PR #5](https://github.com/daydayup0713-wq/uav_simulation/pull/5)，基于待审查的 V0.4 分支，未自动合并旧 PR。
 
 本机默认 NVIDIA EGL 路径因驱动/用户库不匹配失败，显式 Mesa 显示渲染通过；这需要 DISPLAY。主机偶发时钟/接收停顿的原因仍未证明，门禁继续拒绝有问题的运行。本轮提供真机参数模板与部署检查，15 个实际测量项尚缺，未授予真实机体试飞资格。实际算法阶段、模拟近似与资源范围分别记录，当前结论不能外推为真机精度或整机性能。

@@ -58,10 +58,33 @@ class Navigator:
         validate_controls(controls)
         return self.execute_action(NavigateRoute,NavigateRoute.Goal(controls=controls),'route')
 
+    def confirm_reply_discovery(self, action, kind):
+        """Confirm a cold request/reply path before sending any real motion.
+
+        Empty Navigate frames and empty route controls are always rejected by
+        the server before taking motion ownership. Only these no-op probes may
+        be retried when DDS request discovery precedes reply discovery.
+        """
+        errors = []
+        for _ in range(3):
+            try:
+                handle = self.operator.wait(action.send_goal_async(kind.Goal()), 1.)
+            except RuntimeError as error:
+                errors.append(str(error))
+                continue
+            if handle.accepted:
+                try:
+                    self.operator.wait(handle.cancel_goal_async(), 1.)
+                finally:
+                    raise RuntimeError('navigation discovery probe unexpectedly accepted; no motion goal submitted')
+            return
+        raise RuntimeError('navigation reply discovery unconfirmed; no motion goal submitted: ' + '; '.join(errors))
+
     def execute_action(self,kind,goal,name):
         action=ActionClient(self.node,kind,'/uav001/navigation/'+name);handle=None;submitted=None
         try:
             if not action.wait_for_server(timeout_sec=5):raise RuntimeError('navigation action unavailable')
+            self.confirm_reply_discovery(action, kind)
             submitted=action.send_goal_async(goal)
             handle=self.operator.wait(submitted)
             if not handle.accepted:raise RuntimeError('navigation request rejected')
