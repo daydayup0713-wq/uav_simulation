@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "date": "2026-10-10",
+  "date": "2026-10-11",
   "scope": "Actual local Web control checks, including preserved failures. No hardware qualification or broader algorithm-pair qualification is inferred.",
   "cases": [
     {
@@ -421,6 +421,220 @@
         "observed_after_stop": "Web start enabled, stop disabled, observation disconnected; captured supervisor absent from host process inventory"
       },
       "scope": "Actual browser buttons, real public ROS actions and PX4; untracked validation screenshots account for dirty worktree. STOP is a synchronous request, not a persisted command job."
+    },
+    {
+      "run_id": "20261011T045815Z-927b1466",
+      "outcome": "FAIL_GROUND_FRESHNESS",
+      "source_commit": "f9a8fde2f1cc168f6d2680c77aa746590638ec4a",
+      "source_dirty": true,
+      "control_sha256": "1c57a07af9fd4e7bd049ae63bab8575263c135340834d925e2120152ca058d33",
+      "artifacts": [
+        {
+          "path": ".runtime/20261011T045815Z-927b1466/manifest.json",
+          "sha256": "f6738eba97859167fb9feeb2b1e72aed6aa9c8b4458a7b37c03766c1b69c0277",
+          "bytes": 36913
+        },
+        {
+          "path": ".runtime/20261011T045815Z-927b1466/events.jsonl",
+          "sha256": "ba571fbf3540b5d6db67fb0d9ef12efc6e662d7b7595d245603b8d2757d858c9",
+          "bytes": 918048
+        },
+        {
+          "path": ".runtime/20261011T045815Z-927b1466/navigation.jsonl",
+          "sha256": "38d929c07ce6328706487ec6265f63aabdaea2fab87a65b6624111a8304f2f88",
+          "bytes": 27216
+        },
+        {
+          "path": ".runtime/20261011T045815Z-927b1466/px4.log",
+          "sha256": "0a177d5bab84a372b9f1baa4d6a93deae0511fd0bac60b29c58622ce9ce35915",
+          "bytes": 6252
+        },
+        {
+          "path": ".runtime/20261011T045815Z-927b1466/stop-request.json",
+          "sha256": "49eca87b2806f113c6d1f5bb823c92d434ecea468dd8b0dd8eb78404cf6c1897",
+          "bytes": 88
+        }
+      ],
+      "jobs": [
+        {
+          "id": "948fb2a314fb45c6968679861e874a17",
+          "command": "start",
+          "state": "SUCCEEDED",
+          "success": true,
+          "reason": "",
+          "result": {
+            "success": true,
+            "run_id": "20261011T045815Z-927b1466",
+            "reason": "experiment ready; explicitly arm before takeoff"
+          },
+          "artifact": {
+            "path": ".runtime/workbench-jobs/948fb2a314fb45c6968679861e874a17.json",
+            "sha256": "71cd594e0ad9b5218c484e63498795283bb606911c1bb6e53fa2de2200a5c798",
+            "bytes": 274
+          }
+        }
+      ],
+      "final": {
+        "armed": false,
+        "landed": true,
+        "offboard": false
+      },
+      "stop": {
+        "captured_supervisor_pid": 43485,
+        "supervisor_absent_after_stop": true,
+        "scope": "Actual host ps checked after synchronous Web STOP; no command job fabricated"
+      },
+      "reason": "Required external EKF fusion lost/stale before ARM; controls disabled, fresh landed disarmed FAILSAFE stopped safely; source timing root cause remains unproven."
+    },
+    {
+      "run_id": "20261011T050820Z-7f93ef32",
+      "outcome": "PASS",
+      "source_commit": "f9a8fde2f1cc168f6d2680c77aa746590638ec4a",
+      "source_dirty": true,
+      "control_sha256": "1c57a07af9fd4e7bd049ae63bab8575263c135340834d925e2120152ca058d33",
+      "artifacts": [
+        {
+          "path": ".runtime/20261011T050820Z-7f93ef32/manifest.json",
+          "sha256": "2844b581c176666345491a64b7af8661ea6e211991cd670eb9d8f9a141ba7fa5",
+          "bytes": 36913
+        },
+        {
+          "path": ".runtime/20261011T050820Z-7f93ef32/events.jsonl",
+          "sha256": "aef59b8c676137cf980b3c221d5705c234afd780d7f201ab6f9e3ea56855279b",
+          "bytes": 1012782
+        },
+        {
+          "path": ".runtime/20261011T050820Z-7f93ef32/navigation.jsonl",
+          "sha256": "acff2213206a2b3a501db1457567985f13a1af15733e9e34972e08080f832b29",
+          "bytes": 64222
+        },
+        {
+          "path": ".runtime/20261011T050820Z-7f93ef32/px4.log",
+          "sha256": "746015e712f7201dd6c7e29f8c91cd2e12f8db5160c5540d8abd067b67570b0c",
+          "bytes": 6578
+        },
+        {
+          "path": ".runtime/20261011T050820Z-7f93ef32/stop-request.json",
+          "sha256": "bf465803dda568d2c37a6f3a15baf3f870e5e13fc10c25e536a878100dd0f193",
+          "bytes": 87
+        }
+      ],
+      "jobs": [
+        {
+          "id": "172beb6cf95d474a8fc382a268482a4b",
+          "command": "start",
+          "state": "SUCCEEDED",
+          "success": true,
+          "reason": "",
+          "result": {
+            "success": true,
+            "run_id": "20261011T050820Z-7f93ef32",
+            "reason": "experiment ready; explicitly arm before takeoff"
+          },
+          "artifact": {
+            "path": ".runtime/workbench-jobs/172beb6cf95d474a8fc382a268482a4b.json",
+            "sha256": "b1c25687e9e923c467f2a1ccfb1a8c7cf31b6fd535396158eb1143cc54cae82a",
+            "bytes": 274
+          }
+        },
+        {
+          "id": "97bbf642d5b64e36b54c17366c77051b",
+          "command": "arm",
+          "state": "SUCCEEDED",
+          "success": true,
+          "reason": "",
+          "result": {
+            "success": true,
+            "reason": "armed and Offboard confirmed"
+          },
+          "artifact": {
+            "path": ".runtime/workbench-jobs/97bbf642d5b64e36b54c17366c77051b.json",
+            "sha256": "edd97f6a421bc3defd988d5afc0574b7519239908f25bce3aa0620e06ec141c2",
+            "bytes": 210
+          }
+        },
+        {
+          "id": "90f8e6f0b0cf4bb2abcc7b3516f5f9f9",
+          "command": "takeoff",
+          "state": "SUCCEEDED",
+          "success": true,
+          "reason": "",
+          "result": {
+            "success": true,
+            "reason": "target reached within tolerance continuously"
+          },
+          "artifact": {
+            "path": ".runtime/workbench-jobs/90f8e6f0b0cf4bb2abcc7b3516f5f9f9.json",
+            "sha256": "160aacd9867bc06e2166dff29f62fcd007a59c1972f3d2f75ff2cf48a24cf4c8",
+            "bytes": 230
+          }
+        },
+        {
+          "id": "47584d5bc60a43458fe5458abff3783a",
+          "command": "goto",
+          "state": "SUCCEEDED",
+          "success": true,
+          "reason": "",
+          "result": {
+            "success": true,
+            "reason": "continuous navigation target reached"
+          },
+          "artifact": {
+            "path": ".runtime/workbench-jobs/47584d5bc60a43458fe5458abff3783a.json",
+            "sha256": "24de4c093c9ce48b869889cbe9db4358ef030d0b6c648ae43882572af52f8de8",
+            "bytes": 219
+          }
+        },
+        {
+          "id": "5793b0bec1bf4294bb91ded0479c44e3",
+          "command": "hold",
+          "state": "SUCCEEDED",
+          "success": true,
+          "reason": "",
+          "result": {
+            "success": true,
+            "reason": "hold commanded"
+          },
+          "artifact": {
+            "path": ".runtime/workbench-jobs/5793b0bec1bf4294bb91ded0479c44e3.json",
+            "sha256": "f229e18333012782f97fe3a40283005e40211eee525ce21d90d3c3dac67f0467",
+            "bytes": 197
+          }
+        },
+        {
+          "id": "b5760a4ba9fa4f9f9cdd0878486821ee",
+          "command": "land",
+          "state": "SUCCEEDED",
+          "success": true,
+          "reason": "",
+          "result": {
+            "success": true,
+            "reason": "landed and disarmed confirmed"
+          },
+          "artifact": {
+            "path": ".runtime/workbench-jobs/b5760a4ba9fa4f9f9cdd0878486821ee.json",
+            "sha256": "230f9a4d6432b866008593c7226aaa6153671dcf5cf35bd6b37606294222dc8a",
+            "bytes": 212
+          }
+        }
+      ],
+      "final": {
+        "armed": false,
+        "landed": true,
+        "offboard": true
+      },
+      "stop": {
+        "captured_supervisor_pid": 47540,
+        "supervisor_absent_after_stop": true,
+        "scope": "Actual host ps checked after synchronous Web STOP; no command job fabricated"
+      },
+      "goto_target_enu_m": [
+        1.0,
+        1.0,
+        2.2
+      ],
+      "goto_yaw_rad": 0.0,
+      "scope": "Actual browser START/ARM/TAKEOFF/GOTO/HOLD/LAND then owned STOP; all four point-cloud layers nonempty; dirty flag only document/report/screenshot changes, control inventory matches current qualified source."
     }
   ],
   "screenshots": [
@@ -463,6 +677,43 @@
       "path": "docs/validation/l1/workbench-takeoff-contract.jpg",
       "sha256": "5287a5511ded3722a981188b52253a208ee68ccf04cbb9d2e9b5ac5274c15736",
       "bytes": 122906
+    },
+    {
+      "path": "docs/validation/l1/workbench-review-ground-failure.jpg",
+      "sha256": "13fc2e278063f71bb8624ad3c7f5d139534df87f9e12217cf50b7bed8b8e8eae",
+      "bytes": 87070
+    },
+    {
+      "path": "docs/validation/l1/workbench-review-goto.jpg",
+      "sha256": "130a80ebeee5dfdba54a50437f87ad22f3435b3ee074ff9c1dccde4691680e3f",
+      "bytes": 116367
+    },
+    {
+      "path": "docs/validation/l1/workbench-review-landed.jpg",
+      "sha256": "5017be818e0ac3de6aa3888e1728344f76dafdc38dfd1f3f47c47f5a2951402a",
+      "bytes": 113973
+    },
+    {
+      "path": "docs/validation/l1/workbench-review-comparison.jpg",
+      "sha256": "8f5175a3c9091190ab4bfd465cc1a590a84d194a455a318c25303837d5a05e8e",
+      "bytes": 102851
     }
-  ]
+  ],
+  "comparison_review": {
+    "date": "2026-10-11",
+    "localization_reports": 33,
+    "consumed_input_groups": 6,
+    "flight_rows": 34,
+    "current_normal_pass_rows": 1,
+    "visible_current_localization": {
+      "glim": "PASS",
+      "fast_livo2": "PASS",
+      "fast_livo2_rtk": "PASS",
+      "fast_lio2": "FAIL",
+      "lio_sam": "FAIL",
+      "orb_slam3": "FAIL",
+      "vins_fusion": "FAIL"
+    },
+    "scope": "Actual browser DOM shows current and historical measured results; registry, not table, grants control qualification."
+  }
 }

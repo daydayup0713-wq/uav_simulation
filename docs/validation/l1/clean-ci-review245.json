@@ -1,321 +1,333 @@
 {
-  "attempt": 1,
+  "attempt": 2,
   "conclusion": "success",
-  "headSha": "f9a8fde2f1cc168f6d2680c77aa746590638ec4a",
+  "headSha": "24546437b9361a2a00a83508b3773fc31efdc296",
   "jobs": [
     {
-      "completedAt": "2026-10-11T04:58:37Z",
+      "completedAt": "2026-10-11T04:31:14Z",
       "conclusion": "success",
-      "databaseId": 114390707735,
+      "databaseId": 114386833355,
       "name": "headless-sitl",
-      "startedAt": "2026-10-11T04:43:12Z",
+      "startedAt": "2026-10-11T04:18:24Z",
       "status": "completed",
       "steps": [
         {
-          "completedAt": "2026-10-11T04:43:14Z",
+          "completedAt": "2026-10-11T04:18:26Z",
           "conclusion": "success",
           "name": "Set up job",
           "number": 1,
-          "startedAt": "2026-10-11T04:43:12Z",
+          "startedAt": "2026-10-11T04:18:25Z",
           "status": "completed"
         },
         {
-          "completedAt": "2026-10-11T04:43:15Z",
+          "completedAt": "2026-10-11T04:18:27Z",
           "conclusion": "success",
           "name": "Run actions/checkout@v4",
           "number": 2,
-          "startedAt": "2026-10-11T04:43:14Z",
+          "startedAt": "2026-10-11T04:18:26Z",
           "status": "completed"
         },
         {
-          "completedAt": "2026-10-11T04:43:22Z",
+          "completedAt": "2026-10-11T04:18:32Z",
           "conclusion": "success",
           "name": "Run docker/setup-buildx-action@v3",
           "number": 3,
-          "startedAt": "2026-10-11T04:43:15Z",
+          "startedAt": "2026-10-11T04:18:27Z",
           "status": "completed"
         },
         {
-          "completedAt": "2026-10-11T04:46:58Z",
+          "completedAt": "2026-10-11T04:21:03Z",
           "conclusion": "success",
           "name": "Run docker/build-push-action@v6",
           "number": 4,
-          "startedAt": "2026-10-11T04:43:22Z",
+          "startedAt": "2026-10-11T04:18:32Z",
           "status": "completed"
         },
         {
-          "completedAt": "2026-10-11T04:51:11Z",
+          "completedAt": "2026-10-11T04:25:05Z",
           "conclusion": "success",
           "name": "Three flights and bridge-loss landing",
           "number": 5,
-          "startedAt": "2026-10-11T04:46:58Z",
+          "startedAt": "2026-10-11T04:21:03Z",
           "status": "completed"
         },
         {
-          "completedAt": "2026-10-11T04:51:19Z",
+          "completedAt": "2026-10-11T04:25:11Z",
           "conclusion": "success",
           "name": "CPU LIO fixed observation replay and native map export",
           "number": 6,
-          "startedAt": "2026-10-11T04:51:11Z",
+          "startedAt": "2026-10-11T04:25:05Z",
           "status": "completed"
         },
         {
-          "completedAt": "2026-10-11T04:51:21Z",
+          "completedAt": "2026-10-11T04:25:12Z",
           "conclusion": "success",
           "name": "CPU observed-space 3D navigation benchmark",
           "number": 7,
-          "startedAt": "2026-10-11T04:51:19Z",
+          "startedAt": "2026-10-11T04:25:11Z",
           "status": "completed"
         },
         {
-          "completedAt": "2026-10-11T04:56:59Z",
+          "completedAt": "2026-10-11T04:30:11Z",
           "conclusion": "success",
           "name": "Build pinned native workbench cores",
           "number": 8,
-          "startedAt": "2026-10-11T04:51:21Z",
+          "startedAt": "2026-10-11T04:25:12Z",
           "status": "completed"
         },
         {
-          "completedAt": "2026-10-11T04:57:58Z",
+          "completedAt": "2026-10-11T04:31:07Z",
           "conclusion": "success",
           "name": "Real GLIM and three planner CPU fixtures",
           "number": 9,
-          "startedAt": "2026-10-11T04:56:59Z",
+          "startedAt": "2026-10-11T04:30:11Z",
           "status": "completed"
         },
         {
-          "completedAt": "2026-10-11T04:58:03Z",
+          "completedAt": "2026-10-11T04:31:10Z",
           "conclusion": "success",
           "name": "Run actions/upload-artifact@v4",
           "number": 10,
-          "startedAt": "2026-10-11T04:57:58Z",
+          "startedAt": "2026-10-11T04:31:07Z",
           "status": "completed"
         },
         {
-          "completedAt": "2026-10-11T04:58:09Z",
+          "completedAt": "2026-10-11T04:31:11Z",
           "conclusion": "success",
           "name": "Post Run docker/build-push-action@v6",
           "number": 18,
-          "startedAt": "2026-10-11T04:58:03Z",
+          "startedAt": "2026-10-11T04:31:10Z",
           "status": "completed"
         },
         {
-          "completedAt": "2026-10-11T04:58:35Z",
+          "completedAt": "2026-10-11T04:31:12Z",
           "conclusion": "success",
           "name": "Post Run docker/setup-buildx-action@v3",
           "number": 19,
-          "startedAt": "2026-10-11T04:58:09Z",
+          "startedAt": "2026-10-11T04:31:11Z",
           "status": "completed"
         },
         {
-          "completedAt": "2026-10-11T04:58:35Z",
+          "completedAt": "2026-10-11T04:31:12Z",
           "conclusion": "success",
           "name": "Post Run actions/checkout@v4",
           "number": 20,
-          "startedAt": "2026-10-11T04:58:35Z",
+          "startedAt": "2026-10-11T04:31:12Z",
           "status": "completed"
         },
         {
-          "completedAt": "2026-10-11T04:58:35Z",
+          "completedAt": "2026-10-11T04:31:12Z",
           "conclusion": "success",
           "name": "Complete job",
           "number": 21,
-          "startedAt": "2026-10-11T04:58:35Z",
+          "startedAt": "2026-10-11T04:31:12Z",
           "status": "completed"
         }
       ],
-      "url": "https://github.com/daydayup0713-wq/uav_simulation/actions/runs/38112469770/job/114390707735"
+      "url": "https://github.com/daydayup0713-wq/uav_simulation/actions/runs/38063440951/job/114386833355"
     },
     {
-      "completedAt": "2026-10-11T04:43:28Z",
+      "completedAt": "2026-10-10T15:24:09Z",
       "conclusion": "success",
-      "databaseId": 114390707813,
+      "databaseId": 114386833895,
       "name": "web",
-      "startedAt": "2026-10-11T04:43:12Z",
+      "startedAt": "2026-10-10T15:23:57Z",
       "status": "completed",
       "steps": [
         {
-          "completedAt": "2026-10-11T04:43:13Z",
+          "completedAt": "2026-10-10T15:23:59Z",
           "conclusion": "success",
           "name": "Set up job",
           "number": 1,
-          "startedAt": "2026-10-11T04:43:12Z",
+          "startedAt": "2026-10-10T15:23:58Z",
           "status": "completed"
         },
         {
-          "completedAt": "2026-10-11T04:43:14Z",
+          "completedAt": "2026-10-10T15:23:59Z",
           "conclusion": "success",
           "name": "Run actions/checkout@v4",
           "number": 2,
-          "startedAt": "2026-10-11T04:43:13Z",
+          "startedAt": "2026-10-10T15:23:59Z",
           "status": "completed"
         },
         {
-          "completedAt": "2026-10-11T04:43:17Z",
+          "completedAt": "2026-10-10T15:24:01Z",
           "conclusion": "success",
           "name": "Run actions/setup-node@v4",
           "number": 3,
-          "startedAt": "2026-10-11T04:43:14Z",
+          "startedAt": "2026-10-10T15:23:59Z",
           "status": "completed"
         },
         {
-          "completedAt": "2026-10-11T04:43:21Z",
+          "completedAt": "2026-10-10T15:24:03Z",
           "conclusion": "success",
           "name": "Run npm --prefix web ci",
           "number": 4,
-          "startedAt": "2026-10-11T04:43:17Z",
+          "startedAt": "2026-10-10T15:24:01Z",
           "status": "completed"
         },
         {
-          "completedAt": "2026-10-11T04:43:24Z",
+          "completedAt": "2026-10-10T15:24:05Z",
           "conclusion": "success",
           "name": "Run npm --prefix web test",
           "number": 5,
-          "startedAt": "2026-10-11T04:43:21Z",
+          "startedAt": "2026-10-10T15:24:03Z",
           "status": "completed"
         },
         {
-          "completedAt": "2026-10-11T04:43:25Z",
+          "completedAt": "2026-10-10T15:24:06Z",
           "conclusion": "success",
           "name": "Run npm --prefix web run build",
           "number": 6,
-          "startedAt": "2026-10-11T04:43:24Z",
+          "startedAt": "2026-10-10T15:24:05Z",
           "status": "completed"
         },
         {
-          "completedAt": "2026-10-11T04:43:26Z",
+          "completedAt": "2026-10-10T15:24:07Z",
           "conclusion": "success",
           "name": "Run actions/upload-artifact@v4",
           "number": 7,
-          "startedAt": "2026-10-11T04:43:25Z",
+          "startedAt": "2026-10-10T15:24:06Z",
           "status": "completed"
         },
         {
-          "completedAt": "2026-10-11T04:43:26Z",
+          "completedAt": "2026-10-10T15:24:07Z",
           "conclusion": "success",
           "name": "Post Run actions/setup-node@v4",
           "number": 13,
-          "startedAt": "2026-10-11T04:43:26Z",
+          "startedAt": "2026-10-10T15:24:07Z",
           "status": "completed"
         },
         {
-          "completedAt": "2026-10-11T04:43:26Z",
+          "completedAt": "2026-10-10T15:24:07Z",
           "conclusion": "success",
           "name": "Post Run actions/checkout@v4",
           "number": 14,
-          "startedAt": "2026-10-11T04:43:26Z",
+          "startedAt": "2026-10-10T15:24:07Z",
           "status": "completed"
         },
         {
-          "completedAt": "2026-10-11T04:43:26Z",
+          "completedAt": "2026-10-10T15:24:07Z",
           "conclusion": "success",
           "name": "Complete job",
           "number": 15,
-          "startedAt": "2026-10-11T04:43:26Z",
+          "startedAt": "2026-10-10T15:24:07Z",
           "status": "completed"
         }
       ],
-      "url": "https://github.com/daydayup0713-wq/uav_simulation/actions/runs/38112469770/job/114390707813"
+      "url": "https://github.com/daydayup0713-wq/uav_simulation/actions/runs/38063440951/job/114386833895"
     },
     {
-      "completedAt": "2026-10-11T04:44:18Z",
+      "completedAt": "2026-10-10T15:24:57Z",
       "conclusion": "success",
-      "databaseId": 114390707870,
+      "databaseId": 114386852130,
       "name": "policy",
-      "startedAt": "2026-10-11T04:43:12Z",
+      "startedAt": "2026-10-10T15:23:57Z",
       "status": "completed",
       "steps": [
         {
-          "completedAt": "2026-10-11T04:43:13Z",
+          "completedAt": "2026-10-10T15:23:58Z",
           "conclusion": "success",
           "name": "Set up job",
           "number": 1,
-          "startedAt": "2026-10-11T04:43:12Z",
+          "startedAt": "2026-10-10T15:23:58Z",
           "status": "completed"
         },
         {
-          "completedAt": "2026-10-11T04:43:14Z",
+          "completedAt": "2026-10-10T15:23:59Z",
           "conclusion": "success",
           "name": "Run actions/checkout@v4",
           "number": 2,
-          "startedAt": "2026-10-11T04:43:13Z",
+          "startedAt": "2026-10-10T15:23:58Z",
           "status": "completed"
         },
         {
-          "completedAt": "2026-10-11T04:44:02Z",
+          "completedAt": "2026-10-10T15:24:48Z",
           "conclusion": "success",
           "name": "Run sudo apt-get update && sudo apt-get install -y python3-pip python3-pytest python3-numpy python3-scipy python3-psutil python3-yaml python3-opencv",
           "number": 3,
-          "startedAt": "2026-10-11T04:43:14Z",
+          "startedAt": "2026-10-10T15:23:59Z",
           "status": "completed"
         },
         {
-          "completedAt": "2026-10-11T04:44:05Z",
+          "completedAt": "2026-10-10T15:24:50Z",
           "conclusion": "success",
           "name": "Run /usr/bin/python3 -m pip install --user -r dependencies/observation-requirements.txt",
           "number": 4,
-          "startedAt": "2026-10-11T04:44:02Z",
+          "startedAt": "2026-10-10T15:24:48Z",
           "status": "completed"
         },
         {
-          "completedAt": "2026-10-11T04:44:17Z",
+          "completedAt": "2026-10-10T15:24:55Z",
           "conclusion": "success",
           "name": "Run PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 /usr/bin/python3 -m pytest -q",
           "number": 5,
-          "startedAt": "2026-10-11T04:44:05Z",
+          "startedAt": "2026-10-10T15:24:50Z",
           "status": "completed"
         },
         {
-          "completedAt": "2026-10-11T04:44:17Z",
+          "completedAt": "2026-10-10T15:24:56Z",
           "conclusion": "success",
           "name": "Post Run actions/checkout@v4",
           "number": 10,
-          "startedAt": "2026-10-11T04:44:17Z",
+          "startedAt": "2026-10-10T15:24:55Z",
           "status": "completed"
         },
         {
-          "completedAt": "2026-10-11T04:44:17Z",
+          "completedAt": "2026-10-10T15:24:56Z",
           "conclusion": "success",
           "name": "Complete job",
           "number": 11,
-          "startedAt": "2026-10-11T04:44:17Z",
+          "startedAt": "2026-10-10T15:24:56Z",
           "status": "completed"
         }
       ],
-      "url": "https://github.com/daydayup0713-wq/uav_simulation/actions/runs/38112469770/job/114390707870"
+      "url": "https://github.com/daydayup0713-wq/uav_simulation/actions/runs/38063440951/job/114386852130"
     }
   ],
   "status": "completed",
-  "updatedAt": "2026-10-11T04:58:38Z",
-  "url": "https://github.com/daydayup0713-wq/uav_simulation/actions/runs/38112469770",
+  "updatedAt": "2026-10-11T04:31:15Z",
+  "url": "https://github.com/daydayup0713-wq/uav_simulation/actions/runs/38063440951",
   "measurements": {
     "policy": {
       "passed": 394,
-      "skipped": 43,
-      "elapsed_s": 10.93
+      "skipped": 42,
+      "elapsed_s": 4.84
     },
     "container_suite": {
-      "passed": 492,
+      "passed": 487,
       "skipped": 15,
-      "elapsed_s": 32.62
+      "elapsed_s": 27.66
     },
     "web_tests": 13,
     "flight_hover_max_error_m": [
-      0.10477759203042793,
-      0.11875816865411865,
-      0.11402106992381728
+      0.08800080355526463,
+      0.11810158464095058,
+      0.0954023801849798
     ],
     "flight_runs": 3,
     "all_landed_and_disarmed": true,
-    "bridge_exit_landing_s": 7.59150703499995,
+    "bridge_exit_landing_s": 7.608062032000021,
     "failsafe_landing_observed": true,
     "cpu_fixture_passed": true,
-    "scope": "Remote clean dependencies, original PX4 flight/fault gates and analytical CPU fixtures. Full optional native tests and rendering measured separately on this host."
+    "scope": "Current245 source; remote clean dependencies and CPU fixtures, optional private cores separately tested locally. Latest navigation-discovery source requires subsequent CI."
   },
   "raw_log": {
-    "path": ".runtime/ci-38112469770.log",
-    "sha256": "87104c5c5bbd7c5091e3d1f70f86eac3d5f728ae323c509ec0b0bac05213c2ef",
-    "bytes": 486359
+    "path": ".runtime/ci-38063440951-attempt2.log",
+    "bytes": 533017,
+    "sha256": "f77c561c9e767fe5579db6d64e92b9ad769f085084875795bacb0cbde51c4359"
   },
-  "previous_source_ci": "clean-ci-review245.json"
+  "previous_attempts": [
+    {
+      "attempt": 1,
+      "conclusion": "failure",
+      "failed_step": "Re-arm after three completed sorties; mode ACK accepted but preflight false; PX4 Battery unhealthy",
+      "raw_log": {
+        "path": ".runtime/ci-38063440951-failed.log",
+        "bytes": 171875,
+        "sha256": "5c6430793575c40fb0ad54f69e708693c6943362afc87804edd41b75ddcec435"
+      },
+      "source_code_change_before_rerun": false
+    }
+  ]
 }
