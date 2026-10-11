@@ -8,6 +8,12 @@ SENSOR_TOPICS = {
 }
 RECORD_TOPICS = tuple(SENSOR_TOPICS)+('/clock','/tf','/tf_static','/uav001/odometry','/uav001/path','/uav001/diagnostics')
 
+def sensor_topics(calibration):
+    return {**SENSOR_TOPICS, **({'/uav001/gnss/fix':('sensor_msgs/msg/NavSatFix','gnss','frame')} if 'gnss' in calibration else {})}
+
+def record_topics(calibration):
+    return RECORD_TOPICS + (('/uav001/gnss/fix','/uav001/sensors/timed_diagnostics') if 'gnss' in calibration else ())
+
 def stamp_ns(stamp):
     return int(stamp.sec)*10**9+int(stamp.nanosec)
 

@@ -24,26 +24,46 @@ from geometry_msgs.msg import PoseStamped,TransformStamped
 from nav_msgs.msg import Odometry,Path as NavPath
 from sensor_msgs.msg import PointCloud2,PointField
 from uav_lab_interfaces.srv import PlanPath
-from uav_lab_interfaces.action import Navigate,ExecuteFlight
+from uav_lab_interfaces.action import Navigate,NavigateRoute,ExecuteFlight,ExecuteTrajectory
+from uav_lab_interfaces.msg import TrajectoryReference,CollisionSnapshot
 from uav_lab_localization.ingress import validated_scan,RejectedScan
 from uav_lab_localization.benchmark import stamp
 from .occupancy import VoxelMap
 from .poses import PoseHistory,register_scan,remove_self_returns
 from .planner import plan
+from .local_map import RollingMap,register_beams
 
 
 class NavigationNode(Node):
     def __init__(self):
         super().__init__('navigation',namespace='uav001')
         self.set_parameters([rclpy.parameter.Parameter('use_sim_time',value=True)])
+        self.declare_parameter('continuous_trajectory', False)
+        self.continuous_enabled = bool(self.get_parameter('continuous_trajectory').value)
+        self.declare_parameter('planner_backend','astar')
+        self.planner_backend=self.get_parameter('planner_backend').value
+        if self.planner_backend not in ('astar','ego','fast_planner','gcopter'):
+            raise ValueError('unknown planner backend')
+        if self.planner_backend!='astar' and not self.continuous_enabled:
+            raise ValueError('native planner requires continuous trajectory execution')
+        self.declare_parameter('replan_lead_s',{'astar':.6,'ego':1.5,'fast_planner':2.,'gcopter':2.}[self.planner_backend])
+        self.replan_lead_s=float(self.get_parameter('replan_lead_s').value)
+        if not np.isfinite(self.replan_lead_s) or not .4<=self.replan_lead_s<=2.:
+            raise ValueError('bounded native replan lead required')
+        self.reference = None
+        self.reference_at = 0.
         root=Path(os.environ.get('LAB_ROOT',Path.cwd()));run=Path(os.environ['LAB_RUN_DIR']) if os.environ.get('LAB_RUN_DIR') else None
+        self.root=root
         config_file=run/'configuration/navigation.json' if run and (run/'configuration/navigation.json').exists() else root/'configs/navigation.json'
         self.config=json.loads(config_file.read_text())
         calibration_file=run/'configuration/calibration.json' if run and (run/'configuration/calibration.json').exists() else root/'configs/navigation-sensors.json'
         self.calibration=json.loads(calibration_file.read_text())
+        self.timed_clouds=self.calibration['lidar'].get('measurement_time')=='per_beam'
         self.extrinsic=np.eye(4);self.extrinsic[:3,3]=self.calibration['lidar']['xyz']
         self.extrinsic[:3,:3]=Rotation.from_euler('xyz',self.calibration['lidar']['rpy']).as_matrix()
-        self.grid=VoxelMap(self.config['resolution_m'],self.config['lower'],self.config['upper'])
+        self.declare_parameter('rolling_map',False)
+        map_type=RollingMap if self.get_parameter('rolling_map').value else VoxelMap
+        self.grid=map_type(self.config['resolution_m'],self.config['lower'],self.config['upper'])
         self.envelope=np.asarray(self.config['body_halfsize_m'])+self.config['clearance_m']
         self.history=PoseHistory();self.alignment=None;self.pending_clouds=deque(maxlen=8)
         self.map_at,self.map_stamp,self.pose_at,self.quality_at=0.,None,0.,0.
@@ -59,11 +79,15 @@ class NavigationNode(Node):
         self.planning_lock=threading.Lock()
         qos=QoSProfile(depth=1,durability=DurabilityPolicy.TRANSIENT_LOCAL)
         self.occupied_pub=self.create_publisher(PointCloud2,'navigation/occupied',qos)
+        from rclpy.qos import ReliabilityPolicy
+        self.collision_pub=self.create_publisher(CollisionSnapshot,'navigation/collision_snapshot',
+            QoSProfile(depth=1,reliability=ReliabilityPolicy.BEST_EFFORT))
         self.path_pub=self.create_publisher(NavPath,'navigation/path',qos)
         self.diagnostic_pub=self.create_publisher(DiagnosticArray,'navigation/diagnostics',10)
         self.create_subscription(TransformStamped,'localization/control_alignment',self.on_alignment,qos)
         self.create_subscription(Odometry,'localization/odometry',self.on_pose,20)
-        self.create_subscription(PointCloud2,'localization/input/points',self.on_cloud,qos_profile_sensor_data)
+        self.declare_parameter('input_cloud_topic','localization/input/points')
+        self.create_subscription(PointCloud2,self.get_parameter('input_cloud_topic').value,self.on_cloud,qos_profile_sensor_data)
         self.create_subscription(DiagnosticArray,'localization/diagnostics',self.on_quality,10)
         self.create_subscription(Odometry,'odometry',self.on_flight_pose,10)
         self.create_subscription(DiagnosticArray,'diagnostics',self.on_flight_status,10)
@@ -71,8 +95,12 @@ class NavigationNode(Node):
         from std_srvs.srv import Trigger
         self.create_service(Trigger,'navigation/abort',self.abort_service,callback_group=self.action_group)
         self.flight_client=ActionClient(self,ExecuteFlight,'execute_flight',callback_group=self.action_group)
+        self.trajectory_client=ActionClient(self,ExecuteTrajectory,'execute_trajectory',callback_group=self.action_group)
+        self.create_subscription(TrajectoryReference,'trajectory/reference',self.on_reference,10)
         self.server=ActionServer(self,Navigate,'navigation/navigate',execute_callback=self.navigate,
             goal_callback=self.navigation_goal,cancel_callback=lambda handle:CancelResponse.ACCEPT,callback_group=self.action_group)
+        self.route_server=ActionServer(self,NavigateRoute,'navigation/route',execute_callback=self.navigate_route,
+            goal_callback=self.route_goal,cancel_callback=lambda handle:CancelResponse.ACCEPT,callback_group=self.action_group)
         self.create_timer(self.config['map_period_s'],self.map_cycle,callback_group=self.map_group,clock=Clock(clock_type=ClockType.STEADY_TIME))
         self.create_timer(.1,self.tick,clock=Clock(clock_type=ClockType.STEADY_TIME))
 
@@ -119,27 +147,68 @@ class NavigationNode(Node):
     def map_cycle(self):
         begun=time.monotonic()
         if self.failure:return
+        # DDS may discover sensor publishers before /clock. A zero simulated
+        # clock is uninitialized; wait without integrating or declaring ready.
+        # Once a map exists, ordinary freshness checks must still fail closed.
+        if self.map_stamp is None and not self.was_ready and self.get_clock().now().nanoseconds == 0:
+            return
         with self.data_lock:
             if self.alignment is None or not self.quality_ready:return
             for msg in reversed(self.pending_clouds):
                 source=stamp(msg)/1e9
+                records=None
+                if self.timed_clouds:
+                    from uav_lab_experiments.algorithm_inputs import livox_records
+                    try:
+                        lidar=self.calibration['lidar'];start,records=livox_records(msg,lidar['vertical_samples'],
+                            'ring' if lidar.get('kind')=='mechanical' else 'line')
+                        if not len(records):continue
+                        times=(start+records['offset_ns'].astype('int64'))/1e9
+                        source=float(times.max())
+                        if not self.history.samples or times.min()<self.history.samples[0][0]:continue
+                    except ValueError as error:self.failure=str(error);return
                 if self.map_stamp is not None and source<=self.map_stamp:continue
                 try:pose=self.history.at(source);break
                 except ValueError:continue
             else:return
             alignment=self.alignment.copy()
         try:
-            points=remove_self_returns(validated_scan(msg),self.extrinsic,self.config['body_halfsize_m'])
+            if records is None:
+                points=remove_self_returns(validated_scan(msg),self.extrinsic,self.config['body_halfsize_m'])
+            else:
+                raw=np.column_stack([records[n] for n in 'xyz'])
+                body_points=raw@self.extrinsic[:3,:3].T+self.extrinsic[:3,3]
+                keep=~np.all(np.abs(body_points)<=self.config['body_halfsize_m'],axis=1)
+                points,times=raw[keep],times[keep]
             age=self.get_clock().now().nanoseconds/1e9-source
             if age<-.1 or age>self.config['source_timeout_s']:raise ValueError('map source time stale or in future')
-            origin,registered=register_scan(points,pose,alignment,self.extrinsic)
+            if records is None:
+                origin,registered=register_scan(points,pose,alignment,self.extrinsic);origins=None
+            else:
+                with self.data_lock:origins,registered=register_beams(points,times,self.history,alignment,self.extrinsic)
+                origin=origins[-1]
             body=np.linalg.inv(alignment)@pose
             with self.map_lock:
-                self.grid.integrate(origin,registered)
+                if isinstance(self.grid,RollingMap):
+                    shifted=self.grid.recenter(body[:3,3])
+                    if shifted:self.record('local_map_shift',lower=self.grid.lower.tolist(),cells=self.grid.score.size)
+                if origins is not None:
+                    if not isinstance(self.grid,RollingMap):raise ValueError('timed beams require bounded rolling map')
+                    self.grid.integrate_beams(origins,registered)
+                else:self.grid.integrate(origin,registered)
                 self.grid.observe_body(body[:3,3],self.config['body_halfsize_m'])
                 occupied=self.grid.occupied_points()
-                self.grid.source_stamp=source;self.map_stamp=source;self.map_at=time.monotonic()
-            self.publish_occupied(occupied,msg.header.stamp)
+                if isinstance(self.grid,RollingMap):self.grid.mark_source(source)
+                else:self.grid.source_stamp=source
+                self.map_stamp=source;self.map_at=time.monotonic()
+                collision=self.grid.snapshot(self.envelope)
+            from rclpy.time import Time
+            source_header=Time(nanoseconds=round(source*1e9)).to_msg()
+            self.publish_occupied(occupied,source_header)
+            message=CollisionSnapshot();message.header.frame_id='odom';message.header.stamp=source_header
+            message.lower=collision.lower.tolist();message.resolution=collision.resolution
+            message.shape=list(collision.free.shape);message.envelope=self.envelope.tolist();message.version=collision.version
+            message.free=collision.free.astype(np.uint8).tobytes();self.collision_pub.publish(message)
             self.record('map',stamp=source,version=self.grid.version,occupied_cells=len(occupied),compute_s=time.monotonic()-begun,
                 source_age=self.get_clock().now().nanoseconds/1e9-source)
             if self.run and time.monotonic()-self.saved_at>5 and (self.save_future is None or self.save_future.done()):
@@ -199,7 +268,11 @@ class NavigationNode(Node):
             pose=PoseStamped();pose.header=path.header;pose.pose.position.x,pose.pose.position.y,pose.pose.position.z=map(float,values);pose.pose.orientation.w=1.;path.poses.append(pose)
         return path
 
-    def make_plan(self,goal):
+    def on_reference(self, msg):
+        if msg.header.frame_id == 'odom' and np.isfinite([*msg.position, *msg.velocity, *msg.acceleration, msg.yaw, msg.yaw_rate]).all():
+            self.reference, self.reference_at = msg, time.monotonic()
+
+    def make_plan(self,goal,start_override=None):
         if not self.report()['ready']:raise ValueError('navigation map/pose not ready: '+self.failure)
         if self.current is None or time.monotonic()-self.current_at>.5:raise ValueError('fresh flight pose required')
         if goal.header.frame_id!='odom':raise ValueError('navigation goal frame must be odom')
@@ -207,11 +280,11 @@ class NavigationNode(Node):
         if not np.isfinite([p.x,p.y,p.z,q.x,q.y,q.z,q.w]).all() or abs(q.x)>1e-6 or abs(q.y)>1e-6 or abs(q.z*q.z+q.w*q.w-1)>.001:
             raise ValueError('finite position and unit yaw quaternion required')
         if not .5<=p.z<=4.5:raise ValueError('navigation altitude outside 0.5..4.5m')
-        start=self.current.position
+        start=[self.current.position.x,self.current.position.y,self.current.position.z] if start_override is None else start_override
         with self.map_lock:collision=self.grid.snapshot(self.envelope)
         if not self.planning_lock.acquire(blocking=False):raise ValueError('planning worker busy')
         try:
-            pending=self.planning_worker.submit(plan,collision,[start.x,start.y,start.z],[p.x,p.y,p.z],self.config['max_expansions'],self.config['planning_timeout_s'])
+            pending=self.planning_worker.submit(plan,collision,start,[p.x,p.y,p.z],self.config['max_expansions'],self.config['planning_timeout_s'])
             result=pending.result(timeout=self.config['planning_timeout_s']+3.)
         except (WorkerTimeout,BrokenProcessPool,RuntimeError) as error:
             self.failure='planning worker failed: '+str(error)+'; restart lab';raise ValueError(self.failure) from error
@@ -227,6 +300,26 @@ class NavigationNode(Node):
             self.record('plan',success=result.success,reason=result.reason,points=result.points,expanded=result.expanded,map_version=collision.version,**self.archive_plan(collision))
         except ValueError as error:response.success,response.reason=False,str(error)
         return response
+
+    def make_curve(self,goal,initial,planning_timeout=None):
+        from .planner_backends import plan_curve
+        collision,guide=self.make_plan(goal,start_override=initial.position.tolist())
+        if not guide.success:raise ValueError(guide.reason)
+        if not self.planning_lock.acquire(blocking=False):raise ValueError('planning worker busy')
+        directory=(self.run if self.run else self.root/'.runtime/planner-probes')/'planner-core'/uuid.uuid4().hex
+        p,q=goal.pose.position,goal.pose.orientation
+        timeout=8. if planning_timeout is None else planning_timeout
+        try:
+            pending=self.planning_worker.submit(plan_curve,self.root,self.planner_backend,collision,initial,
+                [p.x,p.y,p.z],directory,timeout=timeout,goal_yaw=2*np.arctan2(q.z,q.w))
+            result=pending.result(timeout=timeout+3.)
+        except (WorkerTimeout,BrokenProcessPool,RuntimeError) as error:
+            self.failure='native planning worker failed: '+str(error)+'; restart lab'
+            raise ValueError(self.failure) from error
+        finally:self.planning_lock.release()
+        self.record('native_plan',evidence=str(directory),**{k:v for k,v in result.items() if k!='curve'})
+        if not result['success']:raise ValueError(result['reason'])
+        return result['curve'],collision
 
     def tick(self):
         report=self.report();msg=DiagnosticArray();msg.header.stamp=self.get_clock().now().to_msg()
@@ -253,6 +346,18 @@ class NavigationNode(Node):
         if epoch is not None and int(state.get('operator_generation','-1'))!=epoch:raise RuntimeError('interrupted by operator HOLD/LAND; no continuation')
         if state.get('armed')!='True' or state.get('offboard')!='True' or state.get('phase') not in ('HOLDING','MOVING'):
             raise RuntimeError('navigation requires armed Offboard hover')
+
+    def route_goal(self,request):
+        if not self.continuous_enabled:return GoalResponse.REJECT
+        from .route_navigation import validate_controls
+        from types import SimpleNamespace
+        try:validate_controls(request.controls)
+        except ValueError:return GoalResponse.REJECT
+        return self.navigation_goal(SimpleNamespace(goal=request.controls[-1]))
+
+    def navigate_route(self,handle):
+        from .route_navigation import navigate_route
+        return navigate_route(self,handle)
 
     def future_result(self,future,timeout=5.):
         deadline=time.monotonic()+timeout
@@ -286,6 +391,9 @@ class NavigationNode(Node):
         return response
 
     def navigate(self,handle):
+        if self.continuous_enabled:
+            from .continuous_navigation import navigate_continuous
+            return navigate_continuous(self, handle)
         outcome=Navigate.Result();leg=None;replans=0
         try:
             epoch=self.accepted_epoch;self.check_motion(epoch)
@@ -349,7 +457,7 @@ class NavigationNode(Node):
             with self.motion_lock:self.busy=False
 
     def destroy_node(self):
-        self.server.destroy();self.flight_client.destroy()
+        self.server.destroy();self.route_server.destroy();self.flight_client.destroy();self.trajectory_client.destroy()
         self.planning_worker.shutdown(wait=True,cancel_futures=True)
         self.storage.shutdown(wait=True)
         if self.trace:self.trace.close()

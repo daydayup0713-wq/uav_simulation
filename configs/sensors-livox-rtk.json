@@ -1,0 +1,112 @@
+{
+  "schema_version": 2,
+  "model_to_base_link": [
+    0,
+    0,
+    0.24
+  ],
+  "payload_mass_kg": 0.05,
+  "lidar": {
+    "frame": "lidar_link",
+    "xyz": [
+      0,
+      0,
+      0.16
+    ],
+    "rpy": [
+      0,
+      0,
+      0
+    ],
+    "hz": 10,
+    "horizontal_samples": 2000,
+    "vertical_samples": 4,
+    "horizontal_fov_rad": 6.283185307179586,
+    "vertical_fov_rad": 1.03,
+    "min_m": 0.15,
+    "max_m": 20,
+    "noise_stddev_m": 0.01,
+    "kind": "livox",
+    "measurement_time": "per_beam",
+    "approximation": "Static box ray intersections at each beam time; interpolated 200Hz physics poses; synthetic reflectivity; no glass, multi-path or self returns; Livox coverage approximation, not proprietary optics."
+  },
+  "imu": {
+    "frame": "imu_link",
+    "xyz": [
+      0,
+      0,
+      0
+    ],
+    "rpy": [
+      0,
+      0,
+      0
+    ],
+    "hz": 200,
+    "gyro_stddev": 0.0002,
+    "accel_stddev": 0.01
+  },
+  "camera": {
+    "frame": "camera_link",
+    "optical_frame": "camera_optical_frame",
+    "xyz": [
+      0.2,
+      0,
+      0.06
+    ],
+    "rpy": [
+      0,
+      0,
+      0
+    ],
+    "optical_rpy": [
+      -1.5707963267948966,
+      0,
+      -1.5707963267948966
+    ],
+    "hz": 30,
+    "width": 640,
+    "height": 480,
+    "horizontal_fov_rad": 1.5707963267948966,
+    "near_m": 0.1,
+    "far_m": 25
+  },
+  "truth": {
+    "hz": 25,
+    "frame": "sim_world",
+    "child_frame": "truth_base_link"
+  },
+  "sensor_profile": "livox-rtk",
+  "seed": 7103,
+  "sensor_physics": {
+    "hz": 200,
+    "frame": "sim_world",
+    "child_frame": "truth_base_link",
+    "scope": "simulator only"
+  },
+  "gnss": {
+    "hz": 10,
+    "frame": "gnss_link",
+    "xyz": [
+      0,
+      0,
+      0.12
+    ],
+    "rpy": [
+      0,
+      0,
+      0
+    ],
+    "origin": [
+      47.397742,
+      8.545594,
+      488.0
+    ],
+    "fixed_stddev_m": 0.02,
+    "float_stddev_m": 0.5,
+    "seed": 7103,
+    "events": [],
+    "time_origin": "run simulation time",
+    "approximation": "Noisy local WGS84 measurement, <=1km; injected loss/float/outlier; covariance and quality retained."
+  }
+}

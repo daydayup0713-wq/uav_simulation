@@ -1,0 +1,7 @@
+# Writes next-run configuration under the flight bridge lock; restart required.
+string localization
+string planning
+string input_group
+---
+bool success
+string reason

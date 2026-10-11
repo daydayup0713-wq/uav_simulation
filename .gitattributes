@@ -1,0 +1,5 @@
+# Unified patches retain upstream context, including whitespace, for reproducibility.
+dependencies/patches/*.patch -whitespace
+# Preserve upstream license text byte for byte.
+dependencies/patches/licenses/* -whitespace
+navigation/native/licenses/* -whitespace

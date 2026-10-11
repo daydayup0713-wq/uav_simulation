@@ -11,7 +11,7 @@ import subprocess
 import time
 import uuid
 from contextlib import contextmanager
-from .sensor_contract import SENSOR_TOPICS,RECORD_TOPICS,stamp_ns
+from .sensor_contract import SENSOR_TOPICS,RECORD_TOPICS,stamp_ns,record_topics
 from .sensor_audit import SensorAudit
 from .datasets import inspect_bag,load_dataset,file_hash,check_replay_domain
 
@@ -22,6 +22,7 @@ def parser():
         s=sub.add_parser(cmd);s.add_argument('--duration',type=float,default=default)
     sub.add_parser('bag-check').add_argument('dataset',type=Path)
     play=sub.add_parser('replay');play.add_argument('dataset',type=Path);play.add_argument('--domain',type=int,default=77)
+    play.add_argument('--rate',type=float,default=1.,help='wall playback speed; sensor source timestamps are preserved')
     return p
 
 def runtime_manifest(root, ready=False):
@@ -43,7 +44,8 @@ class LiveAudit:
         from rosidl_runtime_py.utilities import get_message
         self.node=rclpy.create_node('sensor_audit_'+uuid.uuid4().hex[:8])
         self.audit=SensorAudit(calibration);self.clock=None
-        for topic,(typename,_,_) in SENSOR_TOPICS.items():
+        from .sensor_contract import sensor_topics
+        for topic,(typename,_,_) in sensor_topics(calibration).items():
             self.node.create_subscription(get_message(typename),topic,lambda msg,t=topic:self.audit.observe(t,msg,self.clock),qos_profile_sensor_data)
         self.node.create_subscription(get_message('rosgraph_msgs/msg/Clock'),'/clock',self.on_clock,qos_profile_sensor_data)
         qos=QoSProfile(depth=10,durability=DurabilityPolicy.TRANSIENT_LOCAL,reliability=ReliabilityPolicy.RELIABLE)
@@ -98,8 +100,8 @@ def scoped_signals():
     finally:
         for sig,handler in previous.items():signal.signal(sig,handler)
 
-def playback_timeout(report):
-    return max(30,report['bag_duration_s']*1.2+15)
+def playback_timeout(report,rate=1.):
+    return max(30,report['bag_duration_s']/rate*1.2+15)
 
 def record(root, duration):
     run,manifest=runtime_manifest(root,ready=True)
@@ -118,7 +120,7 @@ def record(root, duration):
         monitor=LiveAudit(manifest['calibration'])
         with (destination/'recorder.log').open('w') as log:
             process=subprocess.Popen(['ros2','bag','record','--storage','sqlite3','-o',str(destination/'bag'),
-                 '--qos-profile-overrides-path',str(destination/'configuration/recording-qos.yaml'),*RECORD_TOPICS],
+                 '--qos-profile-overrides-path',str(destination/'configuration/recording-qos.yaml'),*record_topics(manifest['calibration'])],
                  stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
             metadata['recorder_pid']=process.pid;save()
             live_report=monitor.collect(duration,process)
@@ -161,13 +163,14 @@ def replay(root,options):
         deadline=time.monotonic()+2
         while time.monotonic()<deadline:monitor.spin()
         occupied=[t for t,_ in monitor.node.get_topic_names_and_types()
-                  if (t in RECORD_TOPICS or t.startswith('/fmu/')) and monitor.node.count_publishers(t)]
+                  if (t in record_topics(monitor.audit.calibration) or t.startswith('/fmu/')) and monitor.node.count_publishers(t)]
         if occupied:raise ValueError('replay domain already has data/control publishers: '+', '.join(occupied))
         with (options.dataset/'replay.log').open('w') as log:
             process=subprocess.Popen(['ros2','bag','play',str(options.dataset/'bag'),
+                   '--rate',str(options.rate),
                    '--qos-profile-overrides-path',str(options.dataset/'configuration/recording-qos.yaml'),
                    '--topics',*sorted(types)],stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
-            deadline=time.monotonic()+playback_timeout(report)
+            deadline=time.monotonic()+playback_timeout(report,options.rate)
             while process.poll() is None:
                 if time.monotonic()>deadline:raise RuntimeError('replay timeout')
                 monitor.spin()
@@ -175,7 +178,8 @@ def replay(root,options):
             end=time.monotonic()+.5
             while time.monotonic()<end:monitor.spin()
         result=monitor.audit.report(live=True)
-        result.update(domain=options.domain,player_exit_code=process.returncode,dataset=str(options.dataset))
+        result.update(domain=options.domain,player_exit_code=process.returncode,dataset=str(options.dataset),
+                      playback_rate=options.rate,scope='data integrity; does not grant realtime qualification')
         result['passed']=result['passed'] and process.returncode==0
         (options.dataset/'replay-audit.json').write_text(json.dumps(result,indent=2)+'\n')
         return result
@@ -189,17 +193,24 @@ def main(args=None):
 def run_cli(args=None):
     options=parser().parse_args(args)
     root=Path(os.environ.get('LAB_ROOT','.')).resolve()
-    import rclpy
-    from rclpy.signals import SignalHandlerOptions
     initialized=False;monitor=None
     try:
         if options.command in ('record','sensors') and (not math.isfinite(options.duration) or not 3<=options.duration<=3600):
             raise ValueError('--duration must be between 3 and 3600 seconds')
+        if options.command=='replay' and (not math.isfinite(options.rate) or not .1<=options.rate<=4):
+            raise ValueError('--rate must be finite and between 0.1 and 4')
         if options.command=='bag-check':result,_=inspect_bag(options.dataset)
         else:
+            import rclpy
+            from rclpy.signals import SignalHandlerOptions
             if options.command=='replay':
                 check_replay_domain(options.domain,active_domains(root))
                 os.environ['ROS_DOMAIN_ID']=str(options.domain)
+                calibration=load_dataset(options.dataset)['calibration']
+                if calibration.get('sensor_profile'):
+                    archived=options.dataset/'configuration/fastdds-local.xml'
+                    profile=archived if archived.exists() else root/'configs/fastdds-local.xml'
+                    os.environ.update(FASTRTPS_DEFAULT_PROFILES_FILE=str(profile.resolve()),ROS_LOCALHOST_ONLY='0')
             rclpy.init(signal_handler_options=SignalHandlerOptions.NO);initialized=True
             if options.command=='sensors':
                 run,manifest=runtime_manifest(root)

@@ -1,0 +1,719 @@
+{
+  "schema": 1,
+  "date": "2026-10-11",
+  "scope": "Actual local Web control checks, including preserved failures. No hardware qualification or broader algorithm-pair qualification is inferred.",
+  "cases": [
+    {
+      "run_id": "20261010T034246Z-35e866ce",
+      "outcome": "FAIL",
+      "source_commit": "183f634bea197855918fc40c57ff19328e47a1b2",
+      "source_dirty": false,
+      "control_sha256": "1a280030d81a9e934c0ab22d26872837584a57e142c2d45af7e9b88f29025eff",
+      "artifacts": [
+        {
+          "path": ".runtime/20261010T034246Z-35e866ce/manifest.json",
+          "sha256": "cacc1aa27dd16045ccacc7868304890e668d41dedfe15ac001ce3c0c282386d1",
+          "bytes": 36271
+        },
+        {
+          "path": ".runtime/20261010T034246Z-35e866ce/events.jsonl",
+          "sha256": "7c44417110611a8c7c7dfadc141e9dc6c342ca65e992b94952f9bbed8d5e3f9c",
+          "bytes": 572064
+        },
+        {
+          "path": ".runtime/20261010T034246Z-35e866ce/navigation.jsonl",
+          "sha256": "8816528b643741513b6fb683a529d13645cb28b55a454419d1b9b0329d0ca0d0",
+          "bytes": 14444
+        },
+        {
+          "path": ".runtime/20261010T034246Z-35e866ce/px4.log",
+          "sha256": "75e73a741f66d0ad463a7463429f8222e16880818c579a6a82474547f1ef02c1",
+          "bytes": 6252
+        },
+        {
+          "path": ".runtime/20261010T034246Z-35e866ce/stop-request.json",
+          "sha256": "55cdc891a470637151af2dadc157a0e2f29a96f58d61d4c0da2294d18051a107",
+          "bytes": 89
+        }
+      ],
+      "reason": "Source/map stale while disarmed; original Web STOP contract rejected safe ground cleanup."
+    },
+    {
+      "run_id": "20261010T041258Z-124785a4",
+      "outcome": "PARTIAL",
+      "source_commit": "ecc0da7cb0e115e83e2f9309f1de2fcfea689d03",
+      "source_dirty": false,
+      "control_sha256": "1a280030d81a9e934c0ab22d26872837584a57e142c2d45af7e9b88f29025eff",
+      "artifacts": [
+        {
+          "path": ".runtime/20261010T041258Z-124785a4/manifest.json",
+          "sha256": "4eb62e2e76a6ffced579ac6659ef0ee4de0559e3cb39acec64df076a491c4dde",
+          "bytes": 36271
+        },
+        {
+          "path": ".runtime/20261010T041258Z-124785a4/events.jsonl",
+          "sha256": "51f0234e9365060d2ffa6aaec0d128f8fc52f0137af4c51be98f67e880c1e4fe",
+          "bytes": 592278
+        },
+        {
+          "path": ".runtime/20261010T041258Z-124785a4/navigation.jsonl",
+          "sha256": "fdf4b8b0e26a835c511951cf24e08b7c77610ebe225ae13eb4992ef1aeee2cf2",
+          "bytes": 90152
+        },
+        {
+          "path": ".runtime/20261010T041258Z-124785a4/px4.log",
+          "sha256": "7d5916c1b07d91e4d6200c550a096eb8da3de2ba59a975be4c29672f45cd37f1",
+          "bytes": 6578
+        },
+        {
+          "path": ".runtime/20261010T041258Z-124785a4/stop-request.json",
+          "sha256": "9ddaeafa195bfc6dc602e9b37d0023d87b989e20237df7d554956ca00c95db0e",
+          "bytes": 89
+        }
+      ],
+      "reason": "Start/ARM/LAND/STOP succeeded; original Web TAKEOFF gate wrongly required transient landed flag."
+    },
+    {
+      "run_id": "20261010T042020Z-4a5c02f7",
+      "outcome": "FAIL",
+      "source_commit": "1f8e6ed45a4d7d3f6486b89cd52da1f7fb7d0eb9",
+      "source_dirty": false,
+      "control_sha256": "1a280030d81a9e934c0ab22d26872837584a57e142c2d45af7e9b88f29025eff",
+      "artifacts": [
+        {
+          "path": ".runtime/20261010T042020Z-4a5c02f7/manifest.json",
+          "sha256": "a40d08b4066bf53169634899fd6c65a2be18454acfa0c2054a065ee18d1a29a1",
+          "bytes": 36271
+        },
+        {
+          "path": ".runtime/20261010T042020Z-4a5c02f7/events.jsonl",
+          "sha256": "e1a577b92cf2d61c1936cb7080a8efa3d0eaaf2dfb2e979e06b8d44300fd654b",
+          "bytes": 161928
+        },
+        {
+          "path": ".runtime/20261010T042020Z-4a5c02f7/navigation.jsonl",
+          "sha256": "ffde24de691b6a7f87a9f516a687d1a61886f1bda22c3617c41d3db57d0894b0",
+          "bytes": 1630
+        },
+        {
+          "path": ".runtime/20261010T042020Z-4a5c02f7/px4.log",
+          "sha256": "cd88a150c7c89c00ac8376e14afa05277d40b93eab960e7dce37ef4b05c10e4e",
+          "bytes": 6252
+        },
+        {
+          "path": ".runtime/20261010T042020Z-4a5c02f7/stop-request.json",
+          "sha256": "6bed6783fa314dfaec98b1af782801ac037b6ccc279cdad2915ff0a62f32cbe1",
+          "bytes": 89
+        }
+      ],
+      "reason": "Before ARM: fusion receive gap 1.979524863s; source clock advanced 1.000s; safe Web STOP succeeded. Stall cause unproven."
+    },
+    {
+      "run_id": "20261010T042435Z-ffe9dbd7",
+      "outcome": "PARTIAL",
+      "source_commit": "1f8e6ed45a4d7d3f6486b89cd52da1f7fb7d0eb9",
+      "source_dirty": true,
+      "control_sha256": "1a280030d81a9e934c0ab22d26872837584a57e142c2d45af7e9b88f29025eff",
+      "artifacts": [
+        {
+          "path": ".runtime/20261010T042435Z-ffe9dbd7/manifest.json",
+          "sha256": "968649f1cfced135d2992dfd14cd84fe762b6b91aef5fc7e9655b2410ac669a4",
+          "bytes": 36270
+        },
+        {
+          "path": ".runtime/20261010T042435Z-ffe9dbd7/events.jsonl",
+          "sha256": "4b4593d0fdf6f301c160e4e0e78e86108826fe5ecaf295cd7a054e7017abf3cf",
+          "bytes": 6765450
+        },
+        {
+          "path": ".runtime/20261010T042435Z-ffe9dbd7/navigation.jsonl",
+          "sha256": "c67e96b5a82f17ad19768732c3e0157bf501655c344a616a96ec65ff9b1af69b",
+          "bytes": 515670
+        },
+        {
+          "path": ".runtime/20261010T042435Z-ffe9dbd7/px4.log",
+          "sha256": "12e2daab58680a82288414df6ed8fe89427c29de0f77e278d1771aa1a993af9a",
+          "bytes": 6610
+        },
+        {
+          "path": ".runtime/20261010T042435Z-ffe9dbd7/stop-request.json",
+          "sha256": "98e45be60e656bffcddb5d8f51b294269704111fa2150986d3ea6309beb76994",
+          "bytes": 89
+        }
+      ],
+      "reason": "Start/ARM/TAKEOFF and real 47-control route succeeded; later source-age 0.554s rejected Web GOTO and caused protected landing. No GOTO success inferred from this run.",
+      "route_job": {
+        "id": "256eed06e50c4ef8809f5752c2e22696",
+        "command": "route",
+        "state": "SUCCEEDED",
+        "success": true,
+        "reason": "",
+        "result": {
+          "success": true,
+          "reason": "continuous route final target reached"
+        }
+      },
+      "goto_job": {
+        "id": "30cc5c18ea4b49538518451857e3b04a",
+        "command": "goto",
+        "state": "FAILED",
+        "success": false,
+        "reason": "{\"success\": false, \"reason\": \"navigation request rejected\"}\n"
+      }
+    },
+    {
+      "run_id": "20261010T043941Z-8ebd828e",
+      "outcome": "FAIL",
+      "source_commit": "1f8e6ed45a4d7d3f6486b89cd52da1f7fb7d0eb9",
+      "source_dirty": true,
+      "control_sha256": "1a280030d81a9e934c0ab22d26872837584a57e142c2d45af7e9b88f29025eff",
+      "artifacts": [
+        {
+          "path": ".runtime/20261010T043941Z-8ebd828e/manifest.json",
+          "sha256": "394fe0d5063c7b7d4a144c279edcb51d0a2b54c68fd9b6f751966f7c418dece7",
+          "bytes": 36270
+        },
+        {
+          "path": ".runtime/20261010T043941Z-8ebd828e/events.jsonl",
+          "sha256": "5b7d83bfcaa53fcf187442833f3b039d0d7543fbc0b4b15bf034cb2fcf01398f",
+          "bytes": 103292
+        },
+        {
+          "path": ".runtime/20261010T043941Z-8ebd828e/px4.log",
+          "sha256": "665233d8b5c28440405390005455c021a3889e8a7844d37d0a515d9febb4492f",
+          "bytes": 6252
+        }
+      ],
+      "reason": "Web startup readiness failed before ARM; bridge latched after a startup clock/receive gap. Not a flown sortie."
+    },
+    {
+      "run_id": "20261010T044542Z-4ca19d48",
+      "outcome": "FAIL",
+      "source_commit": "1f8e6ed45a4d7d3f6486b89cd52da1f7fb7d0eb9",
+      "source_dirty": true,
+      "control_sha256": "1a280030d81a9e934c0ab22d26872837584a57e142c2d45af7e9b88f29025eff",
+      "artifacts": [
+        {
+          "path": ".runtime/20261010T044542Z-4ca19d48/manifest.json",
+          "sha256": "9f31724cb4b403dc7ed5633a16a6906212c814f23e0fcc94aa7f9e1c801dda90",
+          "bytes": 36270
+        },
+        {
+          "path": ".runtime/20261010T044542Z-4ca19d48/events.jsonl",
+          "sha256": "d852eca46b62d7327bfcc08d41645bad3dc08a5ba0f887417eabb03ab0631836",
+          "bytes": 554924
+        },
+        {
+          "path": ".runtime/20261010T044542Z-4ca19d48/navigation.jsonl",
+          "sha256": "0408f704730df47fdab571ba41139addefa264217c0e963e34e3bf77cad9667b",
+          "bytes": 82234
+        },
+        {
+          "path": ".runtime/20261010T044542Z-4ca19d48/px4.log",
+          "sha256": "3f06f2e46b7c508ac0ce72977b684448c7cdcc2053fdcaebcf04da4bdbda3952",
+          "bytes": 6476
+        },
+        {
+          "path": ".runtime/20261010T044542Z-4ca19d48/stop-request.json",
+          "sha256": "d0e17d07cd6e5f6e5596d8e441918a6c1b892276ce84ad507cd4122ccf89c902",
+          "bytes": 89
+        }
+      ],
+      "reason": "TAKEOFF arrived 10.697s after ARM confirmation; PX4 log proves auto preflight disarming. Operator round trips delayed submission. No PX4 timeout relaxed."
+    },
+    {
+      "run_id": "20261010T045037Z-cfe66802",
+      "outcome": "FAIL",
+      "source_commit": "1f8e6ed45a4d7d3f6486b89cd52da1f7fb7d0eb9",
+      "source_dirty": true,
+      "control_sha256": "1a280030d81a9e934c0ab22d26872837584a57e142c2d45af7e9b88f29025eff",
+      "artifacts": [
+        {
+          "path": ".runtime/20261010T045037Z-cfe66802/manifest.json",
+          "sha256": "21bf31ca1d642fec39eb7ccb15d78d9aa1bb124f3c5e3980ba9aec44a23c92a5",
+          "bytes": 36270
+        },
+        {
+          "path": ".runtime/20261010T045037Z-cfe66802/events.jsonl",
+          "sha256": "24bc2b9885c32618145833e9a36a6f9ec2e3c4e13c1bee98ba338705f9aeb494",
+          "bytes": 921799
+        },
+        {
+          "path": ".runtime/20261010T045037Z-cfe66802/navigation.jsonl",
+          "sha256": "b0202d71780cd20ef52ade61af4512e028b8e286e1f9913f747e0386d21c566f",
+          "bytes": 3892
+        },
+        {
+          "path": ".runtime/20261010T045037Z-cfe66802/px4.log",
+          "sha256": "e800d685c9fded49a2b11da155d311f41b95f6c2adc7abe866541e54781a118f",
+          "bytes": 6252
+        },
+        {
+          "path": ".runtime/20261010T045037Z-cfe66802/stop-request.json",
+          "sha256": "283b64a5da285f2f2fc41fca190e34960881280ce65ef12a3e0847c50e7b3fb6",
+          "bytes": 89
+        }
+      ],
+      "reason": "READY was initially visible, then ground FAILSAFE disabled ARM; no ARM submitted, fresh disarmed landed STOP succeeded."
+    },
+    {
+      "run_id": "20261010T050223Z-6a842c13",
+      "outcome": "PASS",
+      "source_commit": "1f8e6ed45a4d7d3f6486b89cd52da1f7fb7d0eb9",
+      "source_dirty": true,
+      "control_sha256": "1a280030d81a9e934c0ab22d26872837584a57e142c2d45af7e9b88f29025eff",
+      "artifacts": [
+        {
+          "path": ".runtime/20261010T050223Z-6a842c13/manifest.json",
+          "sha256": "2fd647882a91cc3c285d5504de880a3eb5c55e59d6340e724762a0edbc4d2cf0",
+          "bytes": 36270
+        },
+        {
+          "path": ".runtime/20261010T050223Z-6a842c13/events.jsonl",
+          "sha256": "236e40996b0c51e770ab76f2b10037ffc0776e86076b8cf37e8fcb0e87e0ec24",
+          "bytes": 1272089
+        },
+        {
+          "path": ".runtime/20261010T050223Z-6a842c13/navigation.jsonl",
+          "sha256": "c766bfe91b21b3b1ccf7f6bc0eaf04309e24e205b6f101d856635a6ab3cbea05",
+          "bytes": 82061
+        },
+        {
+          "path": ".runtime/20261010T050223Z-6a842c13/px4.log",
+          "sha256": "42d3f7a83de0878e4776756b980183ace79726bff131c8815459a9b348c7c193",
+          "bytes": 6578
+        },
+        {
+          "path": ".runtime/20261010T050223Z-6a842c13/stop-request.json",
+          "sha256": "fb6b3acd66dad289392117368d97c01818da09a94bf27753c7554cd6e4be580b",
+          "bytes": 88
+        }
+      ],
+      "jobs": [
+        {
+          "id": "6ddd250a39624064ad6281187f233bd7",
+          "command": "start",
+          "state": "SUCCEEDED",
+          "success": true,
+          "reason": "",
+          "result": {
+            "success": true,
+            "run_id": "20261010T050223Z-6a842c13",
+            "reason": "experiment ready; explicitly arm before takeoff"
+          },
+          "artifact": {
+            "path": ".runtime/workbench-jobs/6ddd250a39624064ad6281187f233bd7.json",
+            "sha256": "0378a0cf66704f2c5c9adee84a843439a6f01042f617ff3fb93d02631eda70fd",
+            "bytes": 274
+          }
+        },
+        {
+          "id": "9173add1a1104d03a3b7f3a8361cc411",
+          "command": "arm",
+          "state": "SUCCEEDED",
+          "success": true,
+          "reason": "",
+          "result": {
+            "success": true,
+            "reason": "armed and Offboard confirmed"
+          },
+          "artifact": {
+            "path": ".runtime/workbench-jobs/9173add1a1104d03a3b7f3a8361cc411.json",
+            "sha256": "18f4562af0457363007a33806183bdb1ee89ca8968453cce2e6f06c1561bfe7d",
+            "bytes": 210
+          }
+        },
+        {
+          "id": "4c7aaa48303a4d72a2d0f600a0b68d5b",
+          "command": "takeoff",
+          "state": "SUCCEEDED",
+          "success": true,
+          "reason": "",
+          "result": {
+            "success": true,
+            "reason": "target reached within tolerance continuously"
+          },
+          "artifact": {
+            "path": ".runtime/workbench-jobs/4c7aaa48303a4d72a2d0f600a0b68d5b.json",
+            "sha256": "56f4fdf3d2d880a6d8fcd6478f874c9146a5777567ad3ea0484a376ad89aaca9",
+            "bytes": 230
+          }
+        },
+        {
+          "id": "42fac24bd71748a19e2e7517318016a7",
+          "command": "goto",
+          "state": "SUCCEEDED",
+          "success": true,
+          "reason": "",
+          "result": {
+            "success": true,
+            "reason": "continuous navigation target reached"
+          },
+          "artifact": {
+            "path": ".runtime/workbench-jobs/42fac24bd71748a19e2e7517318016a7.json",
+            "sha256": "88f930988ad697fd448d50f3feae01002a3d11a5dcc6766d11c2ff196f77a3cb",
+            "bytes": 219
+          }
+        },
+        {
+          "id": "f6d206475dc64308af44f63578313a2e",
+          "command": "hold",
+          "state": "SUCCEEDED",
+          "success": true,
+          "reason": "",
+          "result": {
+            "success": true,
+            "reason": "hold commanded"
+          },
+          "artifact": {
+            "path": ".runtime/workbench-jobs/f6d206475dc64308af44f63578313a2e.json",
+            "sha256": "d083679d3297ede2156642330f2b9f97927ff731449fa8f4fc59a36d2a55671d",
+            "bytes": 197
+          }
+        },
+        {
+          "id": "c4da914940654c6e8cde173ab4365322",
+          "command": "land",
+          "state": "SUCCEEDED",
+          "success": true,
+          "reason": "",
+          "result": {
+            "success": true,
+            "reason": "landed and disarmed confirmed"
+          },
+          "artifact": {
+            "path": ".runtime/workbench-jobs/c4da914940654c6e8cde173ab4365322.json",
+            "sha256": "7ec652c8658b2e08342e264bd86578c7448bdc365ad0bda2c85b98b4ce8e7c0d",
+            "bytes": 212
+          }
+        }
+      ],
+      "goal_enu_m": [
+        1.0,
+        1.0,
+        2.2
+      ],
+      "goal_yaw_rad": 0.0,
+      "final_telemetry": {
+        "wall_monotonic": 188787.963833625,
+        "sim_ns": 145514000000,
+        "event": "telemetry",
+        "position": [
+          1.0007749795913696,
+          0.9974383115768433,
+          0.22421196103096008
+        ],
+        "yaw": 0.0002678013089945025,
+        "armed": false,
+        "offboard": true,
+        "landed": true
+      },
+      "ulogs": [
+        {
+          "path": ".runtime/20261010T050223Z-6a842c13/px4/log/2026-10-10/05_02_32.ulg",
+          "sha256": "20c428cd96471e523cefb3881ad3f099d6c75df46284b37a533e3d53b91e92e6",
+          "bytes": 31571702
+        }
+      ],
+      "stop": {
+        "requested": true,
+        "supervisor_pid": 856757,
+        "observed_after_stop": "Web start enabled, stop disabled, observation disconnected; captured supervisor absent from host process inventory"
+      },
+      "scope": "Actual browser buttons, real public ROS actions and PX4; untracked validation screenshots account for dirty worktree. STOP is a synchronous request, not a persisted command job."
+    },
+    {
+      "run_id": "20261011T045815Z-927b1466",
+      "outcome": "FAIL_GROUND_FRESHNESS",
+      "source_commit": "f9a8fde2f1cc168f6d2680c77aa746590638ec4a",
+      "source_dirty": true,
+      "control_sha256": "1c57a07af9fd4e7bd049ae63bab8575263c135340834d925e2120152ca058d33",
+      "artifacts": [
+        {
+          "path": ".runtime/20261011T045815Z-927b1466/manifest.json",
+          "sha256": "f6738eba97859167fb9feeb2b1e72aed6aa9c8b4458a7b37c03766c1b69c0277",
+          "bytes": 36913
+        },
+        {
+          "path": ".runtime/20261011T045815Z-927b1466/events.jsonl",
+          "sha256": "ba571fbf3540b5d6db67fb0d9ef12efc6e662d7b7595d245603b8d2757d858c9",
+          "bytes": 918048
+        },
+        {
+          "path": ".runtime/20261011T045815Z-927b1466/navigation.jsonl",
+          "sha256": "38d929c07ce6328706487ec6265f63aabdaea2fab87a65b6624111a8304f2f88",
+          "bytes": 27216
+        },
+        {
+          "path": ".runtime/20261011T045815Z-927b1466/px4.log",
+          "sha256": "0a177d5bab84a372b9f1baa4d6a93deae0511fd0bac60b29c58622ce9ce35915",
+          "bytes": 6252
+        },
+        {
+          "path": ".runtime/20261011T045815Z-927b1466/stop-request.json",
+          "sha256": "49eca87b2806f113c6d1f5bb823c92d434ecea468dd8b0dd8eb78404cf6c1897",
+          "bytes": 88
+        }
+      ],
+      "jobs": [
+        {
+          "id": "948fb2a314fb45c6968679861e874a17",
+          "command": "start",
+          "state": "SUCCEEDED",
+          "success": true,
+          "reason": "",
+          "result": {
+            "success": true,
+            "run_id": "20261011T045815Z-927b1466",
+            "reason": "experiment ready; explicitly arm before takeoff"
+          },
+          "artifact": {
+            "path": ".runtime/workbench-jobs/948fb2a314fb45c6968679861e874a17.json",
+            "sha256": "71cd594e0ad9b5218c484e63498795283bb606911c1bb6e53fa2de2200a5c798",
+            "bytes": 274
+          }
+        }
+      ],
+      "final": {
+        "armed": false,
+        "landed": true,
+        "offboard": false
+      },
+      "stop": {
+        "captured_supervisor_pid": 43485,
+        "supervisor_absent_after_stop": true,
+        "scope": "Actual host ps checked after synchronous Web STOP; no command job fabricated"
+      },
+      "reason": "Required external EKF fusion lost/stale before ARM; controls disabled, fresh landed disarmed FAILSAFE stopped safely; source timing root cause remains unproven."
+    },
+    {
+      "run_id": "20261011T050820Z-7f93ef32",
+      "outcome": "PASS",
+      "source_commit": "f9a8fde2f1cc168f6d2680c77aa746590638ec4a",
+      "source_dirty": true,
+      "control_sha256": "1c57a07af9fd4e7bd049ae63bab8575263c135340834d925e2120152ca058d33",
+      "artifacts": [
+        {
+          "path": ".runtime/20261011T050820Z-7f93ef32/manifest.json",
+          "sha256": "2844b581c176666345491a64b7af8661ea6e211991cd670eb9d8f9a141ba7fa5",
+          "bytes": 36913
+        },
+        {
+          "path": ".runtime/20261011T050820Z-7f93ef32/events.jsonl",
+          "sha256": "aef59b8c676137cf980b3c221d5705c234afd780d7f201ab6f9e3ea56855279b",
+          "bytes": 1012782
+        },
+        {
+          "path": ".runtime/20261011T050820Z-7f93ef32/navigation.jsonl",
+          "sha256": "acff2213206a2b3a501db1457567985f13a1af15733e9e34972e08080f832b29",
+          "bytes": 64222
+        },
+        {
+          "path": ".runtime/20261011T050820Z-7f93ef32/px4.log",
+          "sha256": "746015e712f7201dd6c7e29f8c91cd2e12f8db5160c5540d8abd067b67570b0c",
+          "bytes": 6578
+        },
+        {
+          "path": ".runtime/20261011T050820Z-7f93ef32/stop-request.json",
+          "sha256": "bf465803dda568d2c37a6f3a15baf3f870e5e13fc10c25e536a878100dd0f193",
+          "bytes": 87
+        }
+      ],
+      "jobs": [
+        {
+          "id": "172beb6cf95d474a8fc382a268482a4b",
+          "command": "start",
+          "state": "SUCCEEDED",
+          "success": true,
+          "reason": "",
+          "result": {
+            "success": true,
+            "run_id": "20261011T050820Z-7f93ef32",
+            "reason": "experiment ready; explicitly arm before takeoff"
+          },
+          "artifact": {
+            "path": ".runtime/workbench-jobs/172beb6cf95d474a8fc382a268482a4b.json",
+            "sha256": "b1c25687e9e923c467f2a1ccfb1a8c7cf31b6fd535396158eb1143cc54cae82a",
+            "bytes": 274
+          }
+        },
+        {
+          "id": "97bbf642d5b64e36b54c17366c77051b",
+          "command": "arm",
+          "state": "SUCCEEDED",
+          "success": true,
+          "reason": "",
+          "result": {
+            "success": true,
+            "reason": "armed and Offboard confirmed"
+          },
+          "artifact": {
+            "path": ".runtime/workbench-jobs/97bbf642d5b64e36b54c17366c77051b.json",
+            "sha256": "edd97f6a421bc3defd988d5afc0574b7519239908f25bce3aa0620e06ec141c2",
+            "bytes": 210
+          }
+        },
+        {
+          "id": "90f8e6f0b0cf4bb2abcc7b3516f5f9f9",
+          "command": "takeoff",
+          "state": "SUCCEEDED",
+          "success": true,
+          "reason": "",
+          "result": {
+            "success": true,
+            "reason": "target reached within tolerance continuously"
+          },
+          "artifact": {
+            "path": ".runtime/workbench-jobs/90f8e6f0b0cf4bb2abcc7b3516f5f9f9.json",
+            "sha256": "160aacd9867bc06e2166dff29f62fcd007a59c1972f3d2f75ff2cf48a24cf4c8",
+            "bytes": 230
+          }
+        },
+        {
+          "id": "47584d5bc60a43458fe5458abff3783a",
+          "command": "goto",
+          "state": "SUCCEEDED",
+          "success": true,
+          "reason": "",
+          "result": {
+            "success": true,
+            "reason": "continuous navigation target reached"
+          },
+          "artifact": {
+            "path": ".runtime/workbench-jobs/47584d5bc60a43458fe5458abff3783a.json",
+            "sha256": "24de4c093c9ce48b869889cbe9db4358ef030d0b6c648ae43882572af52f8de8",
+            "bytes": 219
+          }
+        },
+        {
+          "id": "5793b0bec1bf4294bb91ded0479c44e3",
+          "command": "hold",
+          "state": "SUCCEEDED",
+          "success": true,
+          "reason": "",
+          "result": {
+            "success": true,
+            "reason": "hold commanded"
+          },
+          "artifact": {
+            "path": ".runtime/workbench-jobs/5793b0bec1bf4294bb91ded0479c44e3.json",
+            "sha256": "f229e18333012782f97fe3a40283005e40211eee525ce21d90d3c3dac67f0467",
+            "bytes": 197
+          }
+        },
+        {
+          "id": "b5760a4ba9fa4f9f9cdd0878486821ee",
+          "command": "land",
+          "state": "SUCCEEDED",
+          "success": true,
+          "reason": "",
+          "result": {
+            "success": true,
+            "reason": "landed and disarmed confirmed"
+          },
+          "artifact": {
+            "path": ".runtime/workbench-jobs/b5760a4ba9fa4f9f9cdd0878486821ee.json",
+            "sha256": "230f9a4d6432b866008593c7226aaa6153671dcf5cf35bd6b37606294222dc8a",
+            "bytes": 212
+          }
+        }
+      ],
+      "final": {
+        "armed": false,
+        "landed": true,
+        "offboard": true
+      },
+      "stop": {
+        "captured_supervisor_pid": 47540,
+        "supervisor_absent_after_stop": true,
+        "scope": "Actual host ps checked after synchronous Web STOP; no command job fabricated"
+      },
+      "goto_target_enu_m": [
+        1.0,
+        1.0,
+        2.2
+      ],
+      "goto_yaw_rad": 0.0,
+      "scope": "Actual browser START/ARM/TAKEOFF/GOTO/HOLD/LAND then owned STOP; all four point-cloud layers nonempty; dirty flag only document/report/screenshot changes, control inventory matches current qualified source."
+    }
+  ],
+  "screenshots": [
+    {
+      "path": "docs/validation/l1/workbench-comparison-current.jpg",
+      "sha256": "b52f8d43867f74114e912c0f9ece7bc3815f797b26facdb6a80010ed3eca7a8a",
+      "bytes": 74837
+    },
+    {
+      "path": "docs/validation/l1/workbench-current-live.jpg",
+      "sha256": "43fd7b112a3849b1249e6e900f77fc386c379f48589d9fa15bdfd80618235691",
+      "bytes": 173708
+    },
+    {
+      "path": "docs/validation/l1/workbench-failsafe-ground.jpg",
+      "sha256": "86e2c90463c106db8abe1a7234d46e303d4992334888fad097d2b59ac6758bf0",
+      "bytes": 83352
+    },
+    {
+      "path": "docs/validation/l1/workbench-failsafe-repeat.jpg",
+      "sha256": "e7a890b946e5613f01a4be7b004bf32a5ae0481cdaf5788460354ad9b60a7dd5",
+      "bytes": 52504
+    },
+    {
+      "path": "docs/validation/l1/workbench-goto-confirmed.jpg",
+      "sha256": "edb2ed09118cbef3431f7812dc5d9c283ed0efe7810941bcf09e51787e58e5f9",
+      "bytes": 44622
+    },
+    {
+      "path": "docs/validation/l1/workbench-live.jpg",
+      "sha256": "533f868b9078f077a36959c98f1ad65699ba9b1528130b7ae12e56d57465a82e",
+      "bytes": 150951
+    },
+    {
+      "path": "docs/validation/l1/workbench-raw.jpg",
+      "sha256": "a263b5d49733da0b0b4b533cf2238a1b5b5ed5947e8f1f83252064b5b83f7805",
+      "bytes": 89337
+    },
+    {
+      "path": "docs/validation/l1/workbench-takeoff-contract.jpg",
+      "sha256": "5287a5511ded3722a981188b52253a208ee68ccf04cbb9d2e9b5ac5274c15736",
+      "bytes": 122906
+    },
+    {
+      "path": "docs/validation/l1/workbench-review-ground-failure.jpg",
+      "sha256": "13fc2e278063f71bb8624ad3c7f5d139534df87f9e12217cf50b7bed8b8e8eae",
+      "bytes": 87070
+    },
+    {
+      "path": "docs/validation/l1/workbench-review-goto.jpg",
+      "sha256": "130a80ebeee5dfdba54a50437f87ad22f3435b3ee074ff9c1dccde4691680e3f",
+      "bytes": 116367
+    },
+    {
+      "path": "docs/validation/l1/workbench-review-landed.jpg",
+      "sha256": "5017be818e0ac3de6aa3888e1728344f76dafdc38dfd1f3f47c47f5a2951402a",
+      "bytes": 113973
+    },
+    {
+      "path": "docs/validation/l1/workbench-review-comparison.jpg",
+      "sha256": "8f5175a3c9091190ab4bfd465cc1a590a84d194a455a318c25303837d5a05e8e",
+      "bytes": 102851
+    }
+  ],
+  "comparison_review": {
+    "date": "2026-10-11",
+    "localization_reports": 33,
+    "consumed_input_groups": 6,
+    "flight_rows": 34,
+    "current_normal_pass_rows": 1,
+    "visible_current_localization": {
+      "glim": "PASS",
+      "fast_livo2": "PASS",
+      "fast_livo2_rtk": "PASS",
+      "fast_lio2": "FAIL",
+      "lio_sam": "FAIL",
+      "orb_slam3": "FAIL",
+      "vins_fusion": "FAIL"
+    },
+    "scope": "Actual browser DOM shows current and historical measured results; registry, not table, grants control qualification."
+  }
+}

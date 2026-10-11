@@ -1,6 +1,7 @@
 """ROS-independent flight policy with bounded motion and observed confirmation."""
 from dataclasses import dataclass
 import math
+import numpy as np
 from .coordinate import step_toward
 
 @dataclass
@@ -19,7 +20,12 @@ class Telemetry:
     land_at: float = -math.inf
 
 class FlightController:
-    def __init__(self, speed=1., tolerance=.3, settle=2., warmup=2., acceleration=None):
+    def __init__(self, speed=1., tolerance=.3, settle=2., warmup=2., acceleration=None, flight_bounds=None):
+        bounds=np.asarray(flight_bounds if flight_bounds is not None else [[-10.,-10.,.2],[10.,10.,5.]],dtype=float)
+        if (bounds.shape!=(2,3) or not np.isfinite(bounds).all() or np.any(bounds[1]<=bounds[0])
+                or np.any(np.abs(bounds[:,:2])>500.) or bounds[0,2]<.2 or bounds[1,2]>5.):
+            raise ValueError('finite ordered lab flight bounds within +/-500m and z 0.2..5m required')
+        self.flight_lower,self.flight_upper=bounds.copy()
         self.t = Telemetry()
         self.speed, self.tolerance, self.settle, self.warmup = speed, tolerance, settle, warmup
         self.state = 'WAITING'
@@ -38,6 +44,13 @@ class FlightController:
         self.since = 0.
         self.within = None
         self.takeoff_origin = None
+        self.trajectory = None
+        self.trajectory_id = ''
+        self.trajectory_started = 0.
+        self.trajectory_pending = None
+        self.reference = None
+        self.sim_time = 0.
+        self.stop_admission = None
 
     def update(self, now, **values):
         for key, value in values.items():
@@ -95,6 +108,7 @@ class FlightController:
 
     def fail(self, reason):
         self.finish(False, reason)
+        self.clear_trajectory(reason)
         self.pending = None
         self.commands.clear()
         self.streaming = False
@@ -127,12 +141,92 @@ class FlightController:
         self.require_ready(now)
         if self.state == 'LANDING' or not self.t.armed or not self.t.offboard:
             raise ValueError('hold requires an armed Offboard vehicle outside landing')
+        stop = None
+        if self.trajectory is not None and self.reference is not None:
+            from .continuous_trajectory import Trajectory
+            try:
+                stop = Trajectory.stop(self.reference)
+                for segment in stop.segments:
+                    hull=segment.bezier()
+                    if np.any(hull<self.flight_lower) or np.any(hull>self.flight_upper):
+                        raise ValueError('constrained stop outside lab flight bounds')
+                if self.stop_admission is not None:
+                    self.stop_admission(stop, now, self.sim_time)
+            except ValueError as error:
+                self.fail('constrained hold unavailable: '+str(error))
+                raise
         self.finish(False, 'interrupted by hold')
+        self.clear_trajectory('interrupted by hold')
         self.pending = None
         self.setpoint = self.target = self.t.position
         self.yaw = self.t.yaw
         self.state = 'HOLDING'
         self.streaming = True
+        if stop is not None:
+            self.trajectory, self.trajectory_started = stop, self.sim_time
+            self.trajectory_id = 'operator-stop'
+            self.target = tuple(stop.sample(stop.duration).position)
+            self.reference = stop.sample(0.)
+            self.setpoint = tuple(self.reference.position)
+            self.yaw = self.reference.yaw
+
+    def clear_trajectory(self, reason):
+        if self.trajectory_pending is not None:
+            self.results[self.trajectory_pending['token']] = (False, reason)
+        self.trajectory = self.reference = self.trajectory_pending = None
+        self.trajectory_id = ''
+
+    def follow_trajectory(self, trajectory, identifier, now, starts_at, replaces=''):
+        from .continuous_trajectory import State
+        self.require_ready(now)
+        if not self.t.armed or not self.t.offboard or self.state not in ('HOLDING', 'MOVING'):
+            raise ValueError('trajectory requires armed Offboard hover')
+        if not math.isfinite(starts_at) or not self.sim_time <= starts_at <= self.sim_time + 2.:
+            raise ValueError('trajectory start outside current-to-two-second window')
+        if not identifier or len(identifier) > 128 or identifier == self.trajectory_id:
+            raise ValueError('new trajectory identifier required')
+        if self.trajectory_pending is not None:
+            raise ValueError('trajectory replacement already pending; busy')
+        if replaces:
+            if self.trajectory is None or replaces != self.trajectory_id or self.active is None:
+                raise ValueError('trajectory replacement owner mismatch')
+            if starts_at < self.sim_time + .1:
+                raise ValueError('replacement requires at least 100ms scheduling margin')
+            expected = self.trajectory.sample(starts_at - self.trajectory_started)
+        else:
+            if self.active is not None or self.state != 'HOLDING':
+                raise ValueError('trajectory executor busy')
+            if self.trajectory is not None and self.sim_time < self.trajectory_started + self.trajectory.duration:
+                raise ValueError('constrained stop still in progress')
+            expected = State(np.asarray(self.setpoint or self.t.position), yaw=self.yaw)
+        initial = trajectory.sample(0.)
+        if any(not np.allclose(getattr(initial, k), getattr(expected, k), rtol=0, atol=1e-6)
+               for k in ('position', 'velocity', 'acceleration')) or abs(initial.yaw - expected.yaw) > 1e-6 or abs(initial.yaw_rate - expected.yaw_rate) > 1e-6:
+            raise ValueError('trajectory initial state must be continuous with current reference')
+        # Convex hull bounds include every point between controls, not just knots.
+        for segment in trajectory.segments:
+            hull = segment.bezier()
+            if np.any(hull < self.flight_lower) or np.any(hull > self.flight_upper):
+                raise ValueError('trajectory outside lab flight bounds')
+        self.serial += 1
+        token = self.serial
+        self.trajectory_pending = {'trajectory': trajectory, 'id': identifier, 'token': token,
+                                   'starts_at': starts_at, 'requested_at': now}
+        if starts_at <= self.sim_time:
+            self.activate_trajectory(now)
+        return token
+
+    def activate_trajectory(self, now):
+        pending = self.trajectory_pending
+        self.finish(False, 'replaced by continuous trajectory')
+        self.trajectory, self.trajectory_id = pending['trajectory'], pending['id']
+        self.trajectory_started = pending['starts_at']
+        self.active, self.since, self.within = pending['token'], now, None
+        self.trajectory_pending, self.profile, self.takeoff_origin = None, None, None
+        self.target = tuple(self.trajectory.sample(self.trajectory.duration).position)
+        self.reference = self.trajectory.sample(max(0., self.sim_time - self.trajectory_started))
+        self.setpoint, self.yaw = tuple(self.reference.position), self.reference.yaw
+        self.state, self.streaming = 'MOVING', True
 
     def fly(self, operation, now, target=None, yaw=None, height=2.):
         self.require_ready(now)
@@ -145,23 +239,29 @@ class FlightController:
         if operation == 'LAND':
             self.takeoff_origin = None
             self.finish(False, 'interrupted by land')
+            self.clear_trajectory('interrupted by land')
             token = self.begin(now)
             self.state = 'LANDING'
             self.send(21, (), now, 'landing')
             return token
+        if self.trajectory_pending is not None:
+            raise ValueError('trajectory reservation busy')
         if self.active is not None or not self.t.offboard:
             raise ValueError('motion requires idle Offboard vehicle')
+        if self.trajectory is not None and self.sim_time < self.trajectory_started + self.trajectory.duration:
+            raise ValueError('constrained stop still in progress')
         if operation == 'TAKEOFF':
             if self.takeoff_origin is None or math.dist(self.t.position, self.takeoff_origin) > .3:
                 raise ValueError('takeoff requires explicit ground arm and remaining within 0.3m of its origin')
             target = (self.takeoff_origin[0], self.takeoff_origin[1], self.takeoff_origin[2]+height)
         if target is None or len(target) != 3 or not all(math.isfinite(v) for v in target):
             raise ValueError('finite target required')
-        if abs(target[0]) > 10 or abs(target[1]) > 10 or not .2 <= target[2] <= 5:
-            raise ValueError('target outside lab bounds: x/y +/-10m, z 0.2..5m')
+        if np.any(np.asarray(target)<self.flight_lower) or np.any(np.asarray(target)>self.flight_upper):
+            raise ValueError('target outside configured lab flight bounds')
         if yaw is not None and not math.isfinite(yaw):
             raise ValueError('finite yaw required')
         token = self.begin(now)
+        self.clear_trajectory('superseded by flight operation')
         self.takeoff_origin = None
         self.target = tuple(target)
         self.setpoint = self.t.position
@@ -175,12 +275,17 @@ class FlightController:
         return token
 
     def cancel(self, token, now):
+        if self.trajectory_pending is not None and token == self.trajectory_pending['token']:
+            self.results[token] = (False, 'pending trajectory canceled')
+            self.trajectory_pending = None
+            return True
         if token != self.active or self.state != 'MOVING':
             return False
         self.hold(now)
         return True
 
-    def tick(self, now, sim_dt):
+    def tick(self, now, sim_dt, sim_time=None):
+        self.sim_time = self.sim_time + max(0., sim_dt) if sim_time is None else sim_time
         if self.state == 'FAILSAFE':
             return
         if not self.fresh(now):
@@ -226,8 +331,15 @@ class FlightController:
         if self.state in ('MOVING', 'HOLDING') and (not self.t.offboard or not self.t.armed):
             self.fail('vehicle left armed Offboard state')
             return
+        if self.trajectory_pending is not None and self.sim_time >= self.trajectory_pending['starts_at']:
+            self.activate_trajectory(now)
+        if self.trajectory is not None and self.state in ('MOVING', 'HOLDING'):
+            self.reference = self.trajectory.sample(self.sim_time - self.trajectory_started)
+            self.setpoint, self.yaw = tuple(self.reference.position), self.reference.yaw
         if self.state == 'MOVING':
-            if self.acceleration is None:
+            if self.trajectory is not None:
+                pass  # Full time-parameterized curve sampled above, without knot waits.
+            elif self.acceleration is None:
                 self.setpoint = step_toward(self.setpoint, self.target, self.speed*min(max(sim_dt, 0), .1))
             else:
                 self.profile_time += min(max(sim_dt, 0), .1)
@@ -241,5 +353,6 @@ class FlightController:
                     self.finish(True, 'target reached within tolerance continuously')
             else:
                 self.within = None
-            if self.active is not None and now-self.since > 60:
+            budget = max(60., self.trajectory.duration * 3 + 10) if self.trajectory else 60.
+            if self.active is not None and now-self.since > budget:
                 self.fail('motion timeout')

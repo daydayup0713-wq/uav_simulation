@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "repositories": {
+    "ego": {
+      "url": "https://github.com/ZJU-FAST-Lab/ego-planner-swarm.git",
+      "ref": "23a8d5a191711dd65633df689bd00f55d4dea8f9",
+      "tree_sha256": "acaae3eabfd83a5a525f249e237f9705f19bc0d380be545a4809d072d7b35467",
+      "patches": [],
+      "license": "GPL-3.0"
+    },
+    "fast_planner": {
+      "url": "https://github.com/HKUST-Aerial-Robotics/Fast-Planner.git",
+      "ref": "41be219fe4ecc43bf0e0c2b42a523f8755ccc0bd",
+      "tree_sha256": "82b38648a9f172b272316a572cc210f6f1696dd2946b7046197ac1031ff31006",
+      "patches": [],
+      "license": "GPL-3.0 (repository LICENSE); LGPL-3.0 (compiled file headers)"
+    },
+    "gcopter": {
+      "url": "https://github.com/ZJU-FAST-Lab/GCOPTER.git",
+      "ref": "e0444f6d47b84f972ced91746b05feb36ce1fd4f",
+      "tree_sha256": "65efc3623a5ca4425d3558f8768daf773c122b5d42886ee1dc277f95a6c0b552",
+      "patches": [],
+      "license": "MIT"
+    },
+    "nlopt": {
+      "url": "https://github.com/stevengj/nlopt.git",
+      "ref": "09b3c2a6da71cabcb98d2c8facc6b83d2321ed71",
+      "tree_sha256": "b7b57259336129ce5890a015849577492a41eda513a87ef939aa4b20531e1501",
+      "patches": [],
+      "license": "LGPL-2.1-or-later AND MIT (see upstream COPYING)"
+    }
+  },
+  "backends": {
+    "ego": {
+      "source_ref": "23a8d5a191711dd65633df689bd00f55d4dea8f9",
+      "repositories": [
+        "ego"
+      ]
+    },
+    "fast_planner": {
+      "source_ref": "41be219fe4ecc43bf0e0c2b42a523f8755ccc0bd",
+      "repositories": [
+        "fast_planner",
+        "nlopt"
+      ]
+    },
+    "gcopter": {
+      "source_ref": "e0444f6d47b84f972ced91746b05feb36ce1fd4f",
+      "repositories": [
+        "gcopter"
+      ]
+    }
+  }
+}

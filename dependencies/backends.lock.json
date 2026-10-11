@@ -1,0 +1,223 @@
+{
+  "schema": 1,
+  "repositories": {
+    "fast_lio2": {
+      "url": "https://github.com/hku-mars/FAST_LIO.git",
+      "ref": "a4743b095409588842a5b30ddfa27e29d2f99164",
+      "tree_sha256": "f1908fead09e4753feda398c1265a3a963a07651eb8d7fa834a360168d981f7c",
+      "patches": [
+        {
+          "path": "dependencies/patches/fast-lio2-sensor-qos.patch",
+          "sha256": "cca457de4c4e1376ba0f32b2b1aeac6a9529b8d53b839f77822a138783fb7609"
+        }
+      ],
+      "submodules": {
+        "include/ikd-Tree": "e2e3f4e9d3b95a9e66b1ba83dc98d4a05ed8a3c4"
+      }
+    },
+    "livox-driver2": {
+      "url": "https://github.com/Livox-SDK/livox_ros_driver2.git",
+      "ref": "13eb05e4e6dd7a765b934d0c5fd6236676a57b49",
+      "tree_sha256": "ca718124510378997113d70b1cb48dcfdda4d2c75bbff72a9132960564cbb8f7",
+      "patches": []
+    },
+    "fast_livo2": {
+      "url": "https://github.com/hku-mars/FAST-LIVO2.git",
+      "ref": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+      "tree_sha256": "a955a3ff4f6882f08263a10815eb5c2ec5cb3f467d462193cec0590764c3af1e",
+      "patches": [
+        {
+          "path": "dependencies/patches/fast_livo2-intel/0001-Stop-VIO-waiting-on-the-LiDAR-buffer-in-LIVO-mode.patch",
+          "sha256": "6e17abaa0b842b2b5b4ef500051ac6ed0506c8728281ef19113510c2c0bc4297"
+        },
+        {
+          "path": "dependencies/patches/fast_livo2-intel/0002-Port-to-ROS2-and-bring-up-Mid-360-D415-on-A2W.patch",
+          "sha256": "62f11d9265c0e733cd2b72df9b43828631eff4ba8634c5d4e7e326c2c7077d60"
+        },
+        {
+          "path": "dependencies/patches/fast_livo2-intel/0003-Size-OMP-thread-count-from-runtime-CPU-affinity.patch",
+          "sha256": "74e82ac06fb73ef590607161bab611147351f1198d1f51d75a75d565c95977f4"
+        },
+        {
+          "path": "dependencies/patches/fast_livo2-intel/0004-Reformat-sources-to-the-real-clang-format-style.patch",
+          "sha256": "9e404d100958f9d1a95644ff858546ec1bb50bc0e516d2661b678477c7b85c34"
+        },
+        {
+          "path": "dependencies/patches/fast_livo2-intel/0005-Fix-crash-race-risks-and-an-info-leak-in-the-ROS2-no.patch",
+          "sha256": "1a1846ba497d5523c6edf57bcc026cd297fe42be8b05ae4e1c3589150d57ceb9"
+        },
+        {
+          "path": "dependencies/patches/fast-livo2-platform-io.patch",
+          "sha256": "f8be33f39f6cd6a26651f8f19a36a9da06ff038171091610e835eb32e7c08d45"
+        }
+      ]
+    },
+    "vikit-modern": {
+      "url": "https://github.com/Robotic-Developer-Road/rpg_vikit.git",
+      "ref": "4b7abc838f5d2ca9137f70f122eaaeff9eaf0f50",
+      "tree_sha256": "ae52ab31867738f2f313cbd183e5caa97f59e92c7c1e0262de29712da426c989",
+      "patches": [
+        {
+          "path": "dependencies/patches/vikit-modern-private-prefix.patch",
+          "sha256": "af6d6b7bbdb9ec516f43c47f0cc4443ca4f3da042672ee8ee42a31f077128f3e"
+        }
+      ]
+    },
+    "sophus-modern": {
+      "url": "https://github.com/strasdat/Sophus.git",
+      "ref": "de0f8d3d92bf776271e16de56d1803940ebccab9",
+      "tree_sha256": "47220531917ca2b6e71c38e4de5c981a5f86940110dacb682f9acceb412d1728",
+      "patches": []
+    },
+    "sophus-legacy": {
+      "url": "https://github.com/strasdat/Sophus.git",
+      "ref": "a621ff2e56c56c839a6c40418d42c3c254424b5c",
+      "tree_sha256": "6e0d7098b5a7aabbab79c4a67dba0be10ccfe2a72389be3d71b1e3c103730307",
+      "patches": [
+        {
+          "path": "dependencies/patches/sophus-legacy-gcc11.patch",
+          "sha256": "a393ddd41be2162ad771bb7b6d8ad87694f69d02899cf42acd475ddb597d6239"
+        }
+      ]
+    },
+    "fast_livo2_rtk_ros2": {
+      "url": "https://github.com/sb-im/FAST-LIVO2-RTK-ROS2.git",
+      "ref": "b2f9d89fbf825096a4677d2cae44c538c7538864",
+      "tree_sha256": "656c9fa12714ef8e215e2342481de4909f640453765d0413a06e80ca99e295fb",
+      "patches": [
+        {
+          "path": "dependencies/patches/fast-livo2-rtk-private-io.patch",
+          "sha256": "7366de37d1ae7ffa2d1f4a2fb73df87c685c55b83eb5f783a4ea094d2aeaba0a"
+        }
+      ]
+    },
+    "geographiclib": {
+      "url": "https://github.com/geographiclib/geographiclib.git",
+      "ref": "920702bc36ea13c384686556f25fb6369141a8e1",
+      "tree_sha256": "97c27445c36ba5ba4b97175b88e75cf3a8e271dbf53582dfa0060ca51da89882",
+      "patches": []
+    },
+    "lio_sam": {
+      "url": "https://github.com/TixiaoShan/LIO-SAM.git",
+      "ref": "08af3f32f01725372d4269838dc44c19c6d9e76b",
+      "tree_sha256": "e6e4a62d09fd87ebc50a5d3c859b1a0c07778d9585f0b074121ebc6f614d4b8f",
+      "patches": [
+        {
+          "path": "dependencies/patches/lio-sam-integration-audit.patch",
+          "sha256": "54626056650668d13a3809e939968f0fbc42e3938facba0f7502e5e271a5c94f"
+        }
+      ]
+    },
+    "vins_fusion": {
+      "url": "https://github.com/HKUST-Aerial-Robotics/VINS-Fusion.git",
+      "ref": "be55a937a57436548ddfb1bd324bc1e9a9e828e0",
+      "tree_sha256": "fb3697ac0f2e32d2513c7c4b7596fe5bee2308a8eeb442a0aff0f2a9faa48960",
+      "patches": [
+        {
+          "path": "dependencies/patches/vins-fusion-ros2-transport.patch",
+          "sha256": "53c8fd8ca5b3b0abb31b254eb8dd97d61bce1ffd16939b7d8f5d17dd64e25898"
+        }
+      ]
+    },
+    "orb_slam3": {
+      "url": "https://github.com/UZ-SLAMLab/ORB_SLAM3.git",
+      "ref": "4452a3c4ab75b1cde34e5505a36ec3f9edcdc4c4",
+      "tree_sha256": "ad150c87e893591eef595f1ae911b5b39642b5321f1087757d23363cf8d4e2be",
+      "patches": [
+        {
+          "path": "dependencies/patches/orb-slam3-private-transport.patch",
+          "sha256": "5420a763882a9d800be8dd6e94c773ab73a3ed656d475ee081aae34b606a01d3"
+        }
+      ]
+    },
+    "pangolin": {
+      "url": "https://github.com/stevenlovegrove/Pangolin.git",
+      "ref": "aff6883c83f3fd7e8268a9715e84266c42e2efe3",
+      "tree_sha256": "2b48261d5cd18d24fd6930bdeb55f6f6d1ccec76b96e4166d8186ce361d950a5",
+      "patches": []
+    },
+    "glim": {
+      "url": "https://github.com/koide3/glim.git",
+      "ref": "65a5562c6b8906e60693c63cc0c95de885426352",
+      "tree_sha256": "e71082c0e08ef2290fe71dbca5fa501f1b86616f89c05e0bbcc7505a4c2cba39",
+      "patches": []
+    },
+    "glim_ros2": {
+      "url": "https://github.com/koide3/glim_ros2.git",
+      "ref": "bb1d12a8a4ee24f8620da8bb30b585fb1a2b6846",
+      "tree_sha256": "07751062cb026e069a9bc1b85e5808e74eb1ad7ceaa242173e7bf37f2c134b21",
+      "patches": []
+    },
+    "gtsam_points": {
+      "url": "https://github.com/koide3/gtsam_points.git",
+      "ref": "dff0518ae456537a2b0b1362213e32952574a98e",
+      "tree_sha256": "f8804f7100495dba88b9ca2156543d9a241ca935d2d955fc947b474b7b014b72",
+      "patches": []
+    },
+    "vins-fusion-ros2": {
+      "url": "https://github.com/zinuok/VINS-Fusion-ROS2.git",
+      "ref": "72023bc5d2abb14faa4c02a5c040d84f996b587a",
+      "tree_sha256": "0e9420664d7b23f8a6dd7c4d0a370cba9c903f49d2c94cf281f5727117c9298e",
+      "patches": [
+        {
+          "path": "dependencies/patches/vins-fusion-loop-ros2-transport.patch",
+          "sha256": "8a467da7c99e501e39cc318ac7a3c568c076111428dc057f592c17648ee0ebc8"
+        }
+      ]
+    }
+  },
+  "backends": {
+    "fast_lio2": {
+      "repositories": [
+        "fast_lio2",
+        "livox-driver2"
+      ]
+    },
+    "fast_livo2": {
+      "repositories": [
+        "fast_livo2",
+        "vikit-modern",
+        "sophus-modern",
+        "livox-driver2"
+      ]
+    },
+    "fast_livo2_rtk": {
+      "repositories": [
+        "fast_livo2_rtk_ros2",
+        "sophus-legacy",
+        "geographiclib"
+      ]
+    },
+    "lio_sam": {
+      "repositories": [
+        "lio_sam"
+      ]
+    },
+    "vins_fusion": {
+      "repositories": [
+        "vins_fusion",
+        "vins-fusion-ros2"
+      ]
+    },
+    "orb_slam3": {
+      "repositories": [
+        "orb_slam3",
+        "pangolin"
+      ]
+    },
+    "glim": {
+      "repositories": [
+        "glim",
+        "glim_ros2",
+        "gtsam_points"
+      ]
+    }
+  },
+  "patch_provider": {
+    "repository": "https://github.com/open-edge-platform/robotics-ai-suite",
+    "ref": "9121665453e7978d51a5e188255dae33d5d9782e"
+  },
+  "data_tools": {
+    "rosbags": "0.10.11"
+  }
+}

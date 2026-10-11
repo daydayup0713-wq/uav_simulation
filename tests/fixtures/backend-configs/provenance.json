@@ -1,0 +1,88 @@
+{
+  "purpose": "test-only pinned parameter templates; never algorithm installation or qualification",
+  "repositories": {
+    "fast_lio2": {
+      "url": "https://github.com/hku-mars/FAST_LIO.git",
+      "ref": "a4743b095409588842a5b30ddfa27e29d2f99164",
+      "tree_sha256": "f1908fead09e4753feda398c1265a3a963a07651eb8d7fa834a360168d981f7c",
+      "patches": [
+        {
+          "path": "dependencies/patches/fast-lio2-sensor-qos.patch",
+          "sha256": "cca457de4c4e1376ba0f32b2b1aeac6a9529b8d53b839f77822a138783fb7609"
+        }
+      ],
+      "files": {
+        "config/mid360.yaml": "0fba8e5d317235b964b84813c9f6019dabd4267f29bedfa03595f29c0cf80aa1",
+        "config/ouster64.yaml": "fbf800038ce8ed2a7be23d1a55f6263f86fa6288b881ba871a59ec7f3ace9cb1",
+        "LICENSE": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643"
+      }
+    },
+    "fast_livo2": {
+      "url": "https://github.com/hku-mars/FAST-LIVO2.git",
+      "ref": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+      "tree_sha256": "a955a3ff4f6882f08263a10815eb5c2ec5cb3f467d462193cec0590764c3af1e",
+      "patches": [
+        {
+          "path": "dependencies/patches/fast_livo2-intel/0001-Stop-VIO-waiting-on-the-LiDAR-buffer-in-LIVO-mode.patch",
+          "sha256": "6e17abaa0b842b2b5b4ef500051ac6ed0506c8728281ef19113510c2c0bc4297"
+        },
+        {
+          "path": "dependencies/patches/fast_livo2-intel/0002-Port-to-ROS2-and-bring-up-Mid-360-D415-on-A2W.patch",
+          "sha256": "62f11d9265c0e733cd2b72df9b43828631eff4ba8634c5d4e7e326c2c7077d60"
+        },
+        {
+          "path": "dependencies/patches/fast_livo2-intel/0003-Size-OMP-thread-count-from-runtime-CPU-affinity.patch",
+          "sha256": "74e82ac06fb73ef590607161bab611147351f1198d1f51d75a75d565c95977f4"
+        },
+        {
+          "path": "dependencies/patches/fast_livo2-intel/0004-Reformat-sources-to-the-real-clang-format-style.patch",
+          "sha256": "9e404d100958f9d1a95644ff858546ec1bb50bc0e516d2661b678477c7b85c34"
+        },
+        {
+          "path": "dependencies/patches/fast_livo2-intel/0005-Fix-crash-race-risks-and-an-info-leak-in-the-ROS2-no.patch",
+          "sha256": "1a1846ba497d5523c6edf57bcc026cd297fe42be8b05ae4e1c3589150d57ceb9"
+        },
+        {
+          "path": "dependencies/patches/fast-livo2-platform-io.patch",
+          "sha256": "f8be33f39f6cd6a26651f8f19a36a9da06ff038171091610e835eb32e7c08d45"
+        }
+      ],
+      "files": {
+        "config/avia.yaml": "257f26ea3f492a6be910d19472c550b16ca1f38f61cfc8a4989ca6512210febc",
+        "config/NTU_VIRAL.yaml": "d38c2834127db8788854a3da88ec79ba825f6f0c3202a78971ec6681f8351f33",
+        "config/camera_NTU_VIRAL.yaml": "0870a3a506d294b2bc076e5e8594794a4f9baedbb20ed8f1b7daff418b3829cd",
+        "LICENSE": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643"
+      }
+    },
+    "lio_sam": {
+      "url": "https://github.com/TixiaoShan/LIO-SAM.git",
+      "ref": "08af3f32f01725372d4269838dc44c19c6d9e76b",
+      "tree_sha256": "e6e4a62d09fd87ebc50a5d3c859b1a0c07778d9585f0b074121ebc6f614d4b8f",
+      "patches": [
+        {
+          "path": "dependencies/patches/lio-sam-integration-audit.patch",
+          "sha256": "54626056650668d13a3809e939968f0fbc42e3938facba0f7502e5e271a5c94f"
+        }
+      ],
+      "files": {
+        "config/params.yaml": "d2a973c671d033cf56c620563f70f20599088a3a61963b455b3f11d7e224aaa5",
+        "LICENSE": "03434f61258c94068eb798bf4154a3ca95c61eab634886ba3d66d8f03c7c941e"
+      }
+    },
+    "fast_livo2_rtk_ros2": {
+      "url": "https://github.com/sb-im/FAST-LIVO2-RTK-ROS2.git",
+      "ref": "b2f9d89fbf825096a4677d2cae44c538c7538864",
+      "tree_sha256": "656c9fa12714ef8e215e2342481de4909f640453765d0413a06e80ca99e295fb",
+      "patches": [
+        {
+          "path": "dependencies/patches/fast-livo2-rtk-private-io.patch",
+          "sha256": "7366de37d1ae7ffa2d1f4a2fb73df87c685c55b83eb5f783a4ea094d2aeaba0a"
+        }
+      ],
+      "files": {
+        "src/fast_livo/config/HH-LVGO.yaml": "a17f01fc49610352cc4e809f1e2710e572ec057c52d4c55dcdbdde8a45788f9a",
+        "LICENSE": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643"
+      }
+    }
+  }
+}

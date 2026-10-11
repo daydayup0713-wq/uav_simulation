@@ -1,0 +1,594 @@
+{
+  "schema": 1,
+  "scope": "fixed observed map, offline planner comparison; not flight qualification",
+  "input": {
+    "source": "sensor_observed_inflated_snapshot",
+    "frame": "odom",
+    "input_sha256": "934fa6a37d7e5a55bdf68dc40a1a373a4e52402273467aec07c1b9a3b6ec7a1c",
+    "map_sha256": "0998009c4ad7b2a2ba96927eb5ec3e6e0172f723ae8bce5d724babe06a6c6c3b",
+    "envelope": [
+      0.65,
+      0.65,
+      0.55
+    ],
+    "configuration": {
+      "acceleration_m_s2": 0.5,
+      "body_halfsize_m": [
+        0.4,
+        0.4,
+        0.3
+      ],
+      "clearance_m": 0.25,
+      "goal_tolerance_m": 0.15,
+      "lower": [
+        -6,
+        -6,
+        -1
+      ],
+      "map_period_s": 0.3,
+      "max_expansions": 50000,
+      "max_replans": 3,
+      "planning_timeout_s": 2.0,
+      "resolution_m": 0.2,
+      "schema_version": 1,
+      "source_timeout_s": 1.0,
+      "speed_m_s": 0.5,
+      "upper": [
+        6,
+        6,
+        5
+      ]
+    },
+    "run_id": "20261008T065556Z-251316cb",
+    "manifest_sha256": "d10f37e5e234a5d56ad8dd69b5987f63b2f0c134daa7c253fd79d79311de7091"
+  },
+  "rows": [
+    {
+      "backend": "astar",
+      "map_sha256": "0998009c4ad7b2a2ba96927eb5ec3e6e0172f723ae8bce5d724babe06a6c6c3b",
+      "cases": [
+        {
+          "id": "normal",
+          "start": [
+            0.0,
+            0.0,
+            2.0
+          ],
+          "goal": [
+            2.5,
+            3.6,
+            2.0
+          ],
+          "expected_success": true,
+          "success": true,
+          "reason": "continuous A* independently admitted",
+          "runtime_s": 0.10059321600419935,
+          "fallback": false,
+          "implementation_sha256": "1088f15dd53877419061b1e366bc4ca7b4b74a0d50b888affc76f77c3258ede5",
+          "source_ref": "e295a54cd52e665edf8c06436d9fb195f462dc28",
+          "core_peak_rss_bytes": null,
+          "core_cpu_s": null,
+          "evidence": "astar/normal/pipeline-report.json",
+          "duration_s": 16.709201518598327,
+          "segments": 2,
+          "length_m": 4.927505854614298,
+          "derivative_maxima": {
+            "speed": 0.49504950495049516,
+            "acceleration": 0.11590270781274743,
+            "jerk": 0.1028764022340505
+          },
+          "full_curve_observed_clear": true,
+          "observed_inflated_grid_margin_m": 0.02679491924311228,
+          "margin_basis": "distance to blocked/unknown voxel centers minus voxel circumradius; body already inflated",
+          "midpoint_speed_mps": 0.4885958751142522,
+          "passed": true
+        },
+        {
+          "id": "nonzero_initial_pva",
+          "start": [
+            0.0,
+            0.0,
+            2.0
+          ],
+          "velocity": [
+            0.1,
+            0.0,
+            0.0
+          ],
+          "acceleration": [
+            0.02,
+            0.0,
+            0.0
+          ],
+          "goal": [
+            2.5,
+            3.6,
+            2.0
+          ],
+          "expected_success": true,
+          "success": true,
+          "reason": "continuous A* independently admitted",
+          "runtime_s": 0.09968168799241539,
+          "fallback": false,
+          "implementation_sha256": "1088f15dd53877419061b1e366bc4ca7b4b74a0d50b888affc76f77c3258ede5",
+          "source_ref": "e295a54cd52e665edf8c06436d9fb195f462dc28",
+          "core_peak_rss_bytes": null,
+          "core_cpu_s": null,
+          "evidence": "astar/nonzero_initial_pva/pipeline-report.json",
+          "duration_s": 16.231114312984605,
+          "segments": 2,
+          "length_m": 5.036249132687405,
+          "derivative_maxima": {
+            "speed": 0.48613663332160345,
+            "acceleration": 0.13189709862037072,
+            "jerk": 0.136801789917133
+          },
+          "full_curve_observed_clear": true,
+          "observed_inflated_grid_margin_m": 0.02679491924311228,
+          "margin_basis": "distance to blocked/unknown voxel centers minus voxel circumradius; body already inflated",
+          "midpoint_speed_mps": 0.4769939759123741,
+          "passed": true
+        },
+        {
+          "id": "obstacle_rejection",
+          "start": [
+            0.0,
+            0.0,
+            2.0
+          ],
+          "goal": [
+            1.5,
+            0.0,
+            2.0
+          ],
+          "expected_success": false,
+          "success": false,
+          "reason": "GOAL_BLOCKED_OR_UNOBSERVED",
+          "runtime_s": 0.0009057900024345145,
+          "fallback": false,
+          "implementation_sha256": "1088f15dd53877419061b1e366bc4ca7b4b74a0d50b888affc76f77c3258ede5",
+          "source_ref": "e295a54cd52e665edf8c06436d9fb195f462dc28",
+          "core_peak_rss_bytes": null,
+          "core_cpu_s": null,
+          "evidence": "astar/obstacle_rejection/pipeline-report.json",
+          "passed": true
+        },
+        {
+          "id": "outside_observed_map",
+          "start": [
+            0.0,
+            0.0,
+            2.0
+          ],
+          "goal": [
+            20.0,
+            20.0,
+            2.0
+          ],
+          "expected_success": false,
+          "success": false,
+          "reason": "OUTSIDE_BOUNDS",
+          "runtime_s": 0.0007483420049538836,
+          "fallback": false,
+          "implementation_sha256": "1088f15dd53877419061b1e366bc4ca7b4b74a0d50b888affc76f77c3258ede5",
+          "source_ref": "e295a54cd52e665edf8c06436d9fb195f462dc28",
+          "core_peak_rss_bytes": null,
+          "core_cpu_s": null,
+          "evidence": "astar/outside_observed_map/pipeline-report.json",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "backend": "ego",
+      "map_sha256": "0998009c4ad7b2a2ba96927eb5ec3e6e0172f723ae8bce5d724babe06a6c6c3b",
+      "cases": [
+        {
+          "id": "normal",
+          "start": [
+            0.0,
+            0.0,
+            2.0
+          ],
+          "goal": [
+            2.5,
+            3.6,
+            2.0
+          ],
+          "expected_success": true,
+          "success": true,
+          "reason": "native optimized and independently admitted",
+          "runtime_s": 0.31507792000775225,
+          "fallback": false,
+          "implementation_sha256": "57fca48dbd6fd44eae6bba25aafb16a75c163a5951613ed26b6bb36f76b2b613",
+          "source_ref": "23a8d5a191711dd65633df689bd00f55d4dea8f9",
+          "core_peak_rss_bytes": 89931776,
+          "core_cpu_s": 0.05,
+          "evidence": "ego/normal/pipeline-report.json",
+          "duration_s": 14.983666295544314,
+          "segments": 23,
+          "length_m": 4.7431582040519125,
+          "derivative_maxima": {
+            "speed": 0.4519735645511927,
+            "acceleration": 0.2150695319429237,
+            "jerk": 0.27409507706001685
+          },
+          "full_curve_observed_clear": true,
+          "observed_inflated_grid_margin_m": 0.02679491924311228,
+          "margin_basis": "distance to blocked/unknown voxel centers minus voxel circumradius; body already inflated",
+          "midpoint_speed_mps": 0.3014180398834944,
+          "passed": true
+        },
+        {
+          "id": "nonzero_initial_pva",
+          "start": [
+            0.0,
+            0.0,
+            2.0
+          ],
+          "velocity": [
+            0.1,
+            0.0,
+            0.0
+          ],
+          "acceleration": [
+            0.02,
+            0.0,
+            0.0
+          ],
+          "goal": [
+            2.5,
+            3.6,
+            2.0
+          ],
+          "expected_success": true,
+          "success": true,
+          "reason": "native optimized and independently admitted",
+          "runtime_s": 0.3147687230084557,
+          "fallback": false,
+          "implementation_sha256": "57fca48dbd6fd44eae6bba25aafb16a75c163a5951613ed26b6bb36f76b2b613",
+          "source_ref": "23a8d5a191711dd65633df689bd00f55d4dea8f9",
+          "core_peak_rss_bytes": 90714112,
+          "core_cpu_s": 0.04,
+          "evidence": "ego/nonzero_initial_pva/pipeline-report.json",
+          "duration_s": 14.983666295544314,
+          "segments": 23,
+          "length_m": 4.805942826018104,
+          "derivative_maxima": {
+            "speed": 0.4498037011427446,
+            "acceleration": 0.22181456245178438,
+            "jerk": 0.2804963582975019
+          },
+          "full_curve_observed_clear": true,
+          "observed_inflated_grid_margin_m": 0.02679491924311228,
+          "margin_basis": "distance to blocked/unknown voxel centers minus voxel circumradius; body already inflated",
+          "midpoint_speed_mps": 0.30431517772475775,
+          "passed": true
+        },
+        {
+          "id": "obstacle_rejection",
+          "start": [
+            0.0,
+            0.0,
+            2.0
+          ],
+          "goal": [
+            1.5,
+            0.0,
+            2.0
+          ],
+          "expected_success": false,
+          "success": false,
+          "reason": "GOAL_BLOCKED_OR_UNOBSERVED",
+          "runtime_s": 0.00797607799177058,
+          "fallback": false,
+          "implementation_sha256": "57fca48dbd6fd44eae6bba25aafb16a75c163a5951613ed26b6bb36f76b2b613",
+          "source_ref": "23a8d5a191711dd65633df689bd00f55d4dea8f9",
+          "core_peak_rss_bytes": 0,
+          "core_cpu_s": 0.0,
+          "evidence": "ego/obstacle_rejection/pipeline-report.json",
+          "passed": true
+        },
+        {
+          "id": "outside_observed_map",
+          "start": [
+            0.0,
+            0.0,
+            2.0
+          ],
+          "goal": [
+            20.0,
+            20.0,
+            2.0
+          ],
+          "expected_success": false,
+          "success": false,
+          "reason": "OUTSIDE_BOUNDS",
+          "runtime_s": 0.007838610996259376,
+          "fallback": false,
+          "implementation_sha256": "57fca48dbd6fd44eae6bba25aafb16a75c163a5951613ed26b6bb36f76b2b613",
+          "source_ref": "23a8d5a191711dd65633df689bd00f55d4dea8f9",
+          "core_peak_rss_bytes": 0,
+          "core_cpu_s": 0.0,
+          "evidence": "ego/outside_observed_map/pipeline-report.json",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "backend": "fast_planner",
+      "map_sha256": "0998009c4ad7b2a2ba96927eb5ec3e6e0172f723ae8bce5d724babe06a6c6c3b",
+      "cases": [
+        {
+          "id": "normal",
+          "start": [
+            0.0,
+            0.0,
+            2.0
+          ],
+          "goal": [
+            2.5,
+            3.6,
+            2.0
+          ],
+          "expected_success": true,
+          "success": true,
+          "reason": "native optimized and independently admitted",
+          "runtime_s": 0.5101194699964253,
+          "fallback": false,
+          "implementation_sha256": "90387c140d48d62966a7e16be88046d46f3239e15facf0e5f260fbb6e877c58a",
+          "source_ref": "41be219fe4ecc43bf0e0c2b42a523f8755ccc0bd",
+          "core_peak_rss_bytes": 90263552,
+          "core_cpu_s": 0.1,
+          "evidence": "fast_planner/normal/pipeline-report.json",
+          "duration_s": 18.69667898036351,
+          "segments": 24,
+          "length_m": 4.894918292631907,
+          "derivative_maxima": {
+            "speed": 0.4512326590640683,
+            "acceleration": 0.09246260911299992,
+            "jerk": 0.058774724510041766
+          },
+          "full_curve_observed_clear": true,
+          "observed_inflated_grid_margin_m": 0.02679491924311228,
+          "margin_basis": "distance to blocked/unknown voxel centers minus voxel circumradius; body already inflated",
+          "midpoint_speed_mps": 0.44078753072216514,
+          "passed": true
+        },
+        {
+          "id": "nonzero_initial_pva",
+          "start": [
+            0.0,
+            0.0,
+            2.0
+          ],
+          "velocity": [
+            0.1,
+            0.0,
+            0.0
+          ],
+          "acceleration": [
+            0.02,
+            0.0,
+            0.0
+          ],
+          "goal": [
+            2.5,
+            3.6,
+            2.0
+          ],
+          "expected_success": true,
+          "success": true,
+          "reason": "native optimized and independently admitted",
+          "runtime_s": 0.5323231630027294,
+          "fallback": false,
+          "implementation_sha256": "90387c140d48d62966a7e16be88046d46f3239e15facf0e5f260fbb6e877c58a",
+          "source_ref": "41be219fe4ecc43bf0e0c2b42a523f8755ccc0bd",
+          "core_peak_rss_bytes": 90697728,
+          "core_cpu_s": 0.1,
+          "evidence": "fast_planner/nonzero_initial_pva/pipeline-report.json",
+          "duration_s": 17.906721962879878,
+          "segments": 23,
+          "length_m": 5.015806605255236,
+          "derivative_maxima": {
+            "speed": 0.45125840562515557,
+            "acceleration": 0.10176375582754038,
+            "jerk": 0.0883363127843695
+          },
+          "full_curve_observed_clear": true,
+          "observed_inflated_grid_margin_m": 0.02679491924311228,
+          "margin_basis": "distance to blocked/unknown voxel centers minus voxel circumradius; body already inflated",
+          "midpoint_speed_mps": 0.4436017592566584,
+          "passed": true
+        },
+        {
+          "id": "obstacle_rejection",
+          "start": [
+            0.0,
+            0.0,
+            2.0
+          ],
+          "goal": [
+            1.5,
+            0.0,
+            2.0
+          ],
+          "expected_success": false,
+          "success": false,
+          "reason": "GOAL_BLOCKED_OR_UNOBSERVED",
+          "runtime_s": 0.008469022999634035,
+          "fallback": false,
+          "implementation_sha256": "90387c140d48d62966a7e16be88046d46f3239e15facf0e5f260fbb6e877c58a",
+          "source_ref": "41be219fe4ecc43bf0e0c2b42a523f8755ccc0bd",
+          "core_peak_rss_bytes": 0,
+          "core_cpu_s": 0.0,
+          "evidence": "fast_planner/obstacle_rejection/pipeline-report.json",
+          "passed": true
+        },
+        {
+          "id": "outside_observed_map",
+          "start": [
+            0.0,
+            0.0,
+            2.0
+          ],
+          "goal": [
+            20.0,
+            20.0,
+            2.0
+          ],
+          "expected_success": false,
+          "success": false,
+          "reason": "OUTSIDE_BOUNDS",
+          "runtime_s": 0.007973055995535105,
+          "fallback": false,
+          "implementation_sha256": "90387c140d48d62966a7e16be88046d46f3239e15facf0e5f260fbb6e877c58a",
+          "source_ref": "41be219fe4ecc43bf0e0c2b42a523f8755ccc0bd",
+          "core_peak_rss_bytes": 0,
+          "core_cpu_s": 0.0,
+          "evidence": "fast_planner/outside_observed_map/pipeline-report.json",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "backend": "gcopter",
+      "map_sha256": "0998009c4ad7b2a2ba96927eb5ec3e6e0172f723ae8bce5d724babe06a6c6c3b",
+      "cases": [
+        {
+          "id": "normal",
+          "start": [
+            0.0,
+            0.0,
+            2.0
+          ],
+          "goal": [
+            2.5,
+            3.6,
+            2.0
+          ],
+          "expected_success": true,
+          "success": true,
+          "reason": "native optimized and independently admitted",
+          "runtime_s": 0.9509996140113799,
+          "fallback": false,
+          "implementation_sha256": "218b2c9fc6e916fc28cbfa16768d5997994ddc4db5e6f1915cc142ef70ba747f",
+          "source_ref": "e0444f6d47b84f972ced91746b05feb36ce1fd4f",
+          "core_peak_rss_bytes": 5558272,
+          "core_cpu_s": 0.16,
+          "evidence": "gcopter/normal/pipeline-report.json",
+          "duration_s": 12.700945833285912,
+          "segments": 9,
+          "length_m": 4.734217891987667,
+          "derivative_maxima": {
+            "speed": 0.4500185523001438,
+            "acceleration": 0.30285917428622583,
+            "jerk": 0.8522976697141362
+          },
+          "full_curve_observed_clear": true,
+          "observed_inflated_grid_margin_m": 0.02679491924311228,
+          "margin_basis": "distance to blocked/unknown voxel centers minus voxel circumradius; body already inflated",
+          "midpoint_speed_mps": 0.4499535950319345,
+          "passed": true
+        },
+        {
+          "id": "nonzero_initial_pva",
+          "start": [
+            0.0,
+            0.0,
+            2.0
+          ],
+          "velocity": [
+            0.1,
+            0.0,
+            0.0
+          ],
+          "acceleration": [
+            0.02,
+            0.0,
+            0.0
+          ],
+          "goal": [
+            2.5,
+            3.6,
+            2.0
+          ],
+          "expected_success": true,
+          "success": true,
+          "reason": "native optimized and independently admitted",
+          "runtime_s": 0.9546296009939397,
+          "fallback": false,
+          "implementation_sha256": "218b2c9fc6e916fc28cbfa16768d5997994ddc4db5e6f1915cc142ef70ba747f",
+          "source_ref": "e0444f6d47b84f972ced91746b05feb36ce1fd4f",
+          "core_peak_rss_bytes": 5509120,
+          "core_cpu_s": 0.17,
+          "evidence": "gcopter/nonzero_initial_pva/pipeline-report.json",
+          "duration_s": 12.645201176629353,
+          "segments": 9,
+          "length_m": 4.790558179864292,
+          "derivative_maxima": {
+            "speed": 0.4500436891686373,
+            "acceleration": 0.2985882304443337,
+            "jerk": 0.8802366040919742
+          },
+          "full_curve_observed_clear": true,
+          "observed_inflated_grid_margin_m": 0.02679491924311228,
+          "margin_basis": "distance to blocked/unknown voxel centers minus voxel circumradius; body already inflated",
+          "midpoint_speed_mps": 0.44934254251944117,
+          "passed": true
+        },
+        {
+          "id": "obstacle_rejection",
+          "start": [
+            0.0,
+            0.0,
+            2.0
+          ],
+          "goal": [
+            1.5,
+            0.0,
+            2.0
+          ],
+          "expected_success": false,
+          "success": false,
+          "reason": "GOAL_BLOCKED_OR_UNOBSERVED",
+          "runtime_s": 0.005015521004679613,
+          "fallback": false,
+          "implementation_sha256": "218b2c9fc6e916fc28cbfa16768d5997994ddc4db5e6f1915cc142ef70ba747f",
+          "source_ref": "e0444f6d47b84f972ced91746b05feb36ce1fd4f",
+          "core_peak_rss_bytes": 0,
+          "core_cpu_s": 0.0,
+          "evidence": "gcopter/obstacle_rejection/pipeline-report.json",
+          "passed": true
+        },
+        {
+          "id": "outside_observed_map",
+          "start": [
+            0.0,
+            0.0,
+            2.0
+          ],
+          "goal": [
+            20.0,
+            20.0,
+            2.0
+          ],
+          "expected_success": false,
+          "success": false,
+          "reason": "OUTSIDE_BOUNDS",
+          "runtime_s": 0.0048482160054845735,
+          "fallback": false,
+          "implementation_sha256": "218b2c9fc6e916fc28cbfa16768d5997994ddc4db5e6f1915cc142ef70ba747f",
+          "source_ref": "e0444f6d47b84f972ced91746b05feb36ce1fd4f",
+          "core_peak_rss_bytes": 0,
+          "core_cpu_s": 0.0,
+          "evidence": "gcopter/outside_observed_map/pipeline-report.json",
+          "passed": true
+        }
+      ]
+    }
+  ],
+  "all_methods_present": true,
+  "same_map": true,
+  "passed": true
+}

@@ -8,7 +8,7 @@ import rclpy
 from diagnostic_msgs.msg import DiagnosticArray
 from geometry_msgs.msg import PoseStamped
 from uav_lab_interfaces.srv import PlanPath
-from uav_lab_interfaces.action import Navigate
+from uav_lab_interfaces.action import Navigate, NavigateRoute
 from rclpy.action import ActionClient
 from uav_lab_tools.cli import Operator
 from .fixture import write_fixture
@@ -51,10 +51,41 @@ class Navigator:
         finally:self.node.destroy_client(client)
 
     def goto(self,target):
-        action=ActionClient(self.node,Navigate,'/uav001/navigation/navigate');handle=None;submitted=None
+        return self.execute_action(Navigate,Navigate.Goal(goal=pose(target)),'navigate')
+
+    def route(self,controls):
+        from .route_navigation import validate_controls
+        validate_controls(controls)
+        return self.execute_action(NavigateRoute,NavigateRoute.Goal(controls=controls),'route')
+
+    def confirm_reply_discovery(self, action, kind):
+        """Confirm a cold request/reply path before sending any real motion.
+
+        Empty Navigate frames and empty route controls are always rejected by
+        the server before taking motion ownership. Only these no-op probes may
+        be retried when DDS request discovery precedes reply discovery.
+        """
+        errors = []
+        for _ in range(3):
+            try:
+                handle = self.operator.wait(action.send_goal_async(kind.Goal()), 1.)
+            except RuntimeError as error:
+                errors.append(str(error))
+                continue
+            if handle.accepted:
+                try:
+                    self.operator.wait(handle.cancel_goal_async(), 1.)
+                finally:
+                    raise RuntimeError('navigation discovery probe unexpectedly accepted; no motion goal submitted')
+            return
+        raise RuntimeError('navigation reply discovery unconfirmed; no motion goal submitted: ' + '; '.join(errors))
+
+    def execute_action(self,kind,goal,name):
+        action=ActionClient(self.node,kind,'/uav001/navigation/'+name);handle=None;submitted=None
         try:
             if not action.wait_for_server(timeout_sec=5):raise RuntimeError('navigation action unavailable')
-            submitted=action.send_goal_async(Navigate.Goal(goal=pose(target)))
+            self.confirm_reply_discovery(action, kind)
+            submitted=action.send_goal_async(goal)
             handle=self.operator.wait(submitted)
             if not handle.accepted:raise RuntimeError('navigation request rejected')
             result=self.operator.wait(handle.get_result_async()).result
@@ -75,6 +106,35 @@ class Navigator:
         finally:action.destroy()
 
     def destroy(self):self.operator.action.destroy()
+
+    def landed(self):
+        final=self.operator.status();deadline=time.monotonic()+5
+        while (final.get('armed')!='False' or final.get('landed')!='True') and time.monotonic()<deadline:
+            self.operator.spin(.1);final=self.operator.status()
+        if final.get('armed')!='False' or final.get('landed')!='True':raise RuntimeError('landing/disarm not confirmed')
+
+    def route_demo(self,path,runs):
+        data=json.loads(Path(path).read_text())
+        if data.get('frame')!='odom' or data.get('dwell'):raise ValueError('continuous odom route without dwell required')
+        controls=[pose(point) for point in data['controls']]
+        from .route_navigation import validate_controls
+        validate_controls(controls)
+        results=[]
+        for index in range(runs):
+            status=self.operator.status()
+            if status.get('armed')!='False' or status.get('landed')!='True':raise RuntimeError('demo requires landed disarmed vehicle')
+            self.operator.service('arm')
+            try:
+                self.operator.flight('TAKEOFF',height=2.)
+                result=self.route(controls)
+                if not result['success']:raise RuntimeError('route failed: '+str(result))
+                self.operator.flight('LAND');self.landed()
+            except (RuntimeError,KeyboardInterrupt) as error:
+                try:self.operator.flight('LAND')
+                except RuntimeError as failure:raise RuntimeError(str(error)+'; landing failed: '+str(failure)) from error
+                raise
+            results.append({'run':index+1,'route':result,'controls':len(controls),'landed_disarmed':True})
+        return {'success':True,'runs':results}
 
     def demo(self,runs):
         results=[]
@@ -110,6 +170,7 @@ def main(args=None):
     for command in ('plan','goto'):
         child=sub.add_parser(command);child.add_argument('target',nargs=3,type=float)
     demo=sub.add_parser('demo');demo.add_argument('--runs',type=int,default=3)
+    route=sub.add_parser('route-demo');route.add_argument('route',type=Path);route.add_argument('--runs',type=int,default=1)
     f=sub.add_parser('fixture');f.add_argument('output',type=Path)
     b=sub.add_parser('benchmark');b.add_argument('input',type=Path);b.add_argument('output',type=Path)
     options=p.parse_args(args);node=None;nav=None
@@ -124,7 +185,7 @@ def main(args=None):
             elif options.command=='goto':result=nav.goto(options.target)
             else:
                 if options.runs<=0:raise ValueError('positive runs required')
-                result=nav.demo(options.runs)
+                result=nav.route_demo(options.route,options.runs) if options.command=='route-demo' else nav.demo(options.runs)
         print(json.dumps(result,allow_nan=False));return 0 if result.get('success',result.get('ready',result.get('passed',True))) not in (False,'False') else 1
     except (ValueError,RuntimeError,KeyboardInterrupt,OSError) as error:
         print(json.dumps({'success':False,'reason':str(error)}));return 1

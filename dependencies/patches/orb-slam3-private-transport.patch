@@ -1,0 +1,120 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 016e743..968721f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -14,12 +14,12 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
+ 
+ # Check C++11 or C++0x support
+ include(CheckCXXCompilerFlag)
+-CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
++CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX11)
+ CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+ if(COMPILER_SUPPORTS_CXX11)
+-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
++   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+    add_definitions(-DCOMPILEDWITHC11)
+-   message(STATUS "Using flag -std=c++11.")
++   message(STATUS "Using flag -std=c++14.")
+ elseif(COMPILER_SUPPORTS_CXX0X)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+    add_definitions(-DCOMPILEDWITHC0X)
+@@ -120,7 +120,7 @@ ${OpenCV_LIBS}
+ ${EIGEN3_LIBS}
+ ${Pangolin_LIBRARIES}
+ ${PROJECT_SOURCE_DIR}/Thirdparty/DBoW2/lib/libDBoW2.so
+-${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
++g2o
+ -lboost_serialization
+ -lcrypto
+ )
+@@ -388,3 +388,7 @@ if(realsense2_FOUND)
+             Examples_old/Stereo-Inertial/stereo_inertial_realsense_D435i.cc)
+     target_link_libraries(stereo_inertial_realsense_D435i_old ${PROJECT_NAME})
+ endif()
++
++install(TARGETS ORB_SLAM3 DESTINATION lib)
++
++install(TARGETS g2o DESTINATION lib)
+diff --git a/Thirdparty/DBoW2/CMakeLists.txt b/Thirdparty/DBoW2/CMakeLists.txt
+index c312b25..512addf 100644
+--- a/Thirdparty/DBoW2/CMakeLists.txt
++++ b/Thirdparty/DBoW2/CMakeLists.txt
+@@ -43,3 +43,5 @@ include_directories(${OpenCV_INCLUDE_DIRS})
+ add_library(DBoW2 SHARED ${SRCS_DBOW2} ${SRCS_DUTILS})
+ target_link_libraries(DBoW2 ${OpenCV_LIBS})
+ 
++
++install(TARGETS DBoW2 DESTINATION lib)
+diff --git a/include/System.h b/include/System.h
+index 872c86e..451ec16 100644
+--- a/include/System.h
++++ b/include/System.h
+@@ -174,6 +174,8 @@ public:
+     // Information from most recent processed frame
+     // You can call this right after TrackMonocular (or stereo or RGBD)
+     int GetTrackingState();
++    bool GetMetricImuPose(Eigen::Matrix4f& pose, int& map_id,
++                         Eigen::Matrix4f* previous_pose=nullptr, double* previous_stamp=nullptr);
+     std::vector<MapPoint*> GetTrackedMapPoints();
+     std::vector<cv::KeyPoint> GetTrackedKeyPointsUn();
+ 
+diff --git a/src/System.cc b/src/System.cc
+index 60d9c51..8f44e32 100644
+--- a/src/System.cc
++++ b/src/System.cc
+@@ -1547,3 +1547,55 @@ string System::CalculateCheckSum(string filename, int type)
+ 
+ } //namespace ORB_SLAM
+ 
++
++// Platform observation accessor: call immediately after TrackMonocular on its owner thread.
++// No estimator state or optimization is changed.
++namespace ORB_SLAM3 {
++bool System::GetMetricImuPose(Eigen::Matrix4f& pose, int& map_id,
++                              Eigen::Matrix4f* previous_pose, double* previous_stamp) {
++    if (GetTrackingState()!=Tracking::OK) return false;
++    auto map=mpAtlas->GetCurrentMap();
++    if (!map) return false;
++    unique_lock<mutex> lock(map->mMutexMapUpdate);
++    if (!map->isImuInitialized()) return false;
++    map_id=static_cast<int>(map->GetId());
++    pose=mpTracker->mCurrentFrame.GetImuPose().matrix();
++    if (previous_pose) previous_pose->setConstant(std::numeric_limits<float>::quiet_NaN());
++    if (previous_stamp) *previous_stamp=std::numeric_limits<double>::quiet_NaN();
++    // Reconstruct the last two frames against the *current* keyframe poses,
++    // using the same culled-keyframe traversal as SaveTrajectoryEuRoC.
++    // This exposes observations only; estimator math/state are unchanged.
++    auto& poses=mpTracker->mlRelativeFramePoses;
++    auto& refs=mpTracker->mlpReferences;
++    auto& times=mpTracker->mlFrameTimes;
++    auto& lost=mpTracker->mlbLost;
++    if (previous_pose && previous_stamp && poses.size()>=2 &&
++        refs.size()==poses.size() && times.size()==poses.size() && lost.size()==poses.size()) {
++        auto p=poses.rbegin(); auto r=refs.rbegin(); auto t=times.rbegin(); auto l=lost.rbegin();
++        auto reconstruct=[&](const Sophus::SE3f& relative, KeyFrame* reference, bool failed,
++                             Eigen::Matrix4f& result) {
++            if (failed || !reference) return false;
++            Sophus::SE3f chain;
++            int traversed=0;
++            while (reference->isBad()) {
++                if (++traversed>10000) return false;
++                chain=chain*reference->mTcp;reference=reference->GetParent();
++                if (!reference) return false;
++            }
++            if (reference->GetMap()!=map) return false;
++            result=((relative*chain*reference->GetPose()).inverse()*
++                    mpTracker->mCurrentFrame.mImuCalib.mTcb).matrix();
++            return result.allFinite();
++        };
++        Eigen::Matrix4f current, previous;
++        if (std::abs(*t-mpTracker->mCurrentFrame.mTimeStamp)<1e-6 &&
++            reconstruct(*p,*r,*l,current)) {
++            ++p;++r;++t;++l;
++            if (reconstruct(*p,*r,*l,previous)) {
++                pose=current;*previous_pose=previous;*previous_stamp=*t;
++            }
++        }
++    }
++    return pose.allFinite();
++}
++}

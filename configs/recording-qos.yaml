@@ -9,3 +9,5 @@
 /uav001/odometry: {history: keep_last, depth: 100, reliability: reliable, durability: volatile}
 /uav001/path: {history: keep_last, depth: 20, reliability: reliable, durability: volatile}
 /uav001/diagnostics: {history: keep_last, depth: 100, reliability: reliable, durability: volatile}
+/uav001/gnss/fix: {history: keep_last, depth: 100, reliability: best_effort, durability: volatile}
+/uav001/sensors/timed_diagnostics: {history: keep_last, depth: 100, reliability: reliable, durability: volatile}

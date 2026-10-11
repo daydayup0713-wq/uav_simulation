@@ -70,3 +70,45 @@ def test_localization_publishes_frozen_alignment_for_navigation(monkeypatch,isol
         assert output and output[-1].transform.translation.x==2.
         assert output[-1].header.frame_id=='lio_odom' and output[-1].child_frame_id=='odom'
     finally:client.destroy_node();node.destroy_node();rclpy.shutdown()
+
+
+def test_sensor_discovery_before_first_clock_waits_without_latching_failure(monkeypatch, tmp_path, isolated_ros_domain):
+    from uav_lab_navigation.node import NavigationNode
+    from sensor_msgs.msg import PointCloud2, PointField
+    from rosgraph_msgs.msg import Clock
+    from rclpy.qos import qos_profile_sensor_data
+    monkeypatch.delenv('LAB_RUN_DIR', raising=False)
+    monkeypatch.setenv('ROS_LOG_DIR', str(tmp_path / 'ros'))
+    rclpy.init(domain_id=isolated_ros_domain)
+    node = NavigationNode()
+    publisher = rclpy.create_node('clock_discovery_test')
+    clock = publisher.create_publisher(Clock, '/clock', qos_profile_sensor_data)
+    try:
+        node.alignment = np.eye(4)
+        node.quality_ready = True
+        node.quality_at = node.pose_at = time.monotonic()
+        node.history.add(10.1, [0., 0., 1.], [0., 0., 0., 1.])
+        cloud = PointCloud2()
+        cloud.header.frame_id = 'lidar_link'
+        cloud.header.stamp.sec = 10
+        cloud.header.stamp.nanosec = 100000000
+        xyz = np.column_stack((np.full(1000, 1.5), np.random.default_rng(4).uniform(-2, 2, (1000, 2)))).astype('<f4')
+        cloud.width, cloud.height, cloud.point_step, cloud.row_step = 1000, 1, 12, 12000
+        cloud.fields = [PointField(name=n, offset=i*4, datatype=7, count=1) for i, n in enumerate('xyz')]
+        cloud.data = xyz.tobytes()
+        node.on_cloud(cloud)
+        assert node.get_clock().now().nanoseconds == 0
+        node.map_cycle()
+        assert not node.failure
+        assert node.grid.version == 0 and not node.report()['ready']
+        deadline = time.monotonic() + .6
+        while node.get_clock().now().nanoseconds == 0 and time.monotonic() < deadline:
+            message = Clock()
+            message.clock.sec, message.clock.nanosec = 10, 200000000
+            clock.publish(message)
+            rclpy.spin_once(node, timeout_sec=.01)
+        node.map_cycle()
+        assert node.map_stamp == 10.1 and node.grid.version > 0
+        assert not node.failure
+    finally:
+        publisher.destroy_node(); node.destroy_node(); rclpy.shutdown()

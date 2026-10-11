@@ -1,0 +1,150 @@
+diff --git a/vins_estimator/src/estimator/estimator.h b/vins_estimator/src/estimator/estimator.h
+index 05d5fde..8ecf831 100644
+--- a/vins_estimator/src/estimator/estimator.h
++++ b/vins_estimator/src/estimator/estimator.h
+@@ -12,7 +12,7 @@
+ #include <thread>
+ #include <mutex>
+ #include <std_msgs/Header.h>
+-#include <std_msgs/Float32.h>
++
+ #include <ceres/ceres.h>
+ #include <unordered_map>
+ #include <queue>
+@@ -124,7 +124,7 @@ class Estimator
+     Vector3d back_P0, last_P, last_P0;
+     double Headers[(WINDOW_SIZE + 1)];
+ 
+-    IntegrationBase *pre_integrations[(WINDOW_SIZE + 1)];
++    IntegrationBase *pre_integrations[(WINDOW_SIZE + 1)]{};
+     Vector3d acc_0, gyr_0;
+ 
+     vector<double> dt_buf[(WINDOW_SIZE + 1)];
+@@ -159,11 +159,11 @@ class Estimator
+ 
+     int loop_window_index;
+ 
+-    MarginalizationInfo *last_marginalization_info;
++    MarginalizationInfo *last_marginalization_info = nullptr;
+     vector<double *> last_marginalization_parameter_blocks;
+ 
+     map<double, ImageFrame> all_image_frame;
+-    IntegrationBase *tmp_pre_integration;
++    IntegrationBase *tmp_pre_integration = nullptr;
+ 
+     Eigen::Vector3d initP;
+     Eigen::Matrix3d initR;
+diff --git a/vins_estimator/src/estimator/parameters.cpp b/vins_estimator/src/estimator/parameters.cpp
+index 8c8b77a..1a2e251 100644
+--- a/vins_estimator/src/estimator/parameters.cpp
++++ b/vins_estimator/src/estimator/parameters.cpp
+@@ -47,22 +47,6 @@ int SHOW_TRACK;
+ int FLOW_BACK;
+ 
+ 
+-template <typename T>
+-T readParam(ros::NodeHandle &n, std::string name)
+-{
+-    T ans;
+-    if (n.getParam(name, ans))
+-    {
+-        ROS_INFO_STREAM("Loaded " << name << ": " << ans);
+-    }
+-    else
+-    {
+-        ROS_ERROR_STREAM("Failed to load " << name);
+-        n.shutdown();
+-    }
+-    return ans;
+-}
+-
+ void readParameters(std::string config_file)
+ {
+     FILE *fh = fopen(config_file.c_str(),"r");
+diff --git a/vins_estimator/src/utility/visualization.h b/vins_estimator/src/utility/visualization.h
+index d2e7e4e..9f8329b 100644
+--- a/vins_estimator/src/utility/visualization.h
++++ b/vins_estimator/src/utility/visualization.h
+@@ -1,66 +1,19 @@
+-/*******************************************************
+- * Copyright (C) 2019, Aerial Robotics Group, Hong Kong University of Science and Technology
+- * 
+- * This file is part of VINS.
+- * 
+- * Licensed under the GNU General Public License v3.0;
+- * you may not use this file except in compliance with the License.
+- *******************************************************/
+-
++// Platform ROS 2 transport hooks; original upstream GPL-3.0 notices retained in source repository.
+ #pragma once
+-
+-#include <ros/ros.h>
++#include <functional>
+ #include <std_msgs/Header.h>
+-#include <std_msgs/Float32.h>
+-#include <std_msgs/Bool.h>
+-#include <sensor_msgs/Imu.h>
+-#include <sensor_msgs/PointCloud.h>
+-#include <sensor_msgs/Image.h>
+-#include <sensor_msgs/image_encodings.h>
+-#include <cv_bridge/cv_bridge.h>
+-#include <nav_msgs/Path.h>
+-#include <nav_msgs/Odometry.h>
+-#include <geometry_msgs/PointStamped.h>
+-#include <visualization_msgs/Marker.h>
+-#include <tf/transform_broadcaster.h>
+-#include "CameraPoseVisualization.h"
+-#include <eigen3/Eigen/Dense>
+ #include "../estimator/estimator.h"
+-#include "../estimator/parameters.h"
+-#include <fstream>
+-
+-extern ros::Publisher pub_odometry;
+-extern ros::Publisher pub_path, pub_pose;
+-extern ros::Publisher pub_cloud, pub_map;
+-extern ros::Publisher pub_key_poses;
+-extern ros::Publisher pub_ref_pose, pub_cur_pose;
+-extern ros::Publisher pub_key;
+-extern nav_msgs::Path path;
+-extern ros::Publisher pub_pose_graph;
+-extern int IMAGE_ROW, IMAGE_COL;
+-
+-void registerPub(ros::NodeHandle &n);
+-
+-void pubLatestOdometry(const Eigen::Vector3d &P, const Eigen::Quaterniond &Q, const Eigen::Vector3d &V, double t);
+-
+-void pubTrackImage(const cv::Mat &imgTrack, const double t);
+-
+-void printStatistics(const Estimator &estimator, double t);
+-
+-void pubOdometry(const Estimator &estimator, const std_msgs::Header &header);
+-
+-void pubInitialGuess(const Estimator &estimator, const std_msgs::Header &header);
+-
+-void pubKeyPoses(const Estimator &estimator, const std_msgs::Header &header);
+-
+-void pubCameraPose(const Estimator &estimator, const std_msgs::Header &header);
+-
+-void pubPointCloud(const Estimator &estimator, const std_msgs::Header &header);
+-
+-void pubTF(const Estimator &estimator, const std_msgs::Header &header);
+-
+-void pubKeyframe(const Estimator &estimator);
+-
+-void pubRelocalization(const Estimator &estimator);
+-
+-void pubCar(const Estimator & estimator, const std_msgs::Header &header);
++extern std::function<void(double,const Eigen::Vector3d&,const Eigen::Matrix3d&,const Eigen::Vector3d&)> platform_odometry;
++extern std::function<void(double,const std::vector<Eigen::Vector3d>&)> platform_landmarks;
++void pubLatestOdometry(const Eigen::Vector3d&,const Eigen::Quaterniond&,const Eigen::Vector3d&,double);
++void pubTrackImage(const cv::Mat&,double);
++void printStatistics(const Estimator&,double);
++void pubOdometry(const Estimator&,const std_msgs::Header&);
++void pubInitialGuess(const Estimator&,const std_msgs::Header&);
++void pubKeyPoses(const Estimator&,const std_msgs::Header&);
++void pubCameraPose(const Estimator&,const std_msgs::Header&);
++void pubPointCloud(const Estimator&,const std_msgs::Header&);
++void pubTF(const Estimator&,const std_msgs::Header&);
++void pubKeyframe(const Estimator&);
++void pubRelocalization(const Estimator&);
++void pubCar(const Estimator&,const std_msgs::Header&);

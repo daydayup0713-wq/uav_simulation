@@ -28,6 +28,8 @@ def test_cli_sigint_preserves_motion_and_landing_semantics(monkeypatch, tmp_path
     node = rclpy.create_node('cancel_test_server')
     started, canceled, stop = threading.Event(), threading.Event(), threading.Event()
     def accept(goal):
+        if goal.operation == 255:
+            return GoalResponse.REJECT
         started.set()
         time.sleep(response_delay)
         return GoalResponse.ACCEPT if accepted else GoalResponse.REJECT

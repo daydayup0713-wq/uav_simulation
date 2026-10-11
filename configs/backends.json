@@ -1,0 +1,250 @@
+{
+  "schema": 1,
+  "groups": {
+    "synchronous_lidar_imu": [
+      "synchronous_pointcloud",
+      "imu_6axis"
+    ],
+    "livox_visual_inertial": [
+      "timed_livox_pointcloud",
+      "imu_6axis",
+      "monocular_calibrated"
+    ],
+    "livox_visual_inertial_rtk": [
+      "timed_livox_pointcloud",
+      "imu_6axis",
+      "monocular_calibrated",
+      "gnss_rtk"
+    ],
+    "mechanical_inertial": [
+      "timed_ring_pointcloud",
+      "imu_attitude"
+    ],
+    "monocular_inertial": [
+      "monocular_calibrated",
+      "imu_6axis"
+    ],
+    "livox_inertial": [
+      "timed_livox_pointcloud",
+      "imu_6axis"
+    ],
+    "mechanical_lidar_imu": [
+      "timed_ring_pointcloud",
+      "imu_6axis"
+    ],
+    "mechanical_visual_imu": [
+      "timed_ring_pointcloud",
+      "imu_6axis",
+      "monocular_calibrated"
+    ]
+  },
+  "backends": [
+    {
+      "id": "glim",
+      "role": "localization",
+      "source_ref": "65a5562c6b8906e60693c63cc0c95de885426352",
+      "groups": [
+        "synchronous_lidar_imu",
+        "livox_visual_inertial",
+        "mechanical_inertial",
+        "livox_inertial",
+        "mechanical_lidar_imu"
+      ],
+      "capabilities": {
+        "odometry": true,
+        "loop_closure": true,
+        "relocalization": false,
+        "global_optimization": true,
+        "visual_fusion": false
+      },
+      "implementation_sha256": "3c6ce43f01c3033b4d63969d40461f4a4be2b9215953c90edd893469adf63b95"
+    },
+    {
+      "id": "fast_lio2",
+      "role": "localization",
+      "source_ref": "a4743b095409588842a5b30ddfa27e29d2f99164",
+      "groups": [
+        "livox_visual_inertial",
+        "livox_visual_inertial_rtk",
+        "mechanical_inertial",
+        "livox_inertial",
+        "mechanical_lidar_imu"
+      ],
+      "capabilities": {
+        "odometry": true,
+        "loop_closure": false,
+        "relocalization": false,
+        "global_optimization": false
+      },
+      "implementation_sha256": "51ebfa4b076adbfa79ec91a4e7e7242e36e0e9be6d096602edc7097759621b87"
+    },
+    {
+      "id": "fast_livo2",
+      "role": "localization",
+      "source_ref": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+      "groups": [
+        "livox_visual_inertial",
+        "livox_visual_inertial_rtk",
+        "mechanical_visual_imu"
+      ],
+      "capabilities": {
+        "odometry": true,
+        "loop_closure": false,
+        "relocalization": false,
+        "global_optimization": false,
+        "visual_fusion": true
+      },
+      "implementation_sha256": "9add234427f762ad902cada2686fa1eb78b2ff822dc26086db3a9b831b89aea1"
+    },
+    {
+      "id": "fast_livo2_rtk",
+      "role": "localization",
+      "source_ref": "b2f9d89fbf825096a4677d2cae44c538c7538864",
+      "groups": [
+        "livox_visual_inertial_rtk"
+      ],
+      "capabilities": {
+        "odometry": true,
+        "loop_closure": false,
+        "relocalization": false,
+        "global_optimization": "offline_rtk",
+        "visual_fusion": true
+      },
+      "implementation_sha256": "6ac03469b808abd98ab78bf7c23ad2c65699d404c74f8548ace02847f92d6d8f"
+    },
+    {
+      "id": "orb_slam3",
+      "role": "localization",
+      "source_ref": "4452a3c4ab75b1cde34e5505a36ec3f9edcdc4c4",
+      "groups": [
+        "monocular_inertial",
+        "livox_visual_inertial",
+        "livox_visual_inertial_rtk"
+      ],
+      "capabilities": {
+        "odometry": true,
+        "loop_closure": true,
+        "relocalization": true,
+        "global_optimization": true,
+        "visual_fusion": true
+      },
+      "implementation_sha256": "2ecf81439fb55437ff5ffc15ed098181eda5051373b9e92d9e05d7a52dbe0c50"
+    },
+    {
+      "id": "lio_sam",
+      "role": "localization",
+      "source_ref": "08af3f32f01725372d4269838dc44c19c6d9e76b",
+      "groups": [
+        "mechanical_inertial"
+      ],
+      "capabilities": {
+        "odometry": true,
+        "loop_closure": true,
+        "relocalization": false,
+        "global_optimization": true
+      },
+      "implementation_sha256": "e7f1575d9e2aace9da8911e16d097669410669571d2a646c95924b9f335f7602"
+    },
+    {
+      "id": "vins_fusion",
+      "role": "localization",
+      "source_ref": "be55a937a57436548ddfb1bd324bc1e9a9e828e0",
+      "groups": [
+        "monocular_inertial",
+        "livox_visual_inertial",
+        "livox_visual_inertial_rtk"
+      ],
+      "capabilities": {
+        "odometry": true,
+        "loop_closure": true,
+        "relocalization": true,
+        "global_optimization": true,
+        "visual_fusion": true
+      },
+      "implementation_sha256": "6b0ff0f79c0658a304751906ef5ef61901e4c17bb19a8fbd615b7b1a21bd9c26"
+    },
+    {
+      "id": "astar",
+      "role": "planning",
+      "source_ref": "e295a54cd52e665edf8c06436d9fb195f462dc28",
+      "groups": [
+        "synchronous_lidar_imu",
+        "livox_visual_inertial",
+        "livox_visual_inertial_rtk",
+        "mechanical_inertial",
+        "monocular_inertial",
+        "livox_inertial",
+        "mechanical_lidar_imu",
+        "mechanical_visual_imu"
+      ],
+      "capabilities": {
+        "observed_space_only": true,
+        "continuous_trajectory": true,
+        "online_replan": true
+      },
+      "implementation_sha256": "1088f15dd53877419061b1e366bc4ca7b4b74a0d50b888affc76f77c3258ede5"
+    },
+    {
+      "id": "ego",
+      "role": "planning",
+      "source_ref": "23a8d5a191711dd65633df689bd00f55d4dea8f9",
+      "groups": [
+        "synchronous_lidar_imu",
+        "livox_visual_inertial",
+        "livox_visual_inertial_rtk",
+        "mechanical_inertial",
+        "monocular_inertial",
+        "livox_inertial",
+        "mechanical_lidar_imu",
+        "mechanical_visual_imu"
+      ],
+      "capabilities": {
+        "continuous_trajectory": true,
+        "online_replan": true,
+        "single_drone": true
+      },
+      "implementation_sha256": "57fca48dbd6fd44eae6bba25aafb16a75c163a5951613ed26b6bb36f76b2b613"
+    },
+    {
+      "id": "fast_planner",
+      "role": "planning",
+      "source_ref": "41be219fe4ecc43bf0e0c2b42a523f8755ccc0bd",
+      "groups": [
+        "synchronous_lidar_imu",
+        "livox_visual_inertial",
+        "livox_visual_inertial_rtk",
+        "mechanical_inertial",
+        "monocular_inertial",
+        "livox_inertial",
+        "mechanical_lidar_imu",
+        "mechanical_visual_imu"
+      ],
+      "capabilities": {
+        "continuous_trajectory": true,
+        "online_replan": true
+      },
+      "implementation_sha256": "90387c140d48d62966a7e16be88046d46f3239e15facf0e5f260fbb6e877c58a"
+    },
+    {
+      "id": "gcopter",
+      "role": "planning",
+      "source_ref": "e0444f6d47b84f972ced91746b05feb36ce1fd4f",
+      "groups": [
+        "synchronous_lidar_imu",
+        "livox_visual_inertial",
+        "livox_visual_inertial_rtk",
+        "mechanical_inertial",
+        "monocular_inertial",
+        "livox_inertial",
+        "mechanical_lidar_imu",
+        "mechanical_visual_imu"
+      ],
+      "capabilities": {
+        "continuous_trajectory": true,
+        "online_replan": true,
+        "requires_safe_corridor": true
+      },
+      "implementation_sha256": "218b2c9fc6e916fc28cbfa16768d5997994ddc4db5e6f1915cc142ef70ba747f"
+    }
+  ]
+}

@@ -86,6 +86,36 @@ def test_imu_orientation_is_not_an_algorithm_observation():
     assert (msg.orientation.x,msg.orientation.y,msg.orientation.z,msg.orientation.w)==(0,0,0,1)
     assert msg.header.stamp.nanosec==123 and msg.angular_velocity.x==1
 
+def test_declared_noisy_attitude_allowed_but_ideal_attitude_rejected(tmp_path):
+    from sensor_model import prepare_sensors
+    c=prepare_sensors(ROOT,tmp_path,sensor_profile='mechanical')['calibration']
+    audit=module().SensorAudit(c)
+    msg=N(header=stamp(10**9,'imu_link'),angular_velocity=N(x=0.,y=0.,z=0.),
+          linear_acceleration=N(x=0.,y=0.,z=9.81),orientation=N(x=.001,y=0.,z=0.,w=(1-.001**2)**.5),
+          orientation_covariance=[.005**2,0.,0.,0.,.005**2,0.,0.,0.,.005**2])
+    audit.observe('/uav001/imu/data',msg,10**9)
+    assert not audit.errors
+    msg.orientation_covariance=[0.]*9
+    audit.observe('/uav001/imu/data',msg,10**9)
+    assert any('attitude' in e for e in audit.errors)
+
+def test_timed_cloud_requires_real_interval_and_matching_channel_fields(tmp_path):
+    import numpy as np
+    from sensor_model import prepare_sensors
+    from uav_lab_experiments.timed_sensors import point_records
+    c=prepare_sensors(ROOT,tmp_path,sensor_profile='mechanical')['calibration']
+    count=c['lidar']['horizontal_samples']*16
+    records=point_records(np.column_stack([np.ones(count),np.ones(count),np.arange(count)%16*.1]),
+                          np.arange(count)/(count*10),np.arange(count)%16,'mechanical')
+    msg=N(header=stamp(10**9,'lidar_link'),width=count,height=1,point_step=24,row_step=count*24,
+          is_bigendian=False,fields=[N(name=n,offset=records.dtype.fields[n][1],datatype=4 if n=='ring' else 7,count=1)
+                                   for n in records.dtype.names if n!='padding'],data=records.tobytes())
+    audit=module().SensorAudit(c);audit.observe('/uav001/lidar/points',msg,1100000000)
+    assert not audit.errors
+    records['time']=0.;msg.data=records.tobytes()
+    audit.observe('/uav001/lidar/points',msg,1100000000)
+    assert any('sampling interval' in e for e in audit.errors)
+
 def test_long_sensor_outage_cannot_hide_in_average_frequency():
     stats=module().StreamStats(10)
     for index in range(1001):

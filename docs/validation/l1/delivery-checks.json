@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "date": "2026-10-11",
+  "source_revision": "f9a8fde2f1cc168f6d2680c77aa746590638ec4a",
+  "scope": "Final native full regression after delivery report edits; control and algorithm inputs unchanged from qualified source. Subsequent delivery commit contains documentation/evidence only.",
+  "native_suite": {
+    "passed": 506,
+    "skipped": 1,
+    "warnings": 2,
+    "elapsed_s": 63.83,
+    "raw_log": {
+      "path": ".runtime/l1-final-delivery-suite.log",
+      "sha256": "b5684395feb5d693c47a3415b8f1e2f78b2ac50708ce1d0689d03ebcede7bee8",
+      "bytes": 1449
+    }
+  },
+  "artifact_check": {
+    "control_matches_current_pair": true,
+    "witness_artifacts_verified": 1690,
+    "summary_artifacts_verified": 172,
+    "flight_rows": 34,
+    "current_normal_pass_rows": 1,
+    "web_cases": 10
+  },
+  "deferred_minors": []
+}

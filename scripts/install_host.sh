@@ -23,8 +23,8 @@ echo 'deb [signed-by=/usr/share/keyrings/gazebo-archive-keyring.gpg] https://pac
 "${SUDO[@]}" apt-get update
 "${SUDO[@]}" apt-get install -y build-essential cmake ninja-build git ccache pkg-config \
   python3-pip python3-dev python3-colcon-common-extensions python3-pytest python3-empy \
-  python3-jinja2 python3-numpy python3-scipy python3-toml python3-yaml python3-packaging python3-jsonschema python3-serial \
-  libeigen3-dev libxml2-dev libssl-dev libtinyxml2-dev libspdlog-dev libasio-dev libfoonathan-memory-dev \
+  python3-jinja2 python3-numpy python3-scipy python3-toml python3-yaml python3-packaging python3-jsonschema python3-serial python3-psutil python3-opencv \
+  nlohmann-json3-dev libeigen3-dev libxml2-dev libssl-dev libtinyxml2-dev libspdlog-dev libasio-dev libfoonathan-memory-dev \
   libboost-all-dev libtbb-dev ros-humble-gtsam ros-humble-ament-cmake-auto \
   ros-humble-cv-bridge ros-humble-image-transport \
   gz-harmonic ros-humble-ros-base ros-humble-ros-gzharmonic ros-humble-rviz2 \
@@ -32,6 +32,7 @@ echo 'deb [signed-by=/usr/share/keyrings/gazebo-archive-keyring.gpg] https://pac
   ros-humble-std-srvs ros-humble-rosidl-default-generators ros-humble-sensor-msgs \
   ros-humble-rosbag2 ros-humble-rosbag2-py ros-humble-rosbag2-storage-default-plugins
 /usr/bin/python3 -m pip install --user -r "$ROOT/dependencies/build-requirements.txt"
+/usr/bin/python3 -m pip install --user -r "$ROOT/dependencies/observation-requirements.txt"
 [ "$INSTALL_SCOPE" != --system-only ] || exit 0
 /usr/bin/python3 "$ROOT/scripts/bootstrap.py" --jobs 2
 "$ROOT/scripts/build.sh"

@@ -1,0 +1,378 @@
+{
+  "schema": 1,
+  "stage": "Task 6 development measurements; final stage evidence registered separately",
+  "same_recorded_input": "20261008T092101Z-d43acf42-092132-b394af",
+  "grouping_rule": "LiDAR+IMU, LiDAR+IMU+camera and LiDAR+IMU+camera+RTK are distinct input groups; no single ranking",
+  "measurements": [
+    {
+      "id": "fastlio-common-motion-03",
+      "backend": "fast_lio2",
+      "success": false,
+      "quality": {
+        "passed": false,
+        "reason": "quality thresholds failed",
+        "outside_truth_support": 0,
+        "expected_outside_truth_support": 0,
+        "metrics": {
+          "samples": 1986,
+          "coverage": 1.0,
+          "duration_s": 198.6,
+          "max_output_gap_s": 0.20002499400000318,
+          "raw_position_rmse_m": 2.7200756337746195,
+          "ate_rmse_m": 0.9588974067390494,
+          "ate_p95_m": 2.668177297703557,
+          "ate_max_m": 2.860474869616759,
+          "attitude_rmse_deg": 3.8509114185063433,
+          "rpe_translation_rmse_m": 0.06266559544962634,
+          "rpe_rotation_rmse_deg": 0.16963564636234266,
+          "rpe_translation_world_rmse_m": 0.06543269658842797,
+          "attitude_reference_valid": true,
+          "alignment_se3": [
+            [
+              0.9994138093427639,
+              -0.02292862691283796,
+              -0.025422741057515894,
+              0.07868073524670505
+            ],
+            [
+              0.021013637989274407,
+              0.997096486671083,
+              -0.07319168864453063,
+              0.26744165317467156
+            ],
+            [
+              0.027027110712048934,
+              0.07261456008318223,
+              0.9969938118917702,
+              -2.5557444662121487
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "alignment_scale": 1.0
+        }
+      },
+      "scope": "offline replay; no realtime or flight qualification",
+      "report_path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/backend-bench/fastlio-common-motion-03/report.json",
+      "report_sha256": "69aefe6acb19d9d84747ebec95f6c6f79022786f641fafbcf9699441804b76e3",
+      "dataset": "/home/pine/workspace/ai/UAV/uav_simulation/recordings/20261008T092101Z-d43acf42-092132-b394af",
+      "dataset_sha256": {
+        "metadata.yaml": "f6ae5e95de1bc520ae615e11242584dad3e6c1313e695c2f1107ba56c057fe95",
+        "bag_0.db3": "9a5d2800bde6e2822a1f97ad44e4266f0394aa4b043f5bd4c97096647fc82fce"
+      },
+      "run_id": null,
+      "implementation_sha256": "e682e91d0cc5c6cb2f08e2a98ee66b417f03f9594bec1ab7af7c288950d27751",
+      "latency_source_s": {
+        "p50": 0.1140250019999769,
+        "p95": 0.14202500200000756,
+        "min": 0.08401250499997559
+      },
+      "resource_summary": {
+        "replay": {
+          "observed_wall_s": 199.78654750999704,
+          "observed_cpu_s": 165.27,
+          "mean_cpu_cores": 0.8272328745844618,
+          "peak_combined_rss_bytes": 519024640,
+          "process_peak_rss_bytes": {
+            "196381": 129232896,
+            "196382": 147095552,
+            "196383": 242774016
+          },
+          "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+        }
+      },
+      "rtk_batch": null
+    },
+    {
+      "id": "fastlivo-common-motion-02",
+      "backend": "fast_livo2",
+      "success": true,
+      "quality": {
+        "passed": true,
+        "reason": "quality thresholds passed",
+        "outside_truth_support": 0,
+        "expected_outside_truth_support": 0,
+        "metrics": {
+          "samples": 3847,
+          "coverage": 0.9994895354772844,
+          "duration_s": 198.39600000000002,
+          "max_output_gap_s": 0.16400000000000148,
+          "raw_position_rmse_m": 0.3650778938339191,
+          "ate_rmse_m": 0.021644627813859018,
+          "ate_p95_m": 0.03716491520146543,
+          "ate_max_m": 0.12219541495875805,
+          "attitude_rmse_deg": 0.42266570375754736,
+          "rpe_translation_rmse_m": 0.018081388770694692,
+          "rpe_rotation_rmse_deg": 0.33938595966758894,
+          "rpe_translation_world_rmse_m": 0.017965440849777897,
+          "attitude_reference_valid": true,
+          "alignment_se3": [
+            [
+              0.9993963043775658,
+              -0.029636935446867695,
+              -0.018129502303767045,
+              0.061486469900280394
+            ],
+            [
+              0.029614498628546405,
+              0.9995602617401581,
+              -0.0015048657501111292,
+              0.00995108739473589
+            ],
+            [
+              0.01816612967706447,
+              0.0009670611481341568,
+              0.9998345145699317,
+              0.331303495802177
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "alignment_scale": 1.0
+        }
+      },
+      "scope": "offline replay; no realtime or flight qualification",
+      "report_path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/backend-bench/fastlivo-common-motion-02/report.json",
+      "report_sha256": "cf439347e6c9cf60265fb5fc6deb244ba324b52664d37521ba50151c2b6d2e53",
+      "dataset": "/home/pine/workspace/ai/UAV/uav_simulation/recordings/20261008T092101Z-d43acf42-092132-b394af",
+      "dataset_sha256": {
+        "metadata.yaml": "f6ae5e95de1bc520ae615e11242584dad3e6c1313e695c2f1107ba56c057fe95",
+        "bag_0.db3": "9a5d2800bde6e2822a1f97ad44e4266f0394aa4b043f5bd4c97096647fc82fce"
+      },
+      "run_id": null,
+      "implementation_sha256": "c954e66f41a4ca58d9c348d395d08687aa723459706bae379650fb91122c511a",
+      "latency_source_s": {
+        "p50": 0.23799999999999955,
+        "p95": 0.28199999999998226,
+        "min": 0.1599999999999966
+      },
+      "resource_summary": {
+        "replay": {
+          "observed_wall_s": 199.77768533799826,
+          "observed_cpu_s": 252.75,
+          "mean_cpu_cores": 1.265156313991622,
+          "peak_combined_rss_bytes": 1845149696,
+          "process_peak_rss_bytes": {
+            "196762": 90976256,
+            "196763": 129994752,
+            "196764": 155328512,
+            "196765": 1470648320
+          },
+          "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+        }
+      },
+      "rtk_batch": null
+    },
+    {
+      "id": "fastlivo-rtk-motion-05",
+      "backend": "fast_livo2_rtk",
+      "success": true,
+      "quality": {
+        "passed": true,
+        "reason": "quality thresholds passed",
+        "outside_truth_support": 0,
+        "expected_outside_truth_support": 0,
+        "metrics": {
+          "samples": 3848,
+          "coverage": 0.9994895354772844,
+          "duration_s": 198.462,
+          "max_output_gap_s": 0.16400000000000148,
+          "raw_position_rmse_m": 0.24473423985652254,
+          "ate_rmse_m": 0.0068990326060667535,
+          "ate_p95_m": 0.011530125917280712,
+          "ate_max_m": 0.07868383197460689,
+          "attitude_rmse_deg": 0.13279011495281884,
+          "rpe_translation_rmse_m": 0.0070989136193841205,
+          "rpe_rotation_rmse_deg": 0.11457345658218879,
+          "rpe_translation_world_rmse_m": 0.00708586952101092,
+          "attitude_reference_valid": true,
+          "alignment_se3": [
+            [
+              0.9995833411796842,
+              -0.02780903150561717,
+              -0.0077331625341394705,
+              -0.018132565964524394
+            ],
+            [
+              0.02769823619763338,
+              0.9995171191895865,
+              -0.014083187085705474,
+              0.00750669739923611
+            ],
+            [
+              0.008121068131713663,
+              0.013863124239163234,
+              0.9998709226888904,
+              0.21978322705535192
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "alignment_scale": 1.0
+        }
+      },
+      "scope": "offline replay; no realtime or flight qualification",
+      "report_path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/backend-bench/fastlivo-rtk-motion-05/report.json",
+      "report_sha256": "837455d1911a725ff103093bcf81c232605a4777d70285a6f82c233ec126751e",
+      "dataset": "/home/pine/workspace/ai/UAV/uav_simulation/recordings/20261008T092101Z-d43acf42-092132-b394af",
+      "dataset_sha256": {
+        "metadata.yaml": "f6ae5e95de1bc520ae615e11242584dad3e6c1313e695c2f1107ba56c057fe95",
+        "bag_0.db3": "9a5d2800bde6e2822a1f97ad44e4266f0394aa4b043f5bd4c97096647fc82fce"
+      },
+      "run_id": null,
+      "implementation_sha256": null,
+      "latency_source_s": {
+        "p50": 0.23799999999999955,
+        "p95": 0.2819999999999965,
+        "min": 0.1599999999999966
+      },
+      "resource_summary": null,
+      "rtk_batch": {
+        "completed": true,
+        "backend_exit_code": null,
+        "reason": "completed",
+        "quality": {
+          "passed": true,
+          "reason": "quality thresholds passed",
+          "outside_truth_support": 0,
+          "expected_outside_truth_support": 0,
+          "metrics": {
+            "samples": 3847,
+            "coverage": 0.9989790709545686,
+            "duration_s": 198.39600000000002,
+            "max_output_gap_s": 0.16400000000000148,
+            "raw_position_rmse_m": 0.34609053530914446,
+            "ate_rmse_m": 0.013843408439151024,
+            "ate_p95_m": 0.024093211073025,
+            "ate_max_m": 0.053053000809617064,
+            "attitude_rmse_deg": 0.17551518615714626,
+            "rpe_translation_rmse_m": 0.019102751291737736,
+            "rpe_rotation_rmse_deg": 0.10519860570243016,
+            "rpe_translation_world_rmse_m": 0.019089859919422466,
+            "attitude_reference_valid": true,
+            "alignment_se3": [
+              [
+                0.99999996071562,
+                0.0001926973165621454,
+                -0.00020355958150813924,
+                0.009130948340681955
+              ],
+              [
+                -0.00019268654648136688,
+                0.9999999800353125,
+                5.292702579001078e-05,
+                0.0017440983994481945
+              ],
+              [
+                0.00020356977633989581,
+                -5.2887800517942946e-05,
+                0.9999999778811143,
+                0.34550621147784044
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "alignment_scale": 1.0
+          }
+        },
+        "pose_target": "GNSS antenna before final lever-arm conversion; separate from local control pose"
+      }
+    },
+    {
+      "id": "fastlivo-live-01",
+      "backend": "fast_livo2",
+      "success": true,
+      "quality": {
+        "passed": true,
+        "reason": "quality thresholds passed",
+        "outside_truth_support": 0,
+        "expected_outside_truth_support": 0,
+        "metrics": {
+          "samples": 3269,
+          "coverage": 0.9987973541791942,
+          "duration_s": 168.49800000000002,
+          "max_output_gap_s": 0.10000000100001216,
+          "raw_position_rmse_m": 0.2632901371161414,
+          "ate_rmse_m": 0.019060016173335914,
+          "ate_p95_m": 0.040702925032985685,
+          "ate_max_m": 0.12234281711779121,
+          "attitude_rmse_deg": 0.4634131918552369,
+          "rpe_translation_rmse_m": 0.018822264382941732,
+          "rpe_rotation_rmse_deg": 0.3476658283658834,
+          "rpe_translation_world_rmse_m": 0.01875984249263291,
+          "attitude_reference_valid": true,
+          "alignment_se3": [
+            [
+              0.9999274814094173,
+              -0.006530544788071419,
+              0.010118493316243364,
+              0.001503087740367448
+            ],
+            [
+              0.006564029953996632,
+              0.9999730783902343,
+              -0.003279634967931792,
+              -0.00666940592753601
+            ],
+            [
+              -0.010096803107068383,
+              0.003345815226642688,
+              0.9999434284435745,
+              0.270679237824452
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "alignment_scale": 1.0
+        }
+      },
+      "scope": "real-time localization from measured Livox/IMU/camera; no GNSS or truth input. Stock PX4 controls flight; no new backend closed-loop qualification.",
+      "report_path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/backend-bench/fastlivo-live-01/report.json",
+      "report_sha256": "9bebada85386c2e51d4da271a912b4ca1c49e7467ea25391574ff451fe145e9a",
+      "dataset": null,
+      "dataset_sha256": null,
+      "run_id": "20261008T103500Z-1cc0b005",
+      "implementation_sha256": "be120fd527214bf6def4f788d63aa98636bf519754084276921320619b0642ef",
+      "latency_source_s": {
+        "p50": 0.19999999999998863,
+        "p95": 0.2360000000000042
+      },
+      "resource_summary": {
+        "live": {
+          "observed_wall_s": 169.18505295200157,
+          "observed_cpu_s": 251.52000000000004,
+          "mean_cpu_cores": 1.4866561531966846,
+          "peak_combined_rss_bytes": 1652449280,
+          "process_peak_rss_bytes": {
+            "199029": 92377088,
+            "199030": 130674688,
+            "199031": 155045888,
+            "199032": 1276416000
+          },
+          "scope": "sampled owned algorithm, adapters and camera parameter process; excludes bag player"
+        }
+      },
+      "rtk_batch": null
+    }
+  ]
+}

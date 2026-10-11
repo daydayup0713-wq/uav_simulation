@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<profiles xmlns="http://www.eprosima.com/XMLSchemas/fastRTPS_Profiles">
+  <transport_descriptors>
+    <transport_descriptor>
+      <transport_id>lab_local_udp</transport_id><type>UDPv4</type>
+      <interfaceWhiteList><address>127.0.0.1</address></interfaceWhiteList>
+    </transport_descriptor>
+    <transport_descriptor>
+      <transport_id>lab_large_sensor_shm</transport_id><type>SHM</type>
+      <segment_size>67108864</segment_size>
+      <maxMessageSize>2097152</maxMessageSize>
+      <port_queue_capacity>2048</port_queue_capacity>
+    </transport_descriptor>
+  </transport_descriptors>
+  <participant profile_name="lab_local_participant" is_default_profile="true">
+    <rtps>
+      <useBuiltinTransports>false</useBuiltinTransports>
+      <userTransports>
+        <transport_id>lab_local_udp</transport_id>
+        <transport_id>lab_large_sensor_shm</transport_id>
+      </userTransports>
+    </rtps>
+  </participant>
+</profiles>

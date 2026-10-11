@@ -14,10 +14,12 @@ def read_json_comments(path):
     return json.loads(text)
 
 
-def prepare_slam(root, destination, sensors=None):
+def prepare_slam(root, destination, sensors=None, use_timed_scans=False):
     root, destination = Path(root), Path(destination)
     sensors = sensors or json.loads((root / 'configs/sensors.json').read_text())
-    if sensors['lidar'].get('scan_timing', 'synchronous') != 'synchronous':
+    if use_timed_scans and sensors['lidar'].get('measurement_time')!='per_beam':
+        raise ValueError('measured beam times required for timed GLIM')
+    if not use_timed_scans and sensors['lidar'].get('scan_timing', 'synchronous') != 'synchronous':
         raise ValueError('only synchronous generic lidar is supported')
     source = root / '.deps/glim/config'
     if not source.is_dir():
@@ -35,7 +37,7 @@ def prepare_slam(root, destination, sensors=None):
     translation = rl.inv().apply(np.array(imu['xyz']) - np.array(lidar['xyz']))
     configs['config_sensors.json']['sensors'].update(
         T_lidar_imu=translation.tolist() + (rl.inv() * ri).as_quat().tolist(),
-        global_shutter_lidar=True, autoconf_perpoint_times=False, ring_field='',
+        global_shutter_lidar=not use_timed_scans, autoconf_perpoint_times=False, ring_field='',
         imu_acc_noise=0.02, imu_gyro_noise=0.002)
     configs['config_ros.json']['glim_ros'].update(
         imu_topic='/uav001/localization/input/imu', points_topic='/uav001/localization/input/points',

@@ -1,0 +1,239 @@
+{
+  "schema": 1,
+  "scope": "normal simulation and fault qualification of this exact implementation/pair/input group only",
+  "source_revision": "f9a8fde2f1cc168f6d2680c77aa746590638ec4a",
+  "platform_dirty_at_launch": false,
+  "pair": {
+    "localization": "glim",
+    "planning": "fast_planner",
+    "input_group": "synchronous_lidar_imu"
+  },
+  "control_implementation_sha256": "1c57a07af9fd4e7bd049ae63bab8575263c135340834d925e2120152ca058d33",
+  "backend_implementations": {
+    "glim": "3c6ce43f01c3033b4d63969d40461f4a4be2b9215953c90edd893469adf63b95",
+    "fast_planner": "90387c140d48d62966a7e16be88046d46f3239e15facf0e5f260fbb6e877c58a"
+  },
+  "normal_run_id": "20261011T044322Z-615e2577",
+  "runs": 3,
+  "resources": {
+    "closed_loop": {
+      "observed_wall_s": 499.800972774,
+      "observed_cpu_s": 1040.22,
+      "mean_cpu_cores": 2.081268458175584,
+      "peak_combined_rss_bytes": 1123971072,
+      "process_peak_rss_bytes": {
+        "31531": 153440256,
+        "31532": 605450240,
+        "31887": 25726976,
+        "31890": 178233344,
+        "31913": 11644928,
+        "32006": 54800384,
+        "32009": 39424000,
+        "32024": 89362432,
+        "32049": 62402560,
+        "32062": 108576768,
+        "32086": 39174144,
+        "32124": 49999872,
+        "32140": 87859200,
+        "32168": 65208320,
+        "32243": 39399424,
+        "32267": 107958272,
+        "32279": 89960448,
+        "32339": 39387136,
+        "32351": 39481344,
+        "32375": 89280512,
+        "32411": 62439424,
+        "32424": 110063616,
+        "32451": 108326912,
+        "32490": 0,
+        "32562": 39370752,
+        "32595": 37904384,
+        "32607": 25939968,
+        "32619": 88150016,
+        "32632": 38989824,
+        "32644": 39452672,
+        "32711": 16596992,
+        "32723": 107446272,
+        "32735": 86982656,
+        "32749": 0,
+        "32832": 39182336,
+        "32868": 88199168,
+        "32909": 37478400,
+        "33628": 0,
+        "33809": 88301568,
+        "33833": 39432192,
+        "33875": 89759744,
+        "33887": 83255296,
+        "33913": 39243776,
+        "33973": 39297024,
+        "34030": 85798912,
+        "34056": 39464960,
+        "34081": 39161856,
+        "34127": 39403520,
+        "34163": 92377088,
+        "34176": 89432064,
+        "34203": 39403520,
+        "34262": 89264128,
+        "34288": 39239680,
+        "34313": 38150144,
+        "34353": 39415808,
+        "34366": 91291648,
+        "34410": 39223296,
+        "34458": 89317376,
+        "34492": 39473152,
+        "34529": 87773184,
+        "34570": 16232448,
+        "34607": 53014528,
+        "34631": 39182336,
+        "34645": 39362560,
+        "34657": 0,
+        "34669": 89112576,
+        "34683": 64184320,
+        "34695": 39186432,
+        "34707": 109174784,
+        "34808": 87658496,
+        "34822": 39432192,
+        "34886": 107507712,
+        "34898": 16338944,
+        "34910": 38985728
+      },
+      "scope": "sampled owned navigation, localization, camera parameter and native planner processes; excludes flight bridge, PX4, Gazebo, rendering, recorder and browser; 0.5s sampling may miss short-lived children"
+    }
+  },
+  "normal": {
+    "continuous": {
+      "passed": true,
+      "failed_checks": [],
+      "tracking_p95_m": 0.040201944042182795,
+      "tracking_maximum_m": 0.07429618205399453,
+      "tracking_samples": 2055,
+      "reference_samples": 21763,
+      "reference_rate_hz": 50.32841493896417,
+      "reference_max_speed_mps": 0.4886309373196025,
+      "reference_max_acceleration_mps2": 0.35970633893568876,
+      "reference_max_finite_difference_jerk_mps3": 0.616276953575924,
+      "heartbeat_samples": 9342,
+      "setpoint_samples": 23350,
+      "heartbeat_rate_hz": 19.994461956636687,
+      "setpoint_rate_hz": 50.002342866805286,
+      "rate_scope": "only within each trajectory observation window",
+      "tracking_source": "PX4 normalized odometry versus time-aligned commanded reference"
+    },
+    "geometry": {
+      "passed": true,
+      "failed_checks": [],
+      "source": "Gazebo truth and physical scene geometry; evaluator only; no fitted control alignment",
+      "body_halfsize_m": [
+        0.4,
+        0.4,
+        0.3
+      ],
+      "body_scope": "attitude-rotated conservative full-body envelope",
+      "min_body_clearance_m": 0.701089087241638,
+      "airborne_samples": 11231,
+      "truth_tracking_p95_m": 0.03531610681930784,
+      "truth_tracking_samples": 10666,
+      "covered_controls": 141,
+      "expected_controls": 141,
+      "successful_runs": 3,
+      "expected_runs": 3,
+      "handoffs": 138,
+      "minimum_handoff_speed_mps": 0.20731105856484355
+    },
+    "handoffs": {
+      "passed": true,
+      "failed_checks": [],
+      "accepted_curves": 141,
+      "joins": 138,
+      "maximum_join_error": 3.913536161803677e-15,
+      "analytic_maxima": {
+        "speed": 0.4886364006208759,
+        "acceleration": 0.36057253554795066,
+        "jerk": 0.6162769535759276
+      }
+    }
+  },
+  "faults": [
+    {
+      "passed": true,
+      "reason": "",
+      "case": "hold",
+      "run_id": "20261011T045216Z-e7b45e5f",
+      "final": {
+        "armed": false,
+        "landed": true,
+        "offboard": true
+      },
+      "fault_started_at": 2566.756434253,
+      "motion_returncode": 1,
+      "constrained_stop_confirmed": true
+    },
+    {
+      "passed": true,
+      "reason": "",
+      "case": "land",
+      "run_id": "20261011T045315Z-4d2b1205",
+      "final": {
+        "armed": false,
+        "landed": true,
+        "offboard": true
+      },
+      "fault_started_at": 2626.126116052,
+      "motion_returncode": 1
+    },
+    {
+      "passed": true,
+      "reason": "",
+      "case": "localization_exit",
+      "run_id": "20261011T045412Z-1af7c173",
+      "final": {
+        "armed": false,
+        "landed": true,
+        "offboard": true
+      },
+      "fault_started_at": 2683.00383565,
+      "motion_returncode": 1,
+      "failsafe_landing_observed": true,
+      "recovery_arm_rejected": true
+    },
+    {
+      "passed": true,
+      "reason": "",
+      "case": "source_stale",
+      "run_id": "20261011T045510Z-b44d4507",
+      "final": {
+        "armed": false,
+        "landed": true,
+        "offboard": true
+      },
+      "fault_started_at": 2739.742252669,
+      "motion_returncode": 1,
+      "failsafe_landing_observed": true,
+      "source_process_resumed": true,
+      "recovery_arm_rejected": true
+    },
+    {
+      "passed": true,
+      "reason": "",
+      "case": "web_disconnect",
+      "run_id": "20261011T045610Z-27c92cfc",
+      "final": {
+        "armed": false,
+        "landed": true,
+        "offboard": true
+      },
+      "fault_started_at": 2800.792226336,
+      "motion_returncode": 0,
+      "browser": {
+        "received_packet_bytes": 7331,
+        "client_closed": true
+      },
+      "web_process_exit_flight_continued": true
+    }
+  ],
+  "witness": {
+    "path": ".runtime/pair-evidence/l1-glim-fast-review5-20261011.json",
+    "sha256": "a49846a44c3cb37f834bbfc43e9fce91ca064b14ee4c66f27c6fbaef8243a456",
+    "artifact_count": 1690
+  }
+}

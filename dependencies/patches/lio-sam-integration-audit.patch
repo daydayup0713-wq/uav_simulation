@@ -1,0 +1,19 @@
+diff --git a/src/imuPreintegration.cpp b/src/imuPreintegration.cpp
+index 8420c04..d233d19 100644
+--- a/src/imuPreintegration.cpp
++++ b/src/imuPreintegration.cpp
+@@ -293,6 +293,14 @@ public:
+         if (imuQueOpt.empty())
+             return;
+ 
++        // DDS discovery can deliver corrections predating the first IMU.
++        // A zero-duration factor is undefined; wait for a measured interval.
++        if (stamp2Sec(imuQueOpt.front().header.stamp) >= currentCorrectionTime - delta_t)
++        {
++            RCLCPP_WARN(get_logger(), "Correction has no preceding IMU measurement; withheld");
++            return;
++        }
++
+         float p_x = odomMsg->pose.pose.position.x;
+         float p_y = odomMsg->pose.pose.position.y;
+         float p_z = odomMsg->pose.pose.position.z;
