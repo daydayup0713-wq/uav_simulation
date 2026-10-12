@@ -23,9 +23,10 @@ export function useObservation(mode:'live'|'replay'){
  const [connected,setConnected]=useState(false),[clouds,setClouds]=useState<Partial<Record<Layer,Cloud>>>({});
  const [telemetry,setTelemetry]=useState<Telemetry|null>(null),[paths,setPaths]=useState<Record<string,number[][]>>({});
  const [received,setReceived]=useState(-Infinity),[error,setError]=useState('');
+ const [fault,setFault]=useState<{run:string|null;receivedAt:number;simulationTime:number}|null>(null);
  useEffect(()=>{
   let socket:WebSocket|null=null,timer=0,closed=false;
-  setConnected(false);setClouds({});setTelemetry(null);setPaths({});
+  setConnected(false);setClouds({});setTelemetry(null);setPaths({});setFault(null);
   function open(){if(closed||mode!=='live')return;
    socket=new WebSocket(`ws://${location.hostname}:8765`);socket.binaryType='arraybuffer';
    socket.onopen=()=>{if(!closed){setConnected(true);setError('');}};
@@ -34,11 +35,13 @@ export function useObservation(mode:'live'|'replay'){
    socket.onmessage=event=>{if(closed)return;try{
     if(event.data instanceof ArrayBuffer){const cloud=decodeCloud(event.data);setClouds(previous=>({...previous,[cloud.layer]:cloud}));}
     else{const message=JSON.parse(event.data);
-     if(message.kind==='telemetry'){setReceived(Date.now());setTelemetry(message);}
+     if(message.kind==='telemetry'){const now=Date.now();setReceived(now);setTelemetry(message);
+      if(message.diagnostics?.['uav001/flight']?.message==='FAILSAFE')setFault(previous=>previous?.run===message.run_id?previous:{run:message.run_id,receivedAt:now,simulationTime:message.simulation_time});
+      else setFault(null);}
      else if(message.kind==='path')setPaths(previous=>({...previous,[message.layer]:message.points}));}
    }catch(e){setError(e instanceof Error?e.message:'观测数据错误');}};
   }
   open();return()=>{closed=true;clearTimeout(timer);socket?.close();};
  },[mode]);
- return {connected,clouds,telemetry,paths,received,error};
+ return {connected,clouds,telemetry,paths,received,error,fault};
 }

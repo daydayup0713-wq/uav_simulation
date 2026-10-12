@@ -1,0 +1,139 @@
+{
+  "schema": 1,
+  "date": "2026-10-12",
+  "control_source_commit": "16c0466e7073c94521d69dc8950da87a84c36165",
+  "native_tests": {
+    "passed": 545,
+    "skipped": 3
+  },
+  "web_tests": {
+    "passed": 29,
+    "build": true
+  },
+  "normal_runs": 3,
+  "semantic_controls_total": 141,
+  "tracking_p95_m": 0.0400452316,
+  "body_minimum_clearance_m": 0.700713731,
+  "ground_passed": true,
+  "ground_runs": [
+    {
+      "run_id": "20261012T111707Z-06b7abfa",
+      "elapsed_s": 1800.0703911850069
+    },
+    {
+      "run_id": "20261012T114734Z-847b6ce8",
+      "elapsed_s": 1800.0239208569983
+    },
+    {
+      "run_id": "20261012T121804Z-023ef8cd",
+      "elapsed_s": 1800.0092601979995
+    }
+  ],
+  "fault_cases_passed": 5,
+  "pair": {
+    "localization": "glim",
+    "planning": "fast_planner",
+    "input_group": "synchronous_lidar_imu"
+  },
+  "maintenance": {
+    "success": true,
+    "removed": [],
+    "refused": [],
+    "errors": [],
+    "logical_bytes_removed": 0,
+    "filesystem_free_delta_bytes": -77824,
+    "space_scope": "free-space delta includes concurrent writes; logical bytes are completely removed managed objects",
+    "audit_path": "/home/pine/workspace/ai/UAV/uav_simulation/.runtime/maintenance/20261012T125927Z-d281357a.json"
+  },
+  "artifacts": [
+    {
+      "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/pair-evidence/health-final-16c.json",
+      "sha256": "102d7cea5a5bc60f805b3661c9b6554cd3e8fcdec3d10c5e7d3516b4fd8e26af"
+    },
+    {
+      "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-normal-final/acceptance.json",
+      "sha256": "48e5b79abced7b4cee5a5cbf781b0be588ac23ae199d50c54c3403b2f907c95c"
+    },
+    {
+      "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-normal-final/tracking.json",
+      "sha256": "c6d27de8d41479477d975e5b18036c191dd524bdfae6c4c7f9c48dc98f337b91"
+    },
+    {
+      "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-normal-final/geometry.json",
+      "sha256": "4f67533eee860583f6b0c1fcf9392ca33fbf0197fcf990a52ba60c92f57c33a3"
+    },
+    {
+      "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-baseline/storage-final-plan.json",
+      "sha256": "3b7e6177f0f3242127205159bcd605f61caf8a6ee1fed7209067cd399778b8e4"
+    },
+    {
+      "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-baseline/storage-final-apply.json",
+      "sha256": "da9f7166d5becf94c6ec11d9331277ba34348cbf743def12719be4dc808cd23e"
+    },
+    {
+      "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-baseline/ui-ground-source-stale.json",
+      "sha256": "7571c11fe09fd72128b41c72835f9090902be78d8a7bfe7329b28ed58d957e2a"
+    },
+    {
+      "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-baseline/native-delivery-final.log",
+      "sha256": "a7213c1f47a737991e558b5786cf5b8e0021484fe6af5a1bc010a9b4dc628f00"
+    },
+    {
+      "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-baseline/web-delivery-final.log",
+      "sha256": "71e4706e48e53a3cb7d0c2aa2e42568c06e2602ae77e63c68053453de3aaa3a9"
+    },
+    {
+      "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-baseline/web-delivery-build.log",
+      "sha256": "adf1c5af09401e0db36f0be930d77206503deba048f128ace1a660defc406feb"
+    },
+    {
+      "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-fault-matrix-final/hold/fault.json",
+      "sha256": "a39c68748d30a2824722b81a9c076b52bb99ee985a841a46db6993eb12c47e65"
+    },
+    {
+      "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-fault-matrix-final/land/fault.json",
+      "sha256": "0f60dc76204ce1383d1c2e3835e8159e620675f782f85e5191d4398c0b737e82"
+    },
+    {
+      "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-fault-matrix-final/localization_exit/fault.json",
+      "sha256": "a9b9d6d831848dfdf7b291e5a7d6667a3bfcfccb55e78f1fc4de9756af933b60"
+    },
+    {
+      "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-fault-matrix-final/web_disconnect/fault.json",
+      "sha256": "e2e23d3ca56a1d2c1dac6c1f4c362060875388dc149801b815f135aa1c07b5a9"
+    },
+    {
+      "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-fault-stale-qualified-retry/source_stale/fault.json",
+      "sha256": "2d4218980d6bf2a402cb58f4c4ed63f57947805e71255ad7c7b3a5c061cb48e3"
+    }
+  ],
+  "ci": {
+    "verified_commit": "585af0e5e1ba21a0158c547f7362ffac93d211c4",
+    "run_id": 38252610219,
+    "jobs": {
+      "policy": "success",
+      "web": "success",
+      "headless-sitl": "success"
+    },
+    "scope": "all stages executed on corrected CI commit; later frontend/report revision has its own PR checks"
+  },
+  "final_web_run": "20261012T131352Z-4e07c038",
+  "screenshots": [
+    {
+      "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/docs/validation/health/screenshots/replay-final.jpg",
+      "sha256": "bf4b2df96a39b89ae61130126ea4478b0684b73dfc5d838263543e7a3a98cb53"
+    },
+    {
+      "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/docs/validation/health/screenshots/failsafe-final.jpg",
+      "sha256": "5e4e81746aa58feb7f5ec9581f952a7d5e7dc33c82876e7dc7c06703f40ebcac"
+    },
+    {
+      "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/docs/validation/health/screenshots/startup-final.jpg",
+      "sha256": "d2a31b739f3b2c8472475838df22e9209a23f7c7af8e4d7fa1b46b8a39bcb222"
+    },
+    {
+      "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/docs/validation/health/screenshots/ready-final.jpg",
+      "sha256": "f161a0f93c6736a6f9e6ce582ed348b7ff2ae06bbcb728b87e0ca92179603faa"
+    }
+  ]
+}

@@ -143,3 +143,24 @@ it('遥测READY但飞控健康门槛拒绝时标记控制未就绪',async()=>{
  expect(screen.getByRole('heading',{name:'控制未就绪'})).toBeTruthy();
  expect(screen.getByText(/遥测已就绪，但定位或导航控制门槛未通过/)).toBeTruthy();
 });
+
+it('保护详情记录首次观测时间而非每次刷新时间',async()=>{
+ vi.useFakeTimers();vi.stubGlobal('location',{hostname:'127.0.0.1',port:'8080'});let socket:any;
+ vi.stubGlobal('WebSocket',class{onopen?:()=>void;onmessage?:(event:unknown)=>void;constructor(){socket=this;}close(){}});
+ await act(async()=>{render(<App/>);});
+ const report=(time:number)=>JSON.stringify({kind:'telemetry',run_id:'run-one',simulation_time:time,vehicle:null,layer_errors:{},diagnostics:{'uav001/flight':{message:'FAILSAFE',level:2,age_s:0,values:{reason:'localization source stale'}}}});
+ await act(async()=>{socket.onopen();socket.onmessage({data:report(5)});});
+ await act(async()=>{await vi.advanceTimersByTimeAsync(3000);socket.onmessage({data:report(8)});});
+ expect(screen.getByText(/首次观测.*仿真 5.0 s/)).toBeTruthy();
+ expect(screen.queryByText(/首次观测.*仿真 8.0 s/)).toBeNull();
+});
+
+it('历史回放无需在线观测桥，禁用控制解释明确',async()=>{
+ vi.stubGlobal('WebSocket',class{close(){}});
+ const state={mode:'replay',selection:{localization:'glim',planning:'fast_planner',scene:'circle-eight',sensor_profile:null},active_run:null,allowed:[],jobs:[],backends:[],catalog_checking:false,replay:null};
+ vi.stubGlobal('fetch',vi.fn((url:string)=>Promise.resolve({ok:true,json:async()=>url.includes('recordings')?[]:state})));
+ await act(async()=>{render(<App/>);});
+ expect(screen.getByText('当前是历史回放，飞行控制禁用。')).toBeTruthy();
+ expect(screen.queryByText(/观测桥未连接，显示数据可能/)).toBeNull();
+ expect(screen.getByRole('button',{name:'解锁'}).hasAttribute('disabled')).toBe(true);
+});

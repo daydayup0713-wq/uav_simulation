@@ -100,14 +100,14 @@ export default function App(){
     <small>{mode==='replay'?'录制数据 / 仅原始图层':!connected?'缓存数据':telemetry?.layer_errors[key]??(clouds[key]?.display_decimated?'显示降采样 / 有限窗口':clouds[key]?.invalid_sample_points?'已过滤无效返回':clouds[key]?'完整单帧显示':'未收到话题')}</small></div>)}</div></>}
   </main>
   <aside className="right-panel"><div className="section-label">飞行状态 <span>TELEMETRY</span></div>
-   <div className="state-card"><span className="state-caption">当前阶段</span><h3>{phase}</h3>{controlRejected&&mode==='live'&&observedFresh&&<p role="status">遥测已就绪，但定位或导航控制门槛未通过。请查看组件诊断和按钮旁的原因；地面未解锁时可停止实验后排查。</p>}{phase==='FAILSAFE'&&<div className="fault-explanation" role="alert"><b>飞控保护已锁存，当前禁止解锁和起飞。</b><p>数据恢复不会自动续飞。地面未解锁时可停止实验，查看原因后重启。</p><details><summary>故障原因</summary><code>{flight?.values.reason??workbench?.flight?.reason??'等待诊断详情'}</code></details></div>}<div className="state-meta"><span>{mode==='replay'?'历史数据':!observedFresh?'解锁状态未知':armed?'已解锁':'未解锁'}</span><span>{vehicle&&vehicle.age_s<1?'遥测新鲜':'等待遥测'}</span></div></div>
+   <div className="state-card"><span className="state-caption">当前阶段</span><h3>{phase}</h3>{controlRejected&&mode==='live'&&observedFresh&&<p role="status">遥测已就绪，但定位或导航控制门槛未通过。请查看组件诊断和按钮旁的原因；地面未解锁时可停止实验后排查。</p>}{phase==='FAILSAFE'&&<div className="fault-explanation" role="alert"><b>飞控保护已锁存，当前禁止解锁和起飞。</b><p>数据恢复不会自动续飞。地面未解锁时可停止实验，查看原因后重启。</p><details><summary>故障原因与观测时间</summary>{observation.fault&&<p>首次观测（界面本机）：{new Date(observation.fault.receivedAt).toLocaleString()} · 仿真 {observation.fault.simulationTime.toFixed(1)} s。实际故障发生时刻以运行日志为准。</p>}<code>{flight?.values.reason??workbench?.flight?.reason??'等待诊断详情'}</code></details></div>}<div className="state-meta"><span>{mode==='replay'?'历史数据':!observedFresh?'解锁状态未知':armed?'已解锁':'未解锁'}</span><span>{vehicle&&vehicle.age_s<1?'遥测新鲜':'等待遥测'}</span></div></div>
    {!observationOnly&&<><div className="divider"/><FlightControls status={workbench} available={apiAvailable&&observedFresh&&mode==='live'} onCommand={(name,payload)=>void command(name,payload)}/></>}
    <div className="run-info"><label>运行编号</label><code>{telemetry?.run_id??'—'}</code><label>仿真时间</label><strong>{telemetry?telemetry.simulation_time.toFixed(1):'—'} <small>s</small></strong></div>
    <div className="divider"/><div className="section-label">组件健康 <span>HEALTH</span></div>
    {Object.entries(telemetry?.diagnostics??{}).map(([name,value])=><div className="health-row" key={name}><i className={observedFresh&&value.level===0&&value.age_s<2&&!(name==='uav001/flight'&&controlRejected)?'ok':'warn'}/><div><span>{name.replace('uav001/','')}</span><small>{!connected?'观测已断开':observedFresh?value.message:'遥测已过期'}</small>{value.values.reason&&<small>{value.values.reason}</small>}</div></div>)}
    {!Object.keys(telemetry?.diagnostics??{}).length&&<p className="fine-print">连接观测桥后显示实际诊断。</p>}
    <div className="evaluation-note">{telemetry?.evaluation?'评估模式 · 真值独立展示':'观测模式 · 真值未订阅'}</div>
-   {(error||control.error||observation.error)&&<p className="error-message" role="alert">{error||control.error||observation.error}</p>}
+   {(error||control.error||(mode==='live'&&observation.error))&&<p className="error-message" role="alert">{error||control.error||(mode==='live'?observation.error:null)}</p>}
   </aside>
   <footer><span>本机单机实验 · Gazebo / PX4 / ROS 2</span><span>原始数据与显示数据分别保留</span></footer>
  </div>;

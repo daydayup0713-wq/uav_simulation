@@ -29,8 +29,7 @@ export function FlightControls({status,available,onCommand}:{status:WorkbenchSta
  const [target,setTarget]=useState(['0','0','2']),[height,setHeight]=useState('2');
  const pending=status?.jobs.some(job=>job.state==='RUNNING');
  const can=(name:string)=>available&&status?.mode==='live'&&status.allowed.includes(name)&&(!pending||name==='hold'||name==='land');
- const explanation=pending?'指令仍在执行或确认，暂不接受重复运动；悬停与降落仍由后端授权。':!available?'正在等待控制服务和新鲜遥测，暂不能发送飞行指令。':status?.mode==='replay'?
-  '当前是历史回放，飞行控制禁用。':status?.flight?.phase==='HOLDING'?'已解锁并保持悬停。地面可起飞，空中可导航或显式降落。':status?.blocked?.arm??'先显式解锁，再起飞。';
+ const explanation=status?.mode==='replay'?'当前是历史回放，飞行控制禁用。':pending?'指令仍在执行或确认，暂不接受重复运动；悬停与降落仍由后端授权。':!available?'正在等待控制服务和新鲜遥测，暂不能发送飞行指令。':status?.flight?.phase==='HOLDING'?'已解锁并保持悬停。地面可起飞，空中可导航或显式降落。':status?.blocked?.arm??'先显式解锁，再起飞。';
  return <div className="flight-controls"><div className="section-label">实验控制 <span>EXPLICIT COMMANDS</span></div>
   <p id="control-explanation" className="control-notice" role="status">{explanation}</p>
   <div className="command-grid"><button aria-describedby="control-explanation" disabled={!can('arm')} onClick={()=>onCommand('arm',{})}>解锁</button>
