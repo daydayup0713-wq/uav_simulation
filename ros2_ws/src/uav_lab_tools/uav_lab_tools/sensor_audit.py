@@ -3,7 +3,7 @@ import math
 import struct
 import time
 import numpy as np
-from .sensor_contract import SENSOR_TOPICS, stamp_ns, sensor_topics
+from .sensor_contract import  stamp_ns, sensor_topics
 
 class StreamStats:
     def __init__(self, hz):

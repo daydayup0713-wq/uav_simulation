@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """Own a deterministic sensor flight and archive source data for comparisons."""
-import argparse,json,os,subprocess,time
+import argparse,json,subprocess,time
 from pathlib import Path
 from supervise import owned_run_ready
 

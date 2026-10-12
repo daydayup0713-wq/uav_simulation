@@ -2,7 +2,7 @@
 import json
 from pathlib import Path
 import numpy as np
-from uav_lab_bridge.continuous_trajectory import State,Trajectory
+from uav_lab_bridge.continuous_trajectory import State
 from .planner_backends import validate_curve
 from .planner_comparison import load_snapshot
 from .native_provenance import fingerprint,verified_build

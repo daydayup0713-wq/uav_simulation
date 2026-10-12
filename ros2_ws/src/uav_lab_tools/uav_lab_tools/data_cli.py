@@ -11,7 +11,7 @@ import subprocess
 import time
 import uuid
 from contextlib import contextmanager
-from .sensor_contract import SENSOR_TOPICS,RECORD_TOPICS,stamp_ns,record_topics
+from .sensor_contract import RECORD_TOPICS,stamp_ns,record_topics
 from .sensor_audit import SensorAudit
 from .datasets import inspect_bag,load_dataset,file_hash,check_replay_domain
 
@@ -152,7 +152,6 @@ def active_domains(root):
     return domains
 
 def replay(root,options):
-    import rclpy
     check_replay_domain(options.domain,active_domains(root))
     report,types=inspect_bag(options.dataset)
     if not report['passed']:return report

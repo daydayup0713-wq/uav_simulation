@@ -4,7 +4,7 @@ import argparse,json,os,re,subprocess,sys
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'ros2_ws/src/uav_lab_navigation'))
 from uav_lab_navigation.native_provenance import digest,fingerprint,implementation_files
-from bootstrap_backends import prepare_sources,verify_sources,source_tree
+from bootstrap_backends import prepare_sources,verify_sources
 ROOT=Path(__file__).resolve().parents[1]
 
 

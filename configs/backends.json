@@ -57,7 +57,7 @@
         "global_optimization": true,
         "visual_fusion": false
       },
-      "implementation_sha256": "3c6ce43f01c3033b4d63969d40461f4a4be2b9215953c90edd893469adf63b95"
+      "implementation_sha256": "3250ec97ecb96cfc57dda786203f3b872b0915d86b8972b21145d66c54d63890"
     },
     {
       "id": "fast_lio2",
@@ -76,7 +76,7 @@
         "relocalization": false,
         "global_optimization": false
       },
-      "implementation_sha256": "51ebfa4b076adbfa79ec91a4e7e7242e36e0e9be6d096602edc7097759621b87"
+      "implementation_sha256": "7e0d5e460662b75ef335b57d1f47ecf564f56e44423df3e2288b8d4325170fc6"
     },
     {
       "id": "fast_livo2",
@@ -94,7 +94,7 @@
         "global_optimization": false,
         "visual_fusion": true
       },
-      "implementation_sha256": "9add234427f762ad902cada2686fa1eb78b2ff822dc26086db3a9b831b89aea1"
+      "implementation_sha256": "d11a915a4c35e036d7bf78c1aae84b53a59439f5aa8aa119bc12e2b8519e3e79"
     },
     {
       "id": "fast_livo2_rtk",
@@ -110,7 +110,7 @@
         "global_optimization": "offline_rtk",
         "visual_fusion": true
       },
-      "implementation_sha256": "6ac03469b808abd98ab78bf7c23ad2c65699d404c74f8548ace02847f92d6d8f"
+      "implementation_sha256": "3147dce8517a356a21e39486c5c6c6840e4d182214d1b277d03d7b8459030865"
     },
     {
       "id": "orb_slam3",
@@ -128,7 +128,7 @@
         "global_optimization": true,
         "visual_fusion": true
       },
-      "implementation_sha256": "2ecf81439fb55437ff5ffc15ed098181eda5051373b9e92d9e05d7a52dbe0c50"
+      "implementation_sha256": "733f0508a6b4cf893d7588b04b8e2859f128bdef6dcd3592d42e12aed3bf3ad7"
     },
     {
       "id": "lio_sam",
@@ -143,7 +143,7 @@
         "relocalization": false,
         "global_optimization": true
       },
-      "implementation_sha256": "e7f1575d9e2aace9da8911e16d097669410669571d2a646c95924b9f335f7602"
+      "implementation_sha256": "bee39486ad9492f3903e5fe926b33de2a751a17e9005795e2a78becb326dd116"
     },
     {
       "id": "vins_fusion",
@@ -161,7 +161,7 @@
         "global_optimization": true,
         "visual_fusion": true
       },
-      "implementation_sha256": "6b0ff0f79c0658a304751906ef5ef61901e4c17bb19a8fbd615b7b1a21bd9c26"
+      "implementation_sha256": "20204f276b265242aa7ebc06c8113a1801d03910b259284d2cd56a8cb96d096c"
     },
     {
       "id": "astar",
@@ -182,7 +182,7 @@
         "continuous_trajectory": true,
         "online_replan": true
       },
-      "implementation_sha256": "1088f15dd53877419061b1e366bc4ca7b4b74a0d50b888affc76f77c3258ede5"
+      "implementation_sha256": "8b22effae9391f049c59caec66540b68f64c9b146f7ffc400a1040d73a227725"
     },
     {
       "id": "ego",
@@ -203,7 +203,7 @@
         "online_replan": true,
         "single_drone": true
       },
-      "implementation_sha256": "57fca48dbd6fd44eae6bba25aafb16a75c163a5951613ed26b6bb36f76b2b613"
+      "implementation_sha256": "be4f6a110e44ca265216afcee1f71ae1c2a9001e3c65db4e718e3bb3d1d24d4d"
     },
     {
       "id": "fast_planner",
@@ -223,7 +223,7 @@
         "continuous_trajectory": true,
         "online_replan": true
       },
-      "implementation_sha256": "90387c140d48d62966a7e16be88046d46f3239e15facf0e5f260fbb6e877c58a"
+      "implementation_sha256": "4c4abc7feb8b1b51883a0074bb34382e9bf8b79dda5c8bd6b540a7767ec4e396"
     },
     {
       "id": "gcopter",
@@ -244,7 +244,7 @@
         "online_replan": true,
         "requires_safe_corridor": true
       },
-      "implementation_sha256": "218b2c9fc6e916fc28cbfa16768d5997994ddc4db5e6f1915cc142ef70ba747f"
+      "implementation_sha256": "570bdd3a85482e0686f08076ee4c33c332be1d99e565eb2c15f3a34506eab38e"
     }
   ]
 }

@@ -2,7 +2,7 @@
 import hashlib
 import json
 from pathlib import Path
-from .sensor_contract import RECORD_TOPICS, SENSOR_TOPICS, stamp_ns, sensor_topics, record_topics
+from .sensor_contract import  SENSOR_TOPICS, stamp_ns, sensor_topics, record_topics
 from .sensor_audit import SensorAudit
 
 TOPIC_TYPES={t:v[0] for t,v in SENSOR_TOPICS.items()}

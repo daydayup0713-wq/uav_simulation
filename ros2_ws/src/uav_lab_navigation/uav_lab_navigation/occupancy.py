@@ -100,35 +100,42 @@ class VoxelMap:
             raise ValueError('finite Nx3 endpoints required')
         if not self.inside(origin): raise ValueError('sensor origin outside mapping bounds')
         if len(endpoints)>50000: raise ValueError('scan exceeds bounded input')
-        # Reduce duplicate endpoint voxels before vectorized sub-voxel ray sampling.
-        _, unique = np.unique(self.index(endpoints),axis=0,return_index=True)
-        endpoints = endpoints[unique]
-        hit_points = endpoints[self.inside(endpoints)]
-        hits = np.ravel_multi_index(self.index(hit_points).T,self.shape) if len(hit_points) else np.array([],dtype=int)
-        delta = endpoints-origin
-        fractions = np.ones(len(delta))
+        if not len(endpoints):
+            self.version+=1
+            return
+        self._integrate_beams(np.repeat(origin[None,:],len(endpoints),axis=0),endpoints)
+
+    def _integrate_beams(self,origins,endpoints):
+        origins=np.asarray(origins,dtype=float);endpoints=np.asarray(endpoints,dtype=float)
+        if (origins.ndim!=2 or origins.shape[1]!=3 or endpoints.shape!=origins.shape
+                or len(origins)>50000 or not np.isfinite(origins).all() or not np.isfinite(endpoints).all()
+                or not self.inside(origins).all()):
+            raise ValueError('bounded finite measured beam origins/endpoints within local window required')
+        if not len(origins):raise ValueError('measured beam returns missing')
+        _,unique=np.unique(np.column_stack([self.index(origins),self.index(endpoints)]),axis=0,return_index=True)
+        origins,endpoints=origins[unique],endpoints[unique]
+        hit_points=endpoints[self.inside(endpoints)]
+        hits=np.ravel_multi_index(self.index(hit_points).T,self.shape) if len(hit_points) else np.array([],dtype=int)
+        delta=endpoints-origins;fractions=np.ones(len(delta))
         for axis in range(3):
-            moving = np.abs(delta[:,axis])>1e-12
-            edge = np.where(delta[:,axis]>0,self.upper[axis]-1e-9,self.lower[axis]+1e-9)
-            values = np.ones(len(delta)); values[moving] = (edge[moving]-origin[axis])/delta[moving,axis]
-            fractions = np.minimum(fractions,values)
-        delta *= np.clip(fractions,0,1)[:,None]
-        free_mask = np.zeros(self.score.size,dtype=bool)
+            moving=np.abs(delta[:,axis])>1e-12
+            edge=np.where(delta[:,axis]>0,self.upper[axis]-1e-9,self.lower[axis]+1e-9)
+            values=np.ones(len(delta));values[moving]=(edge[moving]-origins[moving,axis])/delta[moving,axis]
+            fractions=np.minimum(fractions,values)
+        delta*=np.clip(fractions,0,1)[:,None]
+        free_mask=np.zeros(self.score.size,dtype=bool)
         for start in range(0,len(delta),256):
-            rays = delta[start:start+256]
-            steps = np.maximum(1,np.ceil(np.linalg.norm(rays,axis=1)/(self.resolution*.5)).astype(int))
-            times = np.arange(steps.max()+1)[None,:]/steps[:,None]
-            valid = times<=1
-            points = (origin+rays[:,None,:]*times[:,:,None])[valid]
-            points = points[self.inside(points)]
-            if len(points): free_mask[np.ravel_multi_index(self.index(points).T,self.shape)] = True
-        free_mask[hits] = False
-        free = np.flatnonzero(free_mask)
-        scores, seen = self.score.ravel(), self.seen.ravel()
-        scores[free] = np.maximum(-4,scores[free].astype(int)-1)
-        scores[hits] = np.minimum(4,scores[hits].astype(int)+2)
-        seen[free], seen[hits] = True, True
-        self.version += 1
+            rays=delta[start:start+256]
+            steps=np.maximum(1,np.ceil(np.linalg.norm(rays,axis=1)/(self.resolution*.5)).astype(int))
+            times=np.arange(steps.max()+1)[None,:]/steps[:,None]
+            points=(origins[start:start+256,None,:]+rays[:,None,:]*times[:,:,None])[times<=1]
+            points=points[self.inside(points)]
+            if len(points):free_mask[np.ravel_multi_index(self.index(points).T,self.shape)]=True
+        free_mask[hits]=False;free=np.flatnonzero(free_mask)
+        scores,seen=self.score.ravel(),self.seen.ravel()
+        scores[free]=np.maximum(-4,scores[free].astype(int)-1);scores[hits]=np.minimum(4,scores[hits].astype(int)+2)
+        seen[free]=True;seen[hits]=True;self.version+=1
+
 
     def observe_body(self, position, halfsize):
         position, halfsize = vector(position), vector(halfsize)

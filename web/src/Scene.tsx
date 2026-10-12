@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import type {Layers,Layer,Coloring} from './Controls';
 import type {Cloud,Vehicle} from './protocol';
+import {writeCloudGeometry,writePathGeometry} from './sceneBuffers';
 
 export function Scene({clouds,layers,color,vehicle,paths,follow,reset}:{clouds:Partial<Record<Layer,Cloud>>;layers:Layers;color:Coloring;
  vehicle:Vehicle|null;paths:Record<string,number[][]>;follow:boolean;reset:number}){
@@ -29,35 +30,34 @@ export function Scene({clouds,layers,color,vehicle,paths,follow,reset}:{clouds:P
   }
   const objects:Partial<Record<Layer,THREE.Points>>={},lines:Record<string,THREE.Line>={};
   const cached:Partial<Record<Layer,{cloud:Cloud;color:Coloring}>>={};
-  const blue=new THREE.Color(0x3e6ebc),teal=new THREE.Color(0x54d5ad),yellow=new THREE.Color(0xf3d381);
+  const cachedPaths:Record<string,number[][]>={};
   function resetView(){camera.position.set(10,-13,10);controls.target.set(1,0,1.5);controls.update();}
   function update(){
    const value=latest.current;
    for(const layer of Object.keys(value.layers) as Layer[]){
-    const cloud=value.clouds[layer];if(objects[layer])objects[layer]!.visible=value.layers[layer];if(!cloud)continue;
+    const cloud=value.clouds[layer];if(objects[layer])objects[layer]!.visible=value.layers[layer]&&Boolean(cloud);if(!cloud)continue;
     if(cached[layer]?.cloud===cloud&&cached[layer]?.color===value.color)continue;
-    const geometry=new THREE.BufferGeometry(),positions=new Float32Array(cloud.count*3),colors=new Float32Array(cloud.count*3);
-    for(let i=0;i<cloud.count;i++){
-     positions.set(cloud.points.subarray(i*4,i*4+3),i*3);
-     const t=THREE.MathUtils.clamp(value.color==='height'?(cloud.points[i*4+2]+.5)/5.5:cloud.points[i*4+3]/100,0,1);
-     const c=t<.5?blue.clone().lerp(teal,t*2):teal.clone().lerp(yellow,(t-.5)*2);c.toArray(colors,i*3);
+    if(!objects[layer]){
+     objects[layer]=new THREE.Points(new THREE.BufferGeometry(),new THREE.PointsMaterial({size:layer==='voxels'?.18:.035,vertexColors:true,transparent:true,opacity:layer==='raw'?1:.7}));
+     objects[layer]!.frustumCulled=false;scene.add(objects[layer]!);
     }
-    geometry.setAttribute('position',new THREE.BufferAttribute(positions,3));geometry.setAttribute('color',new THREE.BufferAttribute(colors,3));
-    if(objects[layer]){scene.remove(objects[layer]!);objects[layer]!.geometry.dispose();(objects[layer]!.material as THREE.Material).dispose();}
-    const object=new THREE.Points(geometry,new THREE.PointsMaterial({size:layer==='voxels'?.18:.035,vertexColors:true,transparent:true,opacity:layer==='raw'?1:.7}));
-    object.visible=value.layers[layer];scene.add(object);objects[layer]=object;cached[layer]={cloud,color:value.color};
+    writeCloudGeometry(objects[layer]!.geometry,cloud.points,cloud.count,value.color);
+    objects[layer]!.visible=value.layers[layer];cached[layer]={cloud,color:value.color};
    }
    drone.visible=Boolean(value.vehicle&&value.vehicle.age_s<2);
    if(value.vehicle){drone.position.fromArray(value.vehicle.position);drone.quaternion.fromArray(value.vehicle.quaternion);}
+   for(const name of Object.keys(lines))lines[name].visible=name in value.paths;
    for(const [name,points] of Object.entries(value.paths)){
-    const geometry=new THREE.BufferGeometry().setFromPoints(points.map(p=>new THREE.Vector3(...p as [number,number,number])));
-    if(lines[name]){scene.remove(lines[name]);lines[name].geometry.dispose();(lines[name].material as THREE.Material).dispose();}
-    lines[name]=new THREE.Line(geometry,new THREE.LineBasicMaterial({color:name==='planned'?0xffc96b:0x80baff,transparent:true,opacity:.9}));scene.add(lines[name]);
+    if(lines[name])lines[name].visible=true;
+    if(cachedPaths[name]===points)continue;
+    if(!lines[name]){lines[name]=new THREE.Line(new THREE.BufferGeometry(),new THREE.LineBasicMaterial({color:name==='planned'?0xffc96b:0x80baff,transparent:true,opacity:.9}));scene.add(lines[name]);}
+    writePathGeometry(lines[name].geometry,points);cachedPaths[name]=points;
    }
   }
   handle.current={update,reset:resetView};resetView();update();
   const resize=new ResizeObserver(()=>{const {width,height}=container.getBoundingClientRect();renderer.setSize(width,height);camera.aspect=width/Math.max(1,height);camera.updateProjectionMatrix();});resize.observe(container);
-  function animate(){frame=requestAnimationFrame(animate);if(latest.current.follow&&drone.visible){const delta=drone.position.clone().sub(controls.target);controls.target.addScaledVector(delta,.07);camera.position.addScaledVector(delta,.07);}controls.update();renderer.render(scene,camera);}
+  let lastRender=0;
+  function animate(now=0){frame=requestAnimationFrame(animate);if(document.hidden||now-lastRender<1000/30)return;lastRender=now;if(latest.current.follow&&drone.visible){const delta=drone.position.clone().sub(controls.target);controls.target.addScaledVector(delta,.07);camera.position.addScaledVector(delta,.07);}controls.update();renderer.render(scene,camera);}
   animate();return()=>{cancelAnimationFrame(frame);resize.disconnect();controls.dispose();scene.traverse(o=>{if(o instanceof THREE.Mesh||o instanceof THREE.Points||o instanceof THREE.Line){o.geometry.dispose();const materials=Array.isArray(o.material)?o.material:[o.material];materials.forEach(m=>m.dispose());}});renderer.dispose();renderer.domElement.remove();handle.current=undefined;};
  },[]);
  useEffect(()=>{handle.current?.update();},[clouds,layers,color,vehicle,paths]);

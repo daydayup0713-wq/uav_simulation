@@ -5,7 +5,6 @@ import json
 from pathlib import Path
 import signal
 import time
-import numpy as np
 
 
 def main():

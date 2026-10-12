@@ -20,7 +20,7 @@ from scipy.spatial.transform import Rotation
 from tf2_msgs.msg import TFMessage
 from tf2_ros import TransformBroadcaster, StaticTransformBroadcaster
 
-from .benchmark import stamp, cloud_xyz
+from .benchmark import stamp
 from .quality import LocalizationQuality, normalize_pose
 from .maps import load_map, relocalize, map_change_allowed
 from .frames import pose_matrix, control_frame_alignment
