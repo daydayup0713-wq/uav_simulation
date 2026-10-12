@@ -2,7 +2,7 @@
 
 面向 PX4 学习、算法验证和巡检仿真的独立实验室。L1 升级增加七个定位后端、四条规划流水线、连续轨迹、六种复杂场景和本地 Web 点云/对照/回放实验台。Gazebo、RViz、CLI 与 V0.1～V0.4 回归入口保留；算法阶段与实际失败结果单独记录。
 
-[实验台操作与算法限制](docs/l1-workbench.md) · [本机验收与实际失败结果](docs/validation/l1/acceptance.md) · [真机准备入口](docs/hardware-preparation.md)
+[实验台操作与算法限制](docs/l1-workbench.md) · [本机验收与实际失败结果](docs/validation/l1/acceptance.md) · [真机准备入口](docs/hardware-preparation.md) · [项目体检](docs/validation/health/audit.md) · [显式维护](docs/maintenance.md)
 
 ```bash
 npm --prefix web ci

@@ -51,6 +51,6 @@ def configuration(value):
 
 def recording_path(root,identifier):
     if not isinstance(identifier,str) or not re.fullmatch(r'[A-Za-z0-9_-]{1,128}',identifier):raise ValueError('invalid recording identifier')
-    root=Path(root).resolve();path=(root/'recordings'/identifier).resolve()
-    if path.parent!=root/'recordings':raise ValueError('recording identifier escapes owned root')
+    root=Path(root).resolve();owned=(root/'recordings').resolve();path=(owned/identifier).resolve()
+    if path.parent!=owned:raise ValueError('recording identifier escapes owned root')
     return path
