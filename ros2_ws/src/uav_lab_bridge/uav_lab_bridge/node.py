@@ -81,7 +81,8 @@ class Bridge(Node):
             config=json.loads(config_path.read_text())
             self.stop_map=StopAdmission(np.asarray(config['body_halfsize_m'])+config['clearance_m'])
             self.policy.stop_admission=self.admit_stop
-            self.create_subscription(DiagnosticArray, 'navigation/diagnostics', self.navigation_callback, 10, callback_group=group)
+            self.navigation_group=MutuallyExclusiveCallbackGroup()
+            self.create_subscription(DiagnosticArray, 'navigation/diagnostics', self.navigation_callback, 1, callback_group=self.navigation_group)
             from rclpy.qos import QoSProfile,ReliabilityPolicy
             self.create_subscription(CollisionSnapshot,'navigation/collision_snapshot',self.collision_callback,
                 QoSProfile(depth=1,reliability=ReliabilityPolicy.BEST_EFFORT),callback_group=group)
@@ -199,13 +200,16 @@ class Bridge(Node):
         return True
 
     def navigation_callback(self, msg):
+        self.timing.arrival('navigation_received',msg.header.stamp.sec+msg.header.stamp.nanosec/1e9,time.monotonic())
         with self.lock:
             for status in msg.status:
                 if status.name == 'uav001/navigation':
                     values = {v.key: v.value for v in status.values}
                     try:source = float(values['source_stamp'])
                     except (ValueError, KeyError):source = math.nan
-                    self.navigation.observe(status.level == DiagnosticStatus.OK and values.get('ready') == 'True', source, values.get('frame'), time.monotonic())
+                    applied=time.monotonic()
+                    self.navigation.observe(status.level == DiagnosticStatus.OK and values.get('ready') == 'True', source, values.get('frame'), applied)
+                    self.timing.arrival('navigation_applied',source if math.isfinite(source) else 0.,applied)
 
     def navigation_ready(self, now):
         return not self.navigation_enabled or self.navigation.ready(now, self.get_clock().now().nanoseconds/1e9)
@@ -301,7 +305,10 @@ class Bridge(Node):
                 self.record('runtime_timing',channels=self.timing.snapshot(wall,sim/1e9),
                     external_sample_age=None if self.external.sample_at is None else wall-self.external.sample_at,
                     external_quality_age=None if self.external.quality_at is None else wall-self.external.quality_at,
-                    fusion_age=wall-self.fusion_received,fusion=self.fusion_flags)
+                    fusion_age=wall-self.fusion_received,fusion=self.fusion_flags,
+                    navigation={'source_stamp':self.navigation.source if self.navigation.source is not None and math.isfinite(self.navigation.source) else None,
+                        'receipt_age_s':wall-self.navigation.received if math.isfinite(self.navigation.received) else None,
+                        'healthy':self.navigation.healthy,'failure':self.navigation.failed})
             dt = 0 if self.previous_sim is None else (sim-self.previous_sim)/1e9
             if dt < 0:
                 self.policy.fail('simulation clock regression')
@@ -365,7 +372,9 @@ class Bridge(Node):
             if self.last_state != self.policy.state:
                 self.last_state = self.policy.state
                 self.get_logger().info(f'{self.policy.state}: {self.policy.reason}')
-                self.record('state', phase=self.policy.state, reason=self.policy.reason)
+                self.record('state', phase=self.policy.state, reason=self.policy.reason,
+                    navigation_source=self.navigation.source if self.navigation.source is not None and math.isfinite(self.navigation.source) else None,
+                    navigation_receipt_age=wall-self.navigation.received if math.isfinite(self.navigation.received) else None)
             if wall-self.last_observe >= .2:
                 self.last_observe = wall
                 self.observe(wall)

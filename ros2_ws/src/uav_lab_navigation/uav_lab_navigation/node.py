@@ -74,6 +74,7 @@ class NavigationNode(Node):
         self.map_lock=threading.RLock();self.data_lock=threading.RLock()
         self.motion_lock=threading.RLock();self.busy=False;self.accepted_epoch=None;self.leg_timeout_s=75.;self.acceptance_timeout_s=5.
         self.map_group=MutuallyExclusiveCallbackGroup();self.action_group=ReentrantCallbackGroup()
+        self.health_group=MutuallyExclusiveCallbackGroup();self.health_lock=threading.Lock();self.health_recorded=0.
         self.trace=(run/'navigation.jsonl').open('a',buffering=1) if run else None
         self.run=run;self.saved_at=0.;self.storage=ThreadPoolExecutor(max_workers=1);self.save_future=None
         self.session_id=uuid.uuid4().hex;self.archive_lock=threading.Lock()
@@ -104,7 +105,7 @@ class NavigationNode(Node):
         self.route_server=ActionServer(self,NavigateRoute,'navigation/route',execute_callback=self.navigate_route,
             goal_callback=self.route_goal,cancel_callback=lambda handle:CancelResponse.ACCEPT,callback_group=self.action_group)
         self.create_timer(self.config['map_period_s'],self.map_cycle,callback_group=self.map_group,clock=Clock(clock_type=ClockType.STEADY_TIME))
-        self.create_timer(.1,self.tick,clock=Clock(clock_type=ClockType.STEADY_TIME))
+        self.create_timer(.1,self.tick,callback_group=self.health_group,clock=Clock(clock_type=ClockType.STEADY_TIME))
 
     def record(self,event,**values):
         if self.trace:self.trace.write(json.dumps({'event':event,'wall_monotonic':time.monotonic(),**values},allow_nan=False)+'\n')
@@ -205,6 +206,9 @@ class NavigationNode(Node):
                 else:self.grid.source_stamp=source
                 self.map_stamp=source;self.map_at=time.monotonic()
                 collision=self.grid.snapshot(self.envelope)
+            # Publish the committed map's health before display and archive work.
+            # The regular steady timer independently reports actual expiry.
+            self.tick()
             from rclpy.time import Time
             source_header=Time(nanoseconds=round(source*1e9)).to_msg()
             self.publish_occupied(occupied,source_header)
@@ -247,18 +251,19 @@ class NavigationNode(Node):
 
     def report(self,now=None):
         now=time.monotonic() if now is None else now
-        source_age=None if self.map_stamp is None else self.get_clock().now().nanoseconds/1e9-self.map_stamp
+        map_stamp,map_at=self.map_stamp,self.map_at
+        source_age=None if map_stamp is None else self.get_clock().now().nanoseconds/1e9-map_stamp
         healthy=(not self.failure and self.alignment is not None and self.quality_ready and now-self.quality_at<=.75
-            and now-self.pose_at<=.5 and self.map_stamp is not None and -.1<=source_age<=self.config['source_timeout_s']
-            and now-self.map_at<=self.config['source_timeout_s'])
+            and now-self.pose_at<=.5 and map_stamp is not None and -.1<=source_age<=self.config['source_timeout_s']
+            and now-map_at<=self.config['source_timeout_s'])
         if self.was_ready and not healthy and not self.failure:
             self.failure='navigation source/quality expired; restart lab'
             self.record('source_failure',quality_ready=self.quality_ready,quality_age=now-self.quality_at,pose_age=now-self.pose_at,
-                map_receipt_age=now-self.map_at,source_age=source_age,
+                map_receipt_age=now-map_at,source_age=source_age,
                 channels=self.timing.snapshot(now,self.get_clock().now().nanoseconds/1e9))
         if healthy:self.was_ready=True
         return {'ready':bool(healthy),'state':'FAILED' if self.failure else 'READY' if healthy else 'INITIALIZING',
-            'reason':self.failure,'source_age':source_age,'source_stamp':self.map_stamp,'map_version':self.grid.version,'frame':'odom'}
+            'reason':self.failure,'source_age':source_age,'source_stamp':map_stamp,'map_version':self.grid.version,'frame':'odom'}
 
     def publish_occupied(self,points,source):
         values=np.asarray(points,dtype='<f4');msg=PointCloud2();msg.header.frame_id='odom';msg.header.stamp=source
@@ -326,10 +331,18 @@ class NavigationNode(Node):
         return result['curve'],collision
 
     def tick(self):
-        report=self.report();msg=DiagnosticArray();msg.header.stamp=self.get_clock().now().to_msg()
-        msg.status=[DiagnosticStatus(name='uav001/navigation',hardware_id='bounded-3d',level=DiagnosticStatus.OK if report['ready'] else DiagnosticStatus.ERROR if self.failure else DiagnosticStatus.WARN,
-            message=report['state'],values=[KeyValue(key=k,value=str(v)) for k,v in report.items()])]
-        self.diagnostic_pub.publish(msg)
+        # Timer and map-completion publication share ordering, while health does
+        # not wait behind ordinary source/reference callbacks.
+        with self.health_lock:
+            report=self.report();msg=DiagnosticArray();msg.header.stamp=self.get_clock().now().to_msg()
+            msg.status=[DiagnosticStatus(name='uav001/navigation',hardware_id='bounded-3d',level=DiagnosticStatus.OK if report['ready'] else DiagnosticStatus.ERROR if self.failure else DiagnosticStatus.WARN,
+                message=report['state'],values=[KeyValue(key=k,value=str(v)) for k,v in report.items()])]
+            self.diagnostic_pub.publish(msg)
+            now=time.monotonic();self.timing.arrival('health_publish',self.get_clock().now().nanoseconds/1e9,now)
+            if now-self.health_recorded>=1.:
+                self.health_recorded=now
+                self.record('health_publish',source_stamp=report.get('source_stamp'),source_age=report.get('source_age'),
+                    state=report['state'],channels=self.timing.snapshot(now,self.get_clock().now().nanoseconds/1e9))
 
     def navigation_goal(self,request):
         with self.motion_lock:
