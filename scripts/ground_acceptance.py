@@ -20,6 +20,16 @@ def diagnostic_level(value):
     return int.from_bytes(value,'little') if isinstance(value,bytes) else int(value)
 
 
+def ground_failure(name,phase,level,values):
+    if diagnostic_level(level)>=2 or phase in ('FAILSAFE','FAILED'):
+        return name+': '+phase+' '+values.get('reason','')
+    if name=='flight':
+        if values.get('armed')=='True':return 'ground acceptance requires unarmed vehicle'
+        for key in ('navigation_ready','external_ready'):
+            if values.get(key)=='False':return 'flight: '+key+' rejected despite '+phase
+    return None
+
+
 def resources(run):
     try:groups=set(json.loads((run/'processes.json').read_text()).values())
     except (OSError,ValueError):return []
@@ -57,9 +67,7 @@ def main():
             if name not in COMPONENTS:continue
             states[name]=status.message;received[name]=time.monotonic()
             values={v.key:v.value for v in status.values}
-            reason=None
-            if diagnostic_level(status.level)>=2 or status.message in ('FAILSAFE','FAILED'):reason=name+': '+status.message+' '+values.get('reason','')
-            if name=='flight' and values.get('armed')=='True':reason='ground acceptance requires unarmed vehicle'
+            reason=ground_failure(name,status.message,status.level,values) if time.monotonic()-begun>5 else None
             if reason and reason not in failures:failures.append(reason)
     for topic in ('/uav001/diagnostics','/uav001/localization/diagnostics','/uav001/navigation/diagnostics'):
         node.create_subscription(DiagnosticArray,topic,diagnose,10)

@@ -15,6 +15,8 @@ def authorize(command,state,now,mode):
     if any(state.get(key) not in ('True','False') for key in ('armed','landed','offboard')):
         raise ValueError('unknown flight state flags prohibit commands')
     armed,landed,offboard=[state.get(key)=='True' for key in ('armed','landed','offboard')]
+    if command in ('arm','takeoff','goto','route') and any(state.get(key)=='False' for key in ('navigation_ready','external_ready')):
+        raise ValueError('reported control health rejected; inspect localization/navigation or restart on ground')
     if command=='stop':
         if armed or not landed or state.get('phase') not in ('READY','FAILSAFE'):
             raise ValueError('disarmed landed stable ground state required')

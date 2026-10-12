@@ -16,6 +16,7 @@ ORIGINS=('http://127.0.0.1:8780','http://localhost:8780')
 
 
 DISABLED_REASONS={
+    'reported control health rejected; inspect localization/navigation or restart on ground':'飞控收到的定位或导航健康尚未通过；地面未解锁时查看诊断，锁存后需停止并重启实验。',
     'fresh flight state required':'等待新鲜飞行遥测；请检查观测桥和飞控诊断。',
     'unknown flight state flags prohibit commands':'飞行状态尚未确认，暂不允许控制。',
     'idle disarmed ground state required':'解锁需要 READY、已落地且未解锁状态。',

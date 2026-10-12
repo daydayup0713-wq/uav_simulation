@@ -80,3 +80,56 @@ it('点云时间落后时明确标记保留旧帧，与飞行健康分开',async
  await act(async()=>{socket.onopen();socket.onmessage({data:buffer});socket.onmessage({data:JSON.stringify({kind:'telemetry',simulation_time:10,vehicle:null,diagnostics:{},layer_errors:{}})});});
  expect(screen.getByText(/点云画面已滞后 9.0 秒/)).toBeTruthy();
 });
+
+it('离开未完成的报告查询后取消读取并清除等待提示',async()=>{
+ vi.stubGlobal('WebSocket',class{close(){}});
+ const state={mode:'live',selection:{localization:'glim',planning:'fast_planner',scene:'circle-eight',sensor_profile:null},active_run:null,allowed:[],jobs:[],backends:[],catalog_checking:false,replay:null};
+ let reportSignal:AbortSignal|undefined;
+ vi.stubGlobal('fetch',vi.fn((url:string,options:RequestInit)=>{
+  if(url.includes('comparison')){reportSignal=options.signal as AbortSignal;return new Promise(()=>{});}
+  return Promise.resolve({ok:true,json:async()=>state});
+ }));
+ await act(async()=>{render(<App/>);});
+ await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'算法对照'}));});
+ expect(screen.getByText('正在读取报告，请稍候…')).toBeTruthy();
+ await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'空间观测'}));});
+ expect(screen.queryByText('正在读取报告，请稍候…')).toBeNull();
+ expect(reportSignal?.aborted).toBe(true);
+});
+
+it('慢回放不会逐帧积压请求，跳转取消旧读取',async()=>{
+ vi.useFakeTimers();vi.stubGlobal('WebSocket',class{close(){}});
+ const state={mode:'replay',selection:{localization:'glim',planning:'fast_planner',scene:'circle-eight',sensor_profile:null},active_run:null,allowed:[],jobs:[],backends:[],catalog_checking:false,
+  replay:{identifier:'recorded',frames:100,frame_times_s:Array.from({length:100},(_,i)=>i*.2),duration_s:20,actual_path:[]}};
+ const frames:AbortSignal[]=[];
+ vi.stubGlobal('fetch',vi.fn((url:string,options:RequestInit)=>{
+  if(url.includes('replay/frame')){frames.push(options.signal as AbortSignal);return new Promise(()=>{});}
+  return Promise.resolve({ok:true,json:async()=>url.includes('recordings')?[]:state});
+ }));
+ await act(async()=>{render(<App/>);});
+ await act(async()=>{await vi.advanceTimersByTimeAsync(101);fireEvent.click(screen.getByRole('button',{name:'播放'}));});
+ await act(async()=>{await vi.advanceTimersByTimeAsync(2000);});
+ expect(frames).toHaveLength(1);
+ await act(async()=>{fireEvent.change(screen.getByRole('slider',{name:'回放进度'}),{target:{value:'30'}});});
+ expect(frames[0].aborted).toBe(true);
+});
+
+it('回放失败保留原因并提供只读重试，成功帧清除该错误',async()=>{
+ vi.useFakeTimers();vi.stubGlobal('WebSocket',class{close(){}});
+ const state={mode:'replay',selection:{localization:'glim',planning:'fast_planner',scene:'circle-eight',sensor_profile:null},active_run:null,allowed:[],jobs:[],backends:[],catalog_checking:false,
+  replay:{identifier:'recorded',frames:2,frame_times_s:[0,.2],duration_s:.2,actual_path:[]}};
+ const text=new TextEncoder().encode(JSON.stringify({kind:'cloud',layer:'raw',count:1,source_count:1,frame:'odom',stamp:0}));
+ const offset=4+Math.ceil(text.length/4)*4,packet=new ArrayBuffer(offset+16);new DataView(packet).setUint32(0,text.length,true);new Uint8Array(packet,4,text.length).set(text);
+ let reads=0;
+ const fetcher=vi.fn((url:string,options:RequestInit)=>{
+  void options;
+  if(url.includes('replay/frame'))return ++reads===1?Promise.reject(Error('录制读取失败')):Promise.resolve({ok:true,arrayBuffer:async()=>packet});
+  return Promise.resolve({ok:true,json:async()=>url.includes('recordings')?[]:state});
+ });vi.stubGlobal('fetch',fetcher);
+ await act(async()=>{render(<App/>);});await act(async()=>{await vi.advanceTimersByTimeAsync(101);});
+ expect(screen.getByText('录制读取失败')).toBeTruthy();
+ await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'重新读取点云帧'}));});
+ await act(async()=>{await vi.advanceTimersByTimeAsync(101);});
+ expect(screen.queryByText('录制读取失败')).toBeNull();expect(screen.getByText('1 显示点')).toBeTruthy();
+ expect(fetcher.mock.calls.every(([,options])=>!options?.method)).toBe(true);
+});

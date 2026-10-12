@@ -162,3 +162,61 @@ def test_native_passed_acceptance_field_retains_recent_three(tmp_path):
         (item/'bridge.log').write_text('READY')
         (item/'acceptance.json').write_text('{"passed":true}')
     assert len(plan(root,NOW)['candidates'])==1
+
+@pytest.mark.parametrize('link_directory',[False,True])
+def test_retained_report_container_transitively_protects_raw_run(tmp_path,link_directory):
+    from maintenance import plan
+    root=project(tmp_path);items=[run(root,i) for i in range(1,5)]
+    reports=root/'.runtime/flight-acceptance';reports.mkdir()
+    nested=reports/'nested';nested.mkdir()
+    (nested/'acceptance.json').write_text(json.dumps({'run_id':items[0].name}))
+    if link_directory:
+        docs=root/'docs';docs.mkdir()
+        (docs/'index.md').write_text('[acceptance](.runtime/flight-acceptance)')
+    assert not plan(root,NOW)['candidates']
+
+
+def test_recent_retained_run_protects_older_origin(tmp_path):
+    from maintenance import plan
+    root=project(tmp_path);items=[run(root,i) for i in range(1,5)]
+    (items[-1]/'origin.json').write_text(json.dumps({'run_id':items[0].name}))
+    assert not plan(root,NOW)['candidates']
+
+
+def test_interrupted_removal_has_durable_intent_and_interrupted_audit(tmp_path,monkeypatch):
+    import maintenance
+    root=project(tmp_path);items=[run(root,i) for i in range(1,5)]
+    proposal=maintenance.plan(root,NOW);original=maintenance.remove_owned
+    def interrupt(*args):
+        audit=list((root/'.runtime/maintenance').glob('*.json'))
+        assert audit and json.loads(audit[0].read_text())['pending']==str(items[0].relative_to(root))
+        original(*args)
+        raise KeyboardInterrupt()
+    monkeypatch.setattr(maintenance,'remove_owned',interrupt)
+    with pytest.raises(KeyboardInterrupt):maintenance.apply(root,proposal,NOW)
+    assert not items[0].exists()
+    record=json.loads(next((root/'.runtime/maintenance').glob('*.json')).read_text())
+    assert record['state']=='interrupted' and record['pending']
+    assert record['result']['success'] is False
+
+
+def test_audit_storage_failure_prevents_any_deletion(tmp_path,monkeypatch):
+    import maintenance
+    root=project(tmp_path);items=[run(root,i) for i in range(1,5)]
+    proposal=maintenance.plan(root,NOW)
+    monkeypatch.setattr(maintenance.os,'fsync',lambda _:(_ for _ in ()).throw(OSError('disk unavailable')))
+    with pytest.raises(OSError):maintenance.apply(root,proposal,NOW)
+    assert all(item.exists() for item in items)
+
+
+def test_intermittent_audit_write_failure_stops_remaining_candidates(tmp_path,monkeypatch):
+    import maintenance
+    root=project(tmp_path);items=[run(root,i) for i in range(1,7)]
+    proposal=maintenance.plan(root,NOW);original=maintenance.os.fsync;calls=[0]
+    def fail_intent(fd):
+        calls[0]+=1
+        if calls[0]==3:raise OSError('intent fsync failed')
+        original(fd)
+    monkeypatch.setattr(maintenance.os,'fsync',fail_intent)
+    with pytest.raises(OSError):maintenance.apply(root,proposal,NOW)
+    assert all(item.exists() for item in items)

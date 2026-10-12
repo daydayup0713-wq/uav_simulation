@@ -2,9 +2,7 @@ import {useEffect,useRef,useState} from 'react';
 import {Controls,layerNames} from './Controls';
 import type {Layers,Layer,Coloring} from './Controls';
 import {Scene} from './Scene';
-import {decodeCloud} from './protocol';
-import type {Cloud} from './protocol';
-import {apiBuffer} from './api';
+import {useReplay} from './useReplay';
 import {useControlConnection,useObservation} from './useConnections';
 import {useReports} from './useReports';
 import {api,Comparison,Configuration,FlightControls,MetricCurve} from './Workbench';
@@ -28,7 +26,9 @@ export default function App(){
  const reports=useReports(tab,mode,!observationOnly);
  const {comparison,runs,recordings}=reports;
  const [wallNow,setWallNow]=useState(Date.now());
- const [replayCloud,setReplayCloud]=useState<Cloud|null>(null);
+ const replay=useReplay(mode,workbench?.replay?.identifier,replayIndex);
+ const {cloud:replayCloud,loading:replayLoading,loadedFrame}=replay;
+ useEffect(()=>{if(replay.error)setPlaying(false);},[replay.error]);
  useEffect(()=>{const timer=setInterval(()=>setWallNow(Date.now()),200);return()=>clearInterval(timer);},[]);
  useEffect(()=>{if(workbench&&!configured.current){setDraft(workbench.selection);configured.current=true;}},[workbench]);
  const readCurve=async(identifier:string)=>{
@@ -37,19 +37,15 @@ export default function App(){
   catch(e){if(request===curveRequest.current)setCurveError(e instanceof Error?e.message:'指标读取失败');}
   finally{if(request===curveRequest.current)setCurveLoading(false);}
  };
- const command=async(name:string,payload:unknown={})=>{try{await api(name,payload);setError('');if(name==='mode'){setPlaying(false);setReplayCloud(null);setReplayIndex(0);}}
+ const command=async(name:string,payload:unknown={})=>{try{await api(name,payload);setError('');if(name==='mode'){setPlaying(false);setReplayIndex(0);}}
   catch(e){setError(e instanceof Error?e.message:'实验操作失败');}};
- useEffect(()=>{setPlaying(false);setReplayIndex(0);setReplayCloud(null);},[workbench?.replay?.identifier]);
+ useEffect(()=>{setPlaying(false);setReplayIndex(0);},[workbench?.replay?.identifier]);
  useEffect(()=>{
-  if(mode!=='replay'||!workbench?.replay)return;
-  let current=true;
-  apiBuffer('replay/frame?index='+replayIndex)
-   .then(buffer=>{if(current)setReplayCloud(decodeCloud(buffer));}).catch(e=>{if(current&&e.name!=='AbortError')setError(e.message);});
-  return()=>{current=false;};
- },[mode,replayIndex,workbench?.replay?.identifier]);
- useEffect(()=>{if(!playing||mode!=='replay'||!workbench?.replay)return;const info=workbench.replay;
-  const timer=setInterval(()=>setReplayIndex(index=>{if(index>=info.frames-1){setPlaying(false);return index;}return index+1;}),200);return()=>clearInterval(timer);
- },[playing,mode,workbench?.replay?.identifier]);
+  if(!playing||mode!=='replay'||!workbench?.replay||replayLoading||loadedFrame!==workbench.replay.identifier+':'+replayIndex)return;
+  const frames=workbench.replay.frames;
+  const timer=setTimeout(()=>{if(replayIndex>=frames-1)setPlaying(false);else setReplayIndex(replayIndex+1);},200);
+  return()=>clearTimeout(timer);
+ },[playing,mode,workbench?.replay?.identifier,replayIndex,replayLoading,loadedFrame]);
  const displayClouds=mode==='replay'?(replayCloud?{raw:replayCloud}:{}):clouds;
  const displayPaths=mode==='replay'?{actual:workbench?.replay?.actual_path??[]}:paths;
  const observedFresh=connected&&wallNow-observation.received<=1000;
@@ -85,7 +81,9 @@ export default function App(){
    {mode==='replay'&&<div className="replay-controls"><select aria-label="录制数据" value={recording} onChange={e=>setRecording(e.target.value)}><option value="">选择本机录制</option>{recordings.map(r=><option key={r.id} value={r.id}>{r.id}</option>)}</select>
     <button disabled={!recording||!apiAvailable} onClick={()=>void command('replay',{identifier:recording})}>载入</button>
     <button disabled={!workbench?.replay} onClick={()=>setPlaying(!playing)}>{playing?'暂停':'播放'}</button>
-    {workbench?.replay&&<><input aria-label="回放进度" type="range" min="0" max={workbench.replay.frames-1} value={replayIndex} onChange={e=>setReplayIndex(Number(e.target.value))}/><span>{workbench.replay.frame_times_s[replayIndex]?.toFixed(1)} / {workbench.replay.duration_s.toFixed(1)} s · 5Hz</span></>}</div>}
+    {workbench?.replay&&<><input aria-label="回放进度" type="range" min="0" max={workbench.replay.frames-1} value={replayIndex} onChange={e=>{setPlaying(false);setReplayIndex(Number(e.target.value));}}/><span>{workbench.replay.frame_times_s[replayIndex]?.toFixed(1)} / {workbench.replay.duration_s.toFixed(1)} s · 5Hz</span></>}</div>}
+   {mode==='replay'&&replay.error&&<p role="alert" className="request-error"><span>{replay.error}</span><button onClick={replay.retry}>重新读取点云帧</button></p>}
+   {mode==='replay'&&replayLoading&&<p role="status">正在读取点云帧，请稍候… 慢速读取时暂停推进，保留上次画面。</p>}
    {mode==='replay'&&!reports.loading&&!reports.error&&!recordings.length&&<p role="status" className="control-notice">暂无可用录制。请先完成传感器录制和数据检查，再载入回放。</p>}
    {mode==='replay'&&!!workbench?.replay?.unshown_source_frames&&<p className="fine-print">{workbench.replay.unshown_source_frames} 帧缺少位姿时间支持，未显示；完整原始录制保留。</p>}
    {cloudAge!==null&&cloudAge>1&&<p role="status" className="control-notice">点云画面已滞后 {cloudAge.toFixed(1)} 秒，正在保留最后一帧可用数据。请查看下方图层的时间／TF 提示；飞行健康请以右侧实际诊断为准。</p>}

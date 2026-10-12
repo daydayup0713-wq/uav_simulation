@@ -16,3 +16,10 @@ def test_humble_byte_diagnostic_levels():
     assert diagnostic_level(b'\x00')==0
     assert diagnostic_level(b'\x02')==2
     assert diagnostic_level(2)==2
+
+
+def test_ready_display_does_not_hide_rejected_control_health():
+    from ground_acceptance import ground_failure
+    assert ground_failure('flight','READY',0,{'armed':'False','navigation_ready':'False'})
+    assert ground_failure('flight','READY',0,{'armed':'False','external_ready':'False'})
+    assert ground_failure('flight','READY',0,{'armed':'False','navigation_ready':'True','external_ready':'True'}) is None
