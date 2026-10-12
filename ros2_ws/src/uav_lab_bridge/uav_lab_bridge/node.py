@@ -32,6 +32,7 @@ from .coordinate import ned_to_enu, enu_to_ned, px4_to_ros_quaternion, yaw_to_ne
 from .clock import Px4Clock
 from .external_odometry import convert_external, ExternalOdometryGate
 from .navigation_gate import NavigationGate
+from .runtime_timing import RuntimeTiming
 
 class Bridge(Node):
     def __init__(self):
@@ -50,6 +51,8 @@ class Bridge(Node):
         self.declare_parameter('external_odometry', False)
         self.external_enabled = bool(self.get_parameter('external_odometry').value)
         self.external = ExternalOdometryGate()
+        self.timing = RuntimeTiming()
+        self.timing_recorded = 0.
         self.external_sent = None
         self.fusion_flags, self.fusion_received = {}, 0.
         self.fusion_was_ready = False
@@ -157,6 +160,7 @@ class Bridge(Node):
                                          'event': event, **values}, allow_nan=False)+'\n')
 
     def external_callback(self, msg):
+        self.timing.arrival('external_pose',msg.header.stamp.sec+msg.header.stamp.nanosec/1e9,time.monotonic())
         with self.lock:
             p, q = msg.pose.pose.position, msg.pose.pose.orientation
             v, w = msg.twist.twist.linear, msg.twist.twist.angular
@@ -291,6 +295,13 @@ class Bridge(Node):
         with self.lock:
             wall = time.monotonic()
             sim = self.get_clock().now().nanoseconds
+            self.timing.arrival('control_clock',sim/1e9,wall)
+            if wall-self.timing_recorded>=1.:
+                self.timing_recorded=wall
+                self.record('runtime_timing',channels=self.timing.snapshot(wall,sim/1e9),
+                    external_sample_age=None if self.external.sample_at is None else wall-self.external.sample_at,
+                    external_quality_age=None if self.external.quality_at is None else wall-self.external.quality_at,
+                    fusion_age=wall-self.fusion_received,fusion=self.fusion_flags)
             dt = 0 if self.previous_sim is None else (sim-self.previous_sim)/1e9
             if dt < 0:
                 self.policy.fail('simulation clock regression')

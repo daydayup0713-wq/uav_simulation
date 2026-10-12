@@ -32,6 +32,7 @@ from .occupancy import VoxelMap
 from .poses import PoseHistory,register_scan,remove_self_returns
 from .planner import plan
 from .local_map import RollingMap,register_beams
+from uav_lab_bridge.runtime_timing import RuntimeTiming
 
 
 class NavigationNode(Node):
@@ -68,6 +69,7 @@ class NavigationNode(Node):
         self.history=PoseHistory();self.alignment=None;self.pending_clouds=deque(maxlen=8)
         self.map_at,self.map_stamp,self.pose_at,self.quality_at=0.,None,0.,0.
         self.quality_ready=False;self.failure='';self.was_ready=False
+        self.timing=RuntimeTiming()
         self.current=None;self.current_at=0.;self.flight_status={};self.flight_at=0.
         self.map_lock=threading.RLock();self.data_lock=threading.RLock()
         self.motion_lock=threading.RLock();self.busy=False;self.accepted_epoch=None;self.leg_timeout_s=75.;self.acceptance_timeout_s=5.
@@ -124,6 +126,7 @@ class NavigationNode(Node):
         try:
             if msg.header.frame_id!='lio_odom' or msg.child_frame_id!='lio_base_link':raise ValueError('wrong navigation pose frame')
             p,q=msg.pose.pose.position,msg.pose.pose.orientation
+            self.timing.arrival('pose',stamp(msg)/1e9,time.monotonic())
             with self.data_lock:
                 self.history.add(stamp(msg)/1e9,[p.x,p.y,p.z],[q.x,q.y,q.z,q.w]);self.pose_at=time.monotonic()
         except ValueError as error:self.failure=str(error)
@@ -251,7 +254,8 @@ class NavigationNode(Node):
         if self.was_ready and not healthy and not self.failure:
             self.failure='navigation source/quality expired; restart lab'
             self.record('source_failure',quality_ready=self.quality_ready,quality_age=now-self.quality_at,pose_age=now-self.pose_at,
-                map_receipt_age=now-self.map_at,source_age=source_age)
+                map_receipt_age=now-self.map_at,source_age=source_age,
+                channels=self.timing.snapshot(now,self.get_clock().now().nanoseconds/1e9))
         if healthy:self.was_ready=True
         return {'ready':bool(healthy),'state':'FAILED' if self.failure else 'READY' if healthy else 'INITIALIZING',
             'reason':self.failure,'source_age':source_age,'source_stamp':self.map_stamp,'map_version':self.grid.version,'frame':'odom'}
