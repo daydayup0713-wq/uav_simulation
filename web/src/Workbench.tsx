@@ -1,10 +1,13 @@
 import {useState} from 'react';
 import type {Backend} from './protocol';
+export {api} from './api';
 export type Selection={localization:string;planning:string;scene:string;sensor_profile:string|null;rendering?:string};
 export type ReplayInfo={identifier:string;frames:number;duration_s:number;frame_times_s:number[];actual_path:number[][];ros_publications:number;scope:string;unshown_source_frames?:number;unshown_reason?:string};
-export type Job={id:string;command:string;state:string;success:boolean|null;reason:string};
+export type Job={id:string;command:string;state:string;success:boolean|null;reason:string;started_at?:number;elapsed_s?:number;stage?:string};
 export type WorkbenchStatus={mode:'live'|'replay';allowed:string[];active_run:string|null;connected:boolean;selection:Selection;
- jobs:Job[];backends:Backend[];catalog_checking:boolean;replay:ReplayInfo|null};
+ jobs:Job[];backends:Backend[];catalog_checking:boolean;replay:ReplayInfo|null;
+ blocked?:Record<string,string>;components?:Record<string,{message:string;reason:string;age_s:number|null}>;
+ flight?:{phase:string;reason?:string};startup?:{stage:string;state:string;reason:string;elapsed_s:number}|null};
 type Run={backend:string;success:boolean;source_verified:boolean;current_implementation?:boolean;error?:string;
  playback_rate?:number;input_counts?:Record<string,number>;
  quality?:{metrics?:Record<string,number|null>;reason?:string};global_quality?:{metrics?:Record<string,number|null>;reason?:string};
@@ -20,36 +23,37 @@ export type CurveData={scope:string;points:{time_s:number;error_m:number;speed_m
 export const scenes=['circle-eight','helix','multi-room','corridor','dense','outdoor-rtk'];
 const sceneNames=['圆形与八字','多高度螺旋','多房间闭环','重复结构长走廊','密集静态障碍','室外路线 / RTK 异常'];
 const stageNames:Record<string,string>={configured:'已配置',installed:'已安装',replay_passed:'回放通过',realtime_passed:'实时通过',closed_loop_qualified:'允许闭环'};
-export async function api<T>(path:string,payload?:unknown):Promise<T>{
- const response=await fetch('/api/'+path,payload===undefined?{cache:'no-store'}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
- const data=await response.json();if(!response.ok)throw Error(data.reason??'实验台请求失败');return data;
-}
 function number(value:unknown,digits=3){return typeof value==='number'&&Number.isFinite(value)?value.toFixed(digits):'—';}
 
 export function FlightControls({status,available,onCommand}:{status:WorkbenchStatus|null;available:boolean;onCommand:(command:string,payload?:unknown)=>void}){
  const [target,setTarget]=useState(['0','0','2']),[height,setHeight]=useState('2');
- const can=(name:string)=>available&&status?.mode==='live'&&status.allowed.includes(name);
+ const pending=status?.jobs.some(job=>job.state==='RUNNING');
+ const can=(name:string)=>available&&status?.mode==='live'&&status.allowed.includes(name)&&(!pending||name==='hold'||name==='land');
+ const explanation=pending?'指令仍在执行或确认，暂不接受重复运动；悬停与降落仍由后端授权。':!available?'正在等待控制服务和新鲜遥测，暂不能发送飞行指令。':status?.mode==='replay'?
+  '当前是历史回放，飞行控制禁用。':status?.flight?.phase==='HOLDING'?'已解锁并保持悬停。地面可起飞，空中可导航或显式降落。':status?.blocked?.arm??'先显式解锁，再起飞。';
  return <div className="flight-controls"><div className="section-label">实验控制 <span>EXPLICIT COMMANDS</span></div>
-  <div className="command-grid"><button disabled={!can('arm')} onClick={()=>onCommand('arm',{})}>解锁</button>
-   <button disabled={!can('disarm')} onClick={()=>onCommand('disarm',{})}>上锁</button>
-   <button disabled={!can('hold')} onClick={()=>onCommand('hold',{})}>悬停</button>
-   <button className="land-command" disabled={!can('land')} onClick={()=>onCommand('land',{})}>降落</button></div>
+  <p id="control-explanation" className="control-notice" role="status">{explanation}</p>
+  <div className="command-grid"><button aria-describedby="control-explanation" disabled={!can('arm')} onClick={()=>onCommand('arm',{})}>解锁</button>
+   <button aria-describedby="control-explanation" disabled={!can('disarm')} onClick={()=>onCommand('disarm',{})}>上锁</button>
+   <button aria-describedby="control-explanation" disabled={!can('hold')} onClick={()=>onCommand('hold',{})}>悬停</button>
+   <button aria-describedby="control-explanation" className="land-command" disabled={!can('land')} onClick={()=>onCommand('land',{})}>降落</button></div>
   <label className="control-label">起飞高度 / m<input type="number" min=".5" max="4.5" step=".1" value={height} onChange={e=>setHeight(e.target.value)}/></label>
-  <button disabled={!can('takeoff')||!Number.isFinite(Number(height))} onClick={()=>onCommand('takeoff',{height:Number(height)})}>起飞</button>
+  <button aria-describedby="control-explanation" disabled={!can('takeoff')||height.trim()===''||!Number.isFinite(Number(height))||Number(height)<.5||Number(height)>4.5} onClick={()=>onCommand('takeoff',{height:Number(height)})}>起飞</button>
   <label className="control-label">导航目标 ENU / m</label><div className="target-inputs">{target.map((value,i)=><label key={i}>{['X','Y','Z'][i]}<input aria-label={'目标 '+['X','Y','Z'][i]} type="number" step=".1" value={value} onChange={e=>setTarget(old=>old.map((x,j)=>i===j?e.target.value:x))}/></label>)}</div>
-  <div className="command-grid"><button disabled={!can('goto')||!target.every(x=>Number.isFinite(Number(x)))} onClick={()=>onCommand('goto',{target:target.map(Number)})}>前往目标</button>
-   <button disabled={!can('route')} onClick={()=>onCommand('route',{})}>执行固定航线</button></div>
+  <div className="command-grid"><button aria-describedby="control-explanation" disabled={!can('goto')||!target.every(x=>x.trim()!==''&&Number.isFinite(Number(x)))} onClick={()=>onCommand('goto',{target:target.map(Number)})}>前往目标</button>
+   <button aria-describedby="control-explanation" disabled={!can('route')} onClick={()=>onCommand('route',{})}>执行固定航线</button></div>
   <p className="fine-print">先解锁，再起飞。航线结束保持悬停，请显式降落。失效状态禁止控制；HOLD / LAND 可打断运动。</p>
-  {status?.jobs.slice(-3).reverse().map(job=><div className={'job '+(job.success===false?'failed':'')} key={job.id}><b>{job.command} · {job.state}</b><small>{job.reason||'等待服务应答与实际状态确认'}</small></div>)}
+  {status?.jobs.slice(-3).reverse().map(job=><div role="status" className={'job '+(job.success===false?'failed':'')} key={job.id}><b>{job.command} · {job.state}</b><small>{job.state==='RUNNING'?`${job.stage??'等待服务应答与实际状态确认'} · ${number(job.elapsed_s,0)} 秒`:job.reason|| (job.success?'操作已确认完成':'结果尚未确认')}</small></div>)}
  </div>;
 }
 
 export function Configuration({status,available,draft,onDraft,onCommand}:{status:WorkbenchStatus|null;available:boolean;draft:Selection;onDraft:(value:Selection)=>void;onCommand:(command:string,payload?:unknown)=>void}){
- const canSelect=available&&status?.mode==='live'&&(!status.active_run||status.allowed.includes('select'));
+ const pending=status?.jobs.some(job=>job.state==='RUNNING');
+ const canSelect=!pending&&available&&status?.mode==='live'&&(!status.active_run||status.allowed.includes('select'));
  return <><div className="section-label">下一实验配置 <span>{status?.active_run?'NEXT RUN':'CONFIGURATION'}</span></div>
   {(['localization','planning'] as const).map(role=><label className="control-label" key={role}>{role==='localization'?'定位后端':'规划后端'}
    <select value={draft[role]} disabled={!canSelect} onChange={e=>onDraft({...draft,[role]:e.target.value})}>
-    {(status?.backends.filter(x=>x.role===role).length?status.backends.filter(x=>x.role===role):[{id:draft[role],name:draft[role],role,stage:'configured'}]).map(x=><option key={x.id} value={x.id}>{x.name??x.id} · {stageNames[x.stage]??x.stage}</option>)}
+    {(available&&status?.backends.filter(x=>x.role===role).length?status.backends.filter(x=>x.role===role):[{id:draft[role],name:draft[role],role,stage:'状态未获取'}]).map(x=><option key={x.id} value={x.id}>{x.name??x.id} · {stageNames[x.stage]??x.stage}</option>)}
    </select></label>)}
   <label className="control-label">实验场景<select value={draft.scene} disabled={!canSelect} onChange={e=>onDraft({...draft,scene:e.target.value})}>{scenes.map((x,i)=><option key={x} value={x}>{sceneNames[i]}</option>)}</select></label>
   <label className="control-label">传感器输入<select value={draft.sensor_profile??'sync'} disabled={!canSelect} onChange={e=>onDraft({...draft,sensor_profile:e.target.value==='sync'?null:e.target.value})}>
@@ -57,9 +61,10 @@ export function Configuration({status,available,draft,onDraft,onCommand}:{status
   <label className="control-label">渲染模式<select value={draft.rendering??'auto'} disabled={!canSelect} onChange={e=>onDraft({...draft,rendering:e.target.value})}>
    <option value="auto">自动 / 无窗口 EGL</option><option value="mesa-display">Intel / Mesa 显示渲染</option></select></label>
   <div className="command-grid"><button disabled={!canSelect} onClick={()=>onCommand('select',draft)}>保存配置</button>
-   <button disabled={!available||status?.mode!=='live'||!!status?.active_run||status?.catalog_checking} onClick={()=>onCommand('start',{})}>启动实验</button>
+   <button disabled={pending||!available||status?.mode!=='live'||!!status?.active_run||status?.catalog_checking} onClick={()=>onCommand('start',{})}>启动实验</button>
    <button disabled={!available||!status?.allowed.includes('stop')||status.mode!=='live'} onClick={()=>onCommand('stop',{})}>停止实验</button></div>
   <p className="fine-print">启动使用已保存配置，只允许当前版本与指定组合通过闭环资格的后端。飞行期间禁止切换，修改在重启后生效。</p>
+  {status?.startup&&<div className="control-notice" role="status"><b>{status.startup.stage}</b><p>{status.startup.state} · 已等待 {number(status.startup.elapsed_s,0)} 秒</p>{status.startup.reason&&<p>{status.startup.reason}</p>}</div>}
  </>;
 }
 
