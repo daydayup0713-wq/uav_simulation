@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """Convert a fixed NTU VIRAL clip; algorithm sensors and evaluator truth are separated."""
-import argparse,json,shutil,hashlib
+import argparse,json
 from pathlib import Path
 import yaml
 import rosbag2_py
@@ -28,7 +28,7 @@ def main():
     topics={'/clock':'rosgraph_msgs/msg/Clock','/uav001/ground_truth/odometry':'nav_msgs/msg/Odometry'}
     topics.update({target:kind.__module__.split('.')[0]+'/msg/'+kind.__name__ for target,kind in SENSORS.values()})
     for topic,typename in topics.items():writer.create_topic(rosbag2_py.TopicMetadata(name=topic,type=typename,serialization_format='cdr'))
-    counts={t:0 for t in topics};first=last=None
+    counts={t:0 for t in topics};first=None
     with Reader(args.source) as reader:
         clip_start=reader.start_time;clip_end=clip_start+int(args.duration*1e9)
         connections=[c for c in reader.connections if c.topic in SENSORS or c.topic=='/leica/pose/relative']
@@ -46,7 +46,6 @@ def main():
                 msg.pose.pose.orientation.w=1.;cdr=serialize_message(msg)
             t=msg.header.stamp.sec*10**9+msg.header.stamp.nanosec
             if first is None:first=t
-            last=t
             clock=Clock();clock.clock=msg.header.stamp
             writer.write('/clock',serialize_message(clock),t);counts['/clock']+=1
             writer.write(target,cdr,t);counts[target]+=1

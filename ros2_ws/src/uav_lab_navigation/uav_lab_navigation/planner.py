@@ -4,7 +4,6 @@ from itertools import product
 import heapq
 import math
 import time
-import numpy as np
 from .occupancy import vector
 
 

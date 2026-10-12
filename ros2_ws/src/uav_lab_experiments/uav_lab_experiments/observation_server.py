@@ -1,6 +1,5 @@
 """Loopback WebSocket observation; slow browser clients cannot block ROS."""
 import asyncio
-import json
 import threading
 from websockets.legacy.server import serve
 from websockets.exceptions import ConnectionClosed

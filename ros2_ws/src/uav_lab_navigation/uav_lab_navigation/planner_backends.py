@@ -11,7 +11,7 @@ import time
 import numpy as np
 import psutil
 from scipy.ndimage import distance_transform_edt
-from uav_lab_bridge.continuous_trajectory import Trajectory,State,Limits
+from uav_lab_bridge.continuous_trajectory import Trajectory,Limits
 from .occupancy import vector
 from .native_provenance import verified_build
 
@@ -128,7 +128,9 @@ def native_plan(root,backend,collision,initial,goal,directory,limits=Limits(),ti
             request=write_request(directory/('attempt-'+str(attempt)),backend,collision,initial,goal,guide.points,limits)
             request['time_scale']=scale;path=directory/('attempt-'+str(attempt))
             (path/'request.json').write_text(json.dumps(request,indent=2,allow_nan=False)+'\n')
+            logs=path/'ros-logs';logs.mkdir()
             env={**os.environ,'OMP_NUM_THREADS':'1','OPENBLAS_NUM_THREADS':'1',
+                 'ROS_LOG_DIR':str(logs),
                  'LD_LIBRARY_PATH':str(Path(root)/'.deps/planners/nlopt/install/lib')+':'+os.environ.get('LD_LIBRARY_PATH','')}
             remaining=timeout-(time.monotonic()-started)
             if remaining<=0:raise ValueError('native planner budget exceeded')

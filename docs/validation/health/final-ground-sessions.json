@@ -1,0 +1,134 @@
+{
+  "schema": 1,
+  "passed": true,
+  "sessions": [
+    {
+      "success": true,
+      "elapsed_s": 1800.0703911850069,
+      "required_duration_s": 1800.0,
+      "final_states": {
+        "localization": "READY",
+        "navigation": "READY",
+        "flight": "READY"
+      },
+      "failures": [],
+      "run_id": "20261012T111707Z-06b7abfa",
+      "scope": "wall-clock ground run; passive observation, no commands",
+      "trace": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-baseline/qualified-ground-no-web.jsonl",
+      "condition": "qualified-ground-no-web",
+      "mean_owned_cpu_cores": 3.0312562349439123,
+      "peak_owned_rss_mib": 1274.2421875,
+      "map_compute_p95_s": 0.07252815099491272,
+      "map_compute_max_s": 0.0984497969984659,
+      "resources_scope": "sampled owned supervisor process groups; excludes independent 8780 server, browser and other host activity",
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-baseline/qualified-ground-no-web.jsonl",
+          "sha256": "c0593b492ce94ae4079be861db8a441988ba8d23d159f93dd47362f48497d3bb"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T111707Z-06b7abfa/manifest.json",
+          "sha256": "9f6f87e922f9ae984a52b9f53d654939da4a8cd74c617c9192ac738d40372659"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T111707Z-06b7abfa/events.jsonl",
+          "sha256": "83c3a78357865dff8eb650c71ba56f29b507add4f2aa5b2ad014c89afe20806c"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T111707Z-06b7abfa/navigation.jsonl",
+          "sha256": "1ee27d5175100324fd1919da384ff365cd7777fa48f576e5167d0e9dfdd5db26"
+        }
+      ]
+    },
+    {
+      "success": true,
+      "elapsed_s": 1800.0239208569983,
+      "required_duration_s": 1800.0,
+      "final_states": {
+        "navigation": "READY",
+        "localization": "READY",
+        "flight": "READY"
+      },
+      "failures": [],
+      "run_id": "20261012T114734Z-847b6ce8",
+      "scope": "wall-clock ground run; passive observation, no commands",
+      "trace": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-baseline/qualified-ground-observer.jsonl",
+      "condition": "qualified-ground-observer",
+      "mean_owned_cpu_cores": 3.9049234042699035,
+      "peak_owned_rss_mib": 1426.703125,
+      "map_compute_p95_s": 0.07522111000434961,
+      "map_compute_max_s": 0.7053826619958272,
+      "resources_scope": "sampled owned supervisor process groups; excludes independent 8780 server, browser and other host activity",
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-baseline/qualified-ground-observer.jsonl",
+          "sha256": "38dd2ac2fd3da0d4d70f43a04d9d5974d5056f3b093042c6a1559c55d7e2ff3b"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T114734Z-847b6ce8/manifest.json",
+          "sha256": "e1a93e344b5e5fe55f12a801d80914f4ab324ef0166bcfe6360c71c85d812bbc"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T114734Z-847b6ce8/events.jsonl",
+          "sha256": "6ba33c908719c65c8ddbe44fd4eae1f85386b4cc2d578f1e84ef58578fd0b0ba"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T114734Z-847b6ce8/navigation.jsonl",
+          "sha256": "022f8630e7b3940f71d5f62e69a07c6042ce36794594b8fa24467b80376edbca"
+        }
+      ]
+    },
+    {
+      "success": true,
+      "elapsed_s": 1800.0092601979995,
+      "required_duration_s": 1800.0,
+      "final_states": {
+        "localization": "READY",
+        "navigation": "READY",
+        "flight": "READY"
+      },
+      "failures": [],
+      "run_id": "20261012T121804Z-023ef8cd",
+      "scope": "wall-clock ground run; passive observation, no commands",
+      "trace": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-baseline/qualified-ground-workbench.jsonl",
+      "condition": "qualified-ground-workbench",
+      "mean_owned_cpu_cores": 3.901131992039631,
+      "peak_owned_rss_mib": 1421.90234375,
+      "map_compute_p95_s": 0.07536625800275942,
+      "map_compute_max_s": 0.1562987930010422,
+      "resources_scope": "sampled owned supervisor process groups; excludes independent 8780 server, browser and other host activity",
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-baseline/qualified-ground-workbench.jsonl",
+          "sha256": "594bdb7b7447945b936298450f958b21795648e527e073fb66d53d04ca6d3689"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T121804Z-023ef8cd/manifest.json",
+          "sha256": "fe0e389c2ca03ab053396297fadb50786b15301358ac39013a78de8c78884bbd"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T121804Z-023ef8cd/events.jsonl",
+          "sha256": "85e2f1158929552ab70bf8a4b9e7a2a06dcbded469446a7ccd930b035dee8ef7"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T121804Z-023ef8cd/navigation.jsonl",
+          "sha256": "21fa16fe48c89bbafb69b8a22b074897857ba0f1bd42c551f74a6af09c45bc6f"
+        }
+      ]
+    }
+  ],
+  "queries": {
+    "count": 480,
+    "failures": 0,
+    "p95_s": 0.022530858994286973,
+    "maximum_s": 0.04188126799999736,
+    "source": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-baseline/qualified-ground-workbench-queries.jsonl"
+  },
+  "source_commit": "16c0466e7073c94521d69dc8950da87a84c36165",
+  "scene": "generic navigation (scene=None)",
+  "limitations": [
+    "Historical pre-fix circle-eight and final generic runs use different geometry; CPU/RSS changes cannot be attributed causally to these code changes.",
+    "Historical timeout root cause is not uniquely demonstrated by these ground passes.",
+    "Resources cover owned simulation process groups; browser/API CPU and earlier-host conditions are not comparable before/after measures."
+  ]
+}

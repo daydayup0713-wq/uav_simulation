@@ -138,16 +138,29 @@ class ManagedProcesses:
             handle.close()
 
 def wait_for(manager, check, description, timeout=30):
-    deadline = time.monotonic()+timeout
-    while time.monotonic()<deadline:
-        manager.check()
-        try:
-            if check():
-                return
-        except subprocess.TimeoutExpired:
-            pass
-        time.sleep(.2)
-    raise RuntimeError('readiness timeout: '+description)
+    begun=time.monotonic()
+    def progress(state,reason=''):
+        path=manager.directory/'startup-progress.json'
+        temporary=path.with_suffix('.tmp')
+        temporary.write_text(json.dumps({'stage':description,'state':state,'reason':reason,
+            'started_at':time.time()-(time.monotonic()-begun),
+            'elapsed_s':time.monotonic()-begun,'timeout_s':timeout})+'\n')
+        temporary.replace(path)
+    progress('RUNNING')
+    try:
+        while time.monotonic()-begun<timeout:
+            manager.check()
+            try:
+                if check():
+                    progress('SUCCEEDED')
+                    return
+            except subprocess.TimeoutExpired:
+                pass
+            time.sleep(.2)
+        raise RuntimeError('readiness timeout: '+description)
+    except (RuntimeError,OSError) as error:
+        progress('FAILED',str(error))
+        raise
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)

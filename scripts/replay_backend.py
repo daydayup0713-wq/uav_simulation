@@ -151,8 +151,8 @@ def main():
     env=dict(os.environ,ROS_LOG_DIR=str(output/'ros-logs'),OMP_NUM_THREADS='2',OPENBLAS_NUM_THREADS='1')
     if args.public_config:
         import shutil
-        shutil.copytree(args.public_config,output/'configuration');config=output/'configuration/parameters.yaml'
-    else:config=write_config(args.backend,metadata['calibration'],output/'configuration',output.name)
+        shutil.copytree(args.public_config,output/'configuration')
+    else:write_config(args.backend,metadata['calibration'],output/'configuration',output.name)
     env=configure_replay_transport(output/'configuration',env)
     map_snapshot=None
     if args.vins_map:
@@ -195,7 +195,6 @@ def main():
     try:
         rclpy.init();node=PoseObserver(args.backend,metadata['calibration'],output)
         if any(node.count_publishers(t) for t in input_topics(args.backend)):raise ValueError('replay domain has occupied input topics')
-        private='/uav001/backends/'+args.backend
         if args.backend=='fast_livo2':
             launch(['/opt/ros/humble/lib/demo_nodes_cpp/parameter_blackboard','--ros-args','--params-file',output/'configuration/camera.yaml'],'camera-parameters')
         if not args.public_config:

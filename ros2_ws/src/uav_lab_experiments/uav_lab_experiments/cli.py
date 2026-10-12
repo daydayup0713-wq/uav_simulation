@@ -3,7 +3,6 @@ import argparse
 import json
 import os
 from pathlib import Path
-import time
 
 from .registry import Registry
 

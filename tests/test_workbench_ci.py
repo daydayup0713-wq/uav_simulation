@@ -22,3 +22,8 @@ def test_cpu_replay_uses_its_own_domain_without_changing_flight_environment():
     result=ci_workbench.replay_environment(original)
     assert result['LAB_DOMAIN_ID']=='77' and original['LAB_DOMAIN_ID']=='42'
     assert result['UNRELATED']=='kept'
+
+
+def test_installed_core_ci_runs_private_environment_regression():
+    source=(Path(__file__).resolve().parents[1]/'scripts/ci_workbench.py').read_text()
+    assert "'tests/test_private_backend_environment.py'" in source

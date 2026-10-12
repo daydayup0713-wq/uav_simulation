@@ -22,7 +22,7 @@ echo 'deb [signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://package
 echo 'deb [signed-by=/usr/share/keyrings/gazebo-archive-keyring.gpg] https://packages.osrfoundation.org/gazebo/ubuntu-stable jammy main' | "${SUDO[@]}" tee /etc/apt/sources.list.d/uav-lab-gazebo.list >/dev/null
 "${SUDO[@]}" apt-get update
 "${SUDO[@]}" apt-get install -y build-essential cmake ninja-build git ccache pkg-config \
-  python3-pip python3-dev python3-colcon-common-extensions python3-pytest python3-empy \
+  python3-pip python3-dev python3-colcon-common-extensions python3-pytest python3-pyflakes python3-empy \
   python3-jinja2 python3-numpy python3-scipy python3-toml python3-yaml python3-packaging python3-jsonschema python3-serial python3-psutil python3-opencv \
   nlohmann-json3-dev libeigen3-dev libxml2-dev libssl-dev libtinyxml2-dev libspdlog-dev libasio-dev libfoonathan-memory-dev \
   libboost-all-dev libtbb-dev ros-humble-gtsam ros-humble-ament-cmake-auto \

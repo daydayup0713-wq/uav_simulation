@@ -18,7 +18,7 @@ def execute_route(path, timeout=600.):
     reference = {'value': None, 'received': 0.}
     def observe(message):
         reference.update(value=message, received=time.monotonic())
-    subscription = node.create_subscription(TrajectoryReference, '/uav001/trajectory/reference', observe, 10)
+    node.create_subscription(TrajectoryReference, '/uav001/trajectory/reference', observe, 10)
     client = ActionClient(node, ExecuteTrajectory, '/uav001/execute_trajectory')
     handle, submitted = None, None
     def wait(future, budget):

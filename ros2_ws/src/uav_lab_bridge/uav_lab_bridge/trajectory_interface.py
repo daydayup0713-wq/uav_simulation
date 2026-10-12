@@ -2,7 +2,7 @@
 import numpy as np
 from uav_lab_interfaces.action import ExecuteTrajectory
 from uav_lab_interfaces.msg import TrajectorySegment
-from .continuous_trajectory import Trajectory, Segment, Limits
+from .continuous_trajectory import Trajectory
 
 
 def trajectory_goal(trajectory, identifier, starts_at_ns=0, replaces='', epoch=None):

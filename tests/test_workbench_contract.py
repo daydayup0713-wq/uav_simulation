@@ -63,3 +63,21 @@ def test_takeoff_submission_defers_transient_landed_flag_to_bridge_origin_guard(
     for unsafe in (dict(armed,armed='False'),dict(armed,offboard='False'),
                    dict(armed,phase='MOVING'),dict(armed,phase='FAILSAFE')):
         with pytest.raises(ValueError):api().authorize('takeoff',unsafe,10.1,'live')
+
+
+def test_owned_recording_mount_is_canonicalized_but_child_escape_rejected(tmp_path):
+    from workbench_contract import recording_path
+    root=tmp_path/'project';root.mkdir();data=tmp_path/'owned-recordings';data.mkdir()
+    (root/'recordings').symlink_to(data,target_is_directory=True)
+    run=data/'valid';run.mkdir()
+    assert recording_path(root,'valid')==run
+    outside=tmp_path/'external';outside.mkdir()
+    (data/'escape').symlink_to(outside,target_is_directory=True)
+    with pytest.raises(ValueError,match='escapes'):recording_path(root,'escape')
+
+
+@pytest.mark.parametrize('flag',['navigation_ready','external_ready'])
+def test_reported_control_gate_failure_blocks_arm_but_allows_safe_ground_stop(flag):
+    current=state(**{flag:'False'})
+    with pytest.raises(ValueError,match='control health'):api().authorize('arm',current,10.1,'live')
+    assert api().authorize('stop',current,10.1,'live')

@@ -4,7 +4,7 @@
 The API observes a bounded WebSocket stream and submits existing CLI/Action
 clients. It creates no ROS publishers. Recorded playback reads files only.
 """
-import argparse,asyncio,json,math,os,signal,subprocess,threading,time,uuid
+import asyncio,json,math,os,signal,subprocess,threading,time,uuid
 from http.server import SimpleHTTPRequestHandler,ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlsplit,parse_qs
@@ -13,6 +13,23 @@ from workbench_reports import comparison,runs,recordings,metrics
 from stop_lab import supervisor_identity
 
 ORIGINS=('http://127.0.0.1:8780','http://localhost:8780')
+
+
+DISABLED_REASONS={
+    'reported control health rejected; inspect localization/navigation or restart on ground':'飞控收到的定位或导航健康尚未通过；地面未解锁时查看诊断，锁存后需停止并重启实验。',
+    'fresh flight state required':'等待新鲜飞行遥测；请检查观测桥和飞控诊断。',
+    'unknown flight state flags prohibit commands':'飞行状态尚未确认，暂不允许控制。',
+    'idle disarmed ground state required':'解锁需要 READY、已落地且未解锁状态。',
+    'idle disarmed landed ground state required':'配置修改需要 READY、已落地且未解锁状态。',
+    'idle landed ground state required':'普通上锁仅允许在已落地的稳定状态执行。',
+    'disarmed landed stable ground state required':'停止实验需要已落地、未解锁且状态稳定。',
+    'explicit armed Offboard state required':'请先显式解锁，并等待 Offboard 状态确认。',
+    'idle hover required; duplicate motion rejected':'等待当前运动完成并进入悬停；重复运动请求会被拒绝。',
+    'airborne hover required':'导航需要先起飞并保持空中悬停。',
+    'armed Offboard hover or motion required':'悬停需要已解锁并处于 Offboard 悬停或运动状态。',
+    'armed vehicle outside existing landing required':'降落需要已解锁；降落过程中不重复提交。',
+    'replay mode cannot send flight or selection commands':'文件回放是只读模式，不能控制飞行。',
+}
 
 
 def validate_http_origin(origin,content_type,length):
@@ -49,7 +66,7 @@ class Workbench:
                             try:message=await asyncio.wait_for(socket.recv(),1.)
                             except asyncio.TimeoutError:continue
                             if isinstance(message,str):self.ingest(json.loads(message),time.monotonic())
-                except (OSError,ValueError,TimeoutError,Exception) as error:
+                except Exception:
                     # Observer disconnect changes freshness, never flight state.
                     if self.stopped.is_set():break
                     await asyncio.sleep(.5)
@@ -86,16 +103,32 @@ class Workbench:
 
     def status(self):
         with self.lock:
-            state=self.flight_state();now=time.monotonic();allowed=[]
+            state=self.flight_state();now=time.monotonic();allowed=[];blocked={}
             active=self.active_run()
-            if active:
-                for command in ('select','stop','arm','disarm','takeoff','goto','route','hold','land'):
+            for command in ('select','stop','arm','disarm','takeoff','goto','route','hold','land'):
+                if active:
                     try:authorize(command,state,now,self.mode);allowed.append(command)
-                    except ValueError:pass
+                    except ValueError as error:
+                        blocked[command]=('飞控已进入保护状态；地面未解锁时停止实验，再排查原因后重启。'
+                            if state.get('phase')=='FAILSAFE' else DISABLED_REASONS.get(str(error),str(error)))
+                else:blocked[command]='尚无活动实验，请先保存配置并启动实验。'
+            components={}
+            for name,item in (self.telemetry or {}).get('diagnostics',{}).items():
+                age=item.get('age_s')
+                components[name]={**item,'age_s':None if not isinstance(age,(float,int)) else age+max(0,now-self.received),
+                    'reason':item.get('values',{}).get('reason','')}
+            progress=None
+            if active:
+                try:
+                    progress=json.loads((active[0]/'startup-progress.json').read_text())
+                    if progress.get('state')=='RUNNING':progress['elapsed_s']=max(0,time.time()-progress['started_at'])
+                except (OSError,ValueError,KeyError):pass
+            jobs=[{**item,'elapsed_s':max(0,(item.get('finished_at') or time.time())-item.get('started_at',time.time()))}
+                for item in list(self.jobs.values())[-20:]]
             public_state={**state,'received_at':state['received_at'] if math.isfinite(state['received_at']) else None}
             return {'mode':self.mode,'selection':self.selection,'flight':public_state,
                 'connected':0<=now-self.received<=1.,'active_run':active[0].name if active else None,
-                'allowed':allowed,'jobs':list(self.jobs.values())[-20:],
+                'allowed':allowed,'blocked':blocked,'components':components,'startup':progress,'jobs':jobs,
                 'backends':self.catalog,'catalog_checking':self.catalog_checking,
                 'replay':self.replay.info() if self.replay else None}
 
@@ -103,7 +136,8 @@ class Workbench:
         with self.lock:
             if self.active_job and not interrupt:raise ValueError('another experiment operation is pending')
             if sum(item['state']=='RUNNING' for item in self.jobs.values())>=3:raise ValueError('operation limit reached')
-            token=uuid.uuid4().hex;record={'id':token,'command':command,'state':'RUNNING','success':None,'reason':''}
+            token=uuid.uuid4().hex;record={'id':token,'command':command,'state':'RUNNING','success':None,'reason':'',
+                'started_at':time.time(),'stage':'正在检查配置与环境' if command=='start' else '等待服务应答与实际状态确认'}
             self.jobs[token]=record
             if not interrupt:self.active_job=token
             def run():
@@ -114,6 +148,7 @@ class Workbench:
                     with self.lock:record.update(state='FAILED',success=False,reason=str(error)[:2000])
                 finally:
                     with self.lock:
+                        record['finished_at']=time.time()
                         if self.active_job==token:self.active_job=None
                         self.processes.pop(token,None)
                         for key in list(self.jobs)[:-40]:

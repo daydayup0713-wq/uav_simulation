@@ -25,3 +25,4 @@ def test_real_planner_core_runs_and_preserves_nonzero_initial_derivatives(tmp_pa
     assert result['core_source_ref'] and result['binary_sha256']
     assert result['core_peak_rss_bytes']>0
     assert result['fallback'] is False
+    assert (tmp_path/backend/'attempt-0/ros-logs').is_dir(),'native ROS logs belong to the immutable planning attempt'

@@ -86,7 +86,7 @@ def flight_comparison(root):
         pair=acceptance.get('backend_pair')
         if not isinstance(pair,dict) or not pair.get('planning'):continue
         directory=source.parent;tracking=read(directory/'tracking.json',{})
-        geometry=read(directory/'geometry.json',{});handoffs=read(directory/'handoffs.json',{})
+        geometry=read(directory/'geometry.json',{})
         current=flight_identity(root,item)
         artifacts=[{'path':str(p),'sha256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in
             [source,directory/'tracking.json',directory/'geometry.json',directory/'handoffs.json'] if p.is_file()]

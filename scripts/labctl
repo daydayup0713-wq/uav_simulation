@@ -2,6 +2,9 @@
 set -euo pipefail
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 case "${1:-}" in
+  maintenance)
+    shift
+    exec /usr/bin/python3 "$ROOT/scripts/maintenance.py" "$@" ;;
   experiments)
     shift
     exec "$ROOT/scripts/env.sh" ros2 run uav_lab_experiments experiments "$@" ;;

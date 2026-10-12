@@ -1,0 +1,539 @@
+{
+  "schema": 1,
+  "conditions": "--web, identical owned startup and 15s passive diagnostics; no arm commands",
+  "before": [
+    {
+      "run_id": "20261012T103504Z-69c2c400",
+      "passed": false,
+      "failures": [
+        "flight: navigation_ready rejected despite READY"
+      ],
+      "rejections": [
+        {
+          "wall_monotonic": 35322.526098552,
+          "sim_ns": 17632000000,
+          "event": "navigation_gate_rejected",
+          "reason": "navigation map/heartbeat expired or invalid; restart lab",
+          "source_stamp": 16.5,
+          "source_age_s": 1.1320000000000014,
+          "receipt_age_s": 0.6728086250004708,
+          "healthy": true,
+          "channels": {
+            "navigation_received": {
+              "source_s": 16.604,
+              "received_at": 35321.850790352,
+              "count": 6,
+              "source_advance_s": 0.04400000000000048,
+              "maximum_receipt_gap_s": 0.011064780999731738,
+              "receipt_age_s": 0.6728194190000067,
+              "source_age_s": 1.0280000000000022
+            },
+            "navigation_applied": {
+              "source_s": 16.5,
+              "received_at": 35321.850801146,
+              "count": 6,
+              "source_advance_s": 0.3999999999999986,
+              "maximum_receipt_gap_s": 0.011068136998801492,
+              "receipt_age_s": 0.6728086250004708,
+              "source_age_s": 1.1320000000000014
+            },
+            "external_pose": {
+              "source_s": 17.6,
+              "received_at": 35322.523024474,
+              "count": 99,
+              "source_advance_s": 0.10000000000000142,
+              "maximum_receipt_gap_s": 0.11913003699737601,
+              "receipt_age_s": 0.000585296998906415,
+              "source_age_s": 0.03200000000000003
+            },
+            "control_clock": {
+              "source_s": 17.628,
+              "received_at": 35322.523609771,
+              "count": 926,
+              "source_advance_s": 0.019999999999999574,
+              "maximum_receipt_gap_s": 0.03686633499455638,
+              "receipt_age_s": 0.0,
+              "source_age_s": 0.004000000000001336
+            }
+          }
+        }
+      ],
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-startup-gate-with-sampler/0-ground.json",
+          "sha256": "ba14064df5477e54d5474b06df5d8794db8bed3eab10a1cfb1b905c376c01549"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T103504Z-69c2c400/manifest.json",
+          "sha256": "8ac7bfe8c2874ca720a82e8ba2d1f2bbbbb4dd0c000dc22e4e65edb2459d640c"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T103504Z-69c2c400/events.jsonl",
+          "sha256": "639ac5c867b180098711a8f6b763fbd19edad01fa223ef4d59758db354c01f25"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T103504Z-69c2c400/navigation.jsonl",
+          "sha256": "356b739f10a56205a113b1e59fa28c85676858ecad0229ec539526113a94e87d"
+        }
+      ]
+    },
+    {
+      "run_id": "20261012T103544Z-7062a091",
+      "passed": true,
+      "failures": [],
+      "rejections": [],
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-startup-gate-with-sampler/1-ground.json",
+          "sha256": "203a817a8b221655dfb4fe0ceb78e508ded1d8ec9e0c4fa4cf51a2c282432d49"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T103544Z-7062a091/manifest.json",
+          "sha256": "a26980f9fa4be367d97306c7ec72c89bd25b6856e68c38c62bd231ead68f5b5e"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T103544Z-7062a091/events.jsonl",
+          "sha256": "faee5cdeb0883dfca604b3f6b605e9f6b2e01d09bb2e90221f6dbe6aa486d513"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T103544Z-7062a091/navigation.jsonl",
+          "sha256": "fd40f83363f6131f693c9f6151d05fd8ea294fe0d5dce34c520c586f08554819"
+        }
+      ]
+    },
+    {
+      "run_id": "20261012T103627Z-6a6093af",
+      "passed": true,
+      "failures": [],
+      "rejections": [],
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-startup-gate-with-sampler/2-ground.json",
+          "sha256": "0f10cf6a7b8399cd2122c1b1d058e7a114b4087c9914164de006e263129d5815"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T103627Z-6a6093af/manifest.json",
+          "sha256": "d7b238f58fa5ae1364998423477c2ad51b164dad56347c5a54b6719e3f1292b1"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T103627Z-6a6093af/events.jsonl",
+          "sha256": "32297d2773bbbf874b680e7f31675f9456875fb40c254ec58cf0df3ed2016aea"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T103627Z-6a6093af/navigation.jsonl",
+          "sha256": "113d235dce53e988dc399c745c360021abbed4292667059f751891e43e948f04"
+        }
+      ]
+    },
+    {
+      "run_id": "20261012T103711Z-6585f2bf",
+      "passed": true,
+      "failures": [],
+      "rejections": [],
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-startup-gate-with-sampler/3-ground.json",
+          "sha256": "1e32a2801d2cf369f7d272db0fd31123c37818fdaca6585a3ce0b0640ac1d2eb"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T103711Z-6585f2bf/manifest.json",
+          "sha256": "84ce03eee2dcd07bcaf35f13ab6fb4c3a9be75162fa5ce9ebd8e1a0210a96917"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T103711Z-6585f2bf/events.jsonl",
+          "sha256": "f2d344bdcd94a9d9127618e70847ae0f48d2e3ac7aed74131ac9a869763125e3"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T103711Z-6585f2bf/navigation.jsonl",
+          "sha256": "caed989bcbe20a5095ab23277bab29249efb200665cb3538575b97630f658b1e"
+        }
+      ]
+    },
+    {
+      "run_id": "20261012T103755Z-585ec696",
+      "passed": true,
+      "failures": [],
+      "rejections": [],
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-startup-gate-with-sampler/4-ground.json",
+          "sha256": "f74ee00f1945431842349163122a4140a906eeda6993daddbd9cca3fdfcd1a3b"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T103755Z-585ec696/manifest.json",
+          "sha256": "7f30d761807e6491809900169e9a4a494fcee56ab59174203be33d4fd5294137"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T103755Z-585ec696/events.jsonl",
+          "sha256": "2d265348825b4d7cd6d0fbe97b0523b44205d6dd3b7796c41e37f6ae1773b5ba"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T103755Z-585ec696/navigation.jsonl",
+          "sha256": "303736bfe373112de0a198ad00b63f1cef1b8ec1a5e2dbb8ca954553b454b0ee"
+        }
+      ]
+    },
+    {
+      "run_id": "20261012T103838Z-66323cbc",
+      "passed": true,
+      "failures": [],
+      "rejections": [],
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-startup-gate-with-sampler/5-ground.json",
+          "sha256": "868000b7631058c1fcea177ca0c3b45abb4253b81de950b87f8adfb3232c357b"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T103838Z-66323cbc/manifest.json",
+          "sha256": "7cc323578cfbd886f07f7ed369ec5ef67661744f634280006654db25a1e5114d"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T103838Z-66323cbc/events.jsonl",
+          "sha256": "805478f9f91259891b09c4279c735138d8375da60a4cfcf0f8966025b01ae5f7"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T103838Z-66323cbc/navigation.jsonl",
+          "sha256": "3a919803838eeb8c6a56a08cf72d0064fda10fadbbb6b41616075e1fd085200c"
+        }
+      ]
+    },
+    {
+      "run_id": "20261012T103921Z-2164436d",
+      "passed": true,
+      "failures": [],
+      "rejections": [],
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-startup-gate-with-sampler/6-ground.json",
+          "sha256": "80e8af0d686c4c289a0d9d029692d589a0197d9c24bc8bc1fec987c3266ce107"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T103921Z-2164436d/manifest.json",
+          "sha256": "d1039835e080ba7f0a9e3ec78dcf2bfdddca4af6707405610f7d0f41a83bb4fa"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T103921Z-2164436d/events.jsonl",
+          "sha256": "11d60cef4931fd317f0137c50377e51e3e3f8bb27bdca66aea316c70bf38343b"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T103921Z-2164436d/navigation.jsonl",
+          "sha256": "bd963f41eae73e29c50330b19f71b66b9dae9fd0f533e405a9d2d95d8d7e2d14"
+        }
+      ]
+    },
+    {
+      "run_id": "20261012T104005Z-2921f5e0",
+      "passed": true,
+      "failures": [],
+      "rejections": [],
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-startup-gate-with-sampler/7-ground.json",
+          "sha256": "c208c915b3e93faae3541c63b0e1f76dbcdbc223b9bd6921826e6fa51e47b3f4"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104005Z-2921f5e0/manifest.json",
+          "sha256": "c7cf39369b18247cf872320f68ec40ce094c797c24d244e7cff2959a6d098774"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104005Z-2921f5e0/events.jsonl",
+          "sha256": "60fac201ea3da6bc5f9daf2d7111b8981b897f6cccf04d73f28403e0e3eb0a99"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104005Z-2921f5e0/navigation.jsonl",
+          "sha256": "8a4bbcc65979f8d28f17fb08f5e638d7ef4a5d02da598f860edb16e8f053ad67"
+        }
+      ]
+    },
+    {
+      "run_id": "20261012T104048Z-104d65fa",
+      "passed": true,
+      "failures": [],
+      "rejections": [],
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-startup-gate-with-sampler/8-ground.json",
+          "sha256": "c84a5fe7d78ed9880c4aaf49f24cd84de172a5bf1aa5d0120e387663a061e151"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104048Z-104d65fa/manifest.json",
+          "sha256": "1b546d623a86d2500584159ae531f770e784d0c0c2880d27190685ae5555d7b2"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104048Z-104d65fa/events.jsonl",
+          "sha256": "0df2a0fb27ecb21181d1e46e5cc9f0cb8c9a89dcb470fa91551436a26187c107"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104048Z-104d65fa/navigation.jsonl",
+          "sha256": "32946a8a7586b74ccddecb8a884268c19c744b5dcaa9bb2f9fa6d3d842425b36"
+        }
+      ]
+    },
+    {
+      "run_id": "20261012T104130Z-3b924708",
+      "passed": true,
+      "failures": [],
+      "rejections": [],
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-startup-gate-with-sampler/9-ground.json",
+          "sha256": "3d98d1d573d7e47d4ccdc270fb6586527f27f7985646caef85f3a234c8d7f499"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104130Z-3b924708/manifest.json",
+          "sha256": "704e7f639ba9984a7d86de1787e573f96909d101fd6bf812b6375ee2e185613e"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104130Z-3b924708/events.jsonl",
+          "sha256": "26c597d40f9532a24a2fcb2bdc9781a08ef2f56d24ed3254439e31c258bd6b14"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104130Z-3b924708/navigation.jsonl",
+          "sha256": "09ddf4d49399be0dface4e7cb0a8026d0c7ce77c11298d489e133e628fd16844"
+        }
+      ]
+    }
+  ],
+  "after": [
+    {
+      "run_id": "20261012T104351Z-88c3a61b",
+      "passed": true,
+      "failures": [],
+      "rejections": [],
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-startup-best-effort/0-ground.json",
+          "sha256": "f6cd7dd935b7a611a5070b44f095b356835f85e0bf70770e6dd6e2daf75831c3"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104351Z-88c3a61b/manifest.json",
+          "sha256": "132703f4b0fb58c30f44cb327f93e1084ca37574534b4d419c4becf88147f688"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104351Z-88c3a61b/events.jsonl",
+          "sha256": "4d9a558a0d6678c50feb8c4782619b82bd4a640738202b79f4ac4cb4977c1950"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104351Z-88c3a61b/navigation.jsonl",
+          "sha256": "fd1845fef7c15d5cdce2ca0cf5506c530b5b29ca658a9d42b510fdbbea5d8f61"
+        }
+      ]
+    },
+    {
+      "run_id": "20261012T104434Z-8519fc12",
+      "passed": true,
+      "failures": [],
+      "rejections": [],
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-startup-best-effort/1-ground.json",
+          "sha256": "5bcf3429fb2a2d903135cbdf03b3160c1dc024fe463e60ef1eaecb215cf0c7d0"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104434Z-8519fc12/manifest.json",
+          "sha256": "3ebdb76caa7e24ea215ca9bdc82efbd1e767c227d60880536bf98933210b921f"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104434Z-8519fc12/events.jsonl",
+          "sha256": "99c5f9bc9dad829b8cff5061dc0181a8a67bd79557a3326bb581a7c9f55c02a0"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104434Z-8519fc12/navigation.jsonl",
+          "sha256": "1bffd2bf0c7095a6ee8a6d29830969293810cd0845711950abb478263ed570b2"
+        }
+      ]
+    },
+    {
+      "run_id": "20261012T104518Z-347ff223",
+      "passed": true,
+      "failures": [],
+      "rejections": [],
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-startup-best-effort/2-ground.json",
+          "sha256": "04b1a9b5ac0ecfb253e823a53d5abc3dda1d4ea667ae4980af1be4ba44e043c2"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104518Z-347ff223/manifest.json",
+          "sha256": "61a7c705aaee8c5845052b432ff523002b7e86122f203564f0797a8508d16e82"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104518Z-347ff223/events.jsonl",
+          "sha256": "d911b9dace099494c9a0253ee9c3672be070b593f02e7eb9b10192bf1b6e4a65"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104518Z-347ff223/navigation.jsonl",
+          "sha256": "10662536b6492d4c4bb33adab384ecf24fdcc37ea3cfb2d7774f09281ad7fd91"
+        }
+      ]
+    },
+    {
+      "run_id": "20261012T104601Z-c9868f91",
+      "passed": true,
+      "failures": [],
+      "rejections": [],
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-startup-best-effort/3-ground.json",
+          "sha256": "295f6602548dc3813b5de4142004f125eaf845a53e95a62dc5eb3869f40060bc"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104601Z-c9868f91/manifest.json",
+          "sha256": "1f3e2bbf3648e727bcdd2a0e0e5b7a0efbba298a9dfd43c5236d226f07c6a1c0"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104601Z-c9868f91/events.jsonl",
+          "sha256": "470d07e7d4e8bedff3ef24dd241acf86931bbdce6f8a93b643cdf974f68a253c"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104601Z-c9868f91/navigation.jsonl",
+          "sha256": "45c7406b090eceda8193c069b16bd28cfe55f8668945cab2d2b37dbaa6f5b2fe"
+        }
+      ]
+    },
+    {
+      "run_id": "20261012T104644Z-c517397f",
+      "passed": true,
+      "failures": [],
+      "rejections": [],
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-startup-best-effort/4-ground.json",
+          "sha256": "fc5f530520e630536d4d42831f62eae9a86e5cbefda3811fbef412a402b58def"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104644Z-c517397f/manifest.json",
+          "sha256": "0d0fde8264b3a023dfb4a2d1613e4b64b3942f0d2aa8102c1cc79c8ee93003ad"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104644Z-c517397f/events.jsonl",
+          "sha256": "7aa59634243a65746a490190d2f293b3cfadd04a72cc4520d251232348c2fbc3"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104644Z-c517397f/navigation.jsonl",
+          "sha256": "7a46e49a7aaf402c454c2a247c81311b7b3e2bab81e52816577d193aa6691b24"
+        }
+      ]
+    },
+    {
+      "run_id": "20261012T104727Z-5b52d14a",
+      "passed": true,
+      "failures": [],
+      "rejections": [],
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-startup-best-effort/5-ground.json",
+          "sha256": "c20629f0df0607953fdd700b2bf1da3dcdee7cb91b139c0333ff1f915df2dfaf"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104727Z-5b52d14a/manifest.json",
+          "sha256": "59933ccde2fe23a8aaeb29148af70711834a4c238766403e8bd7a21298c7ff9d"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104727Z-5b52d14a/events.jsonl",
+          "sha256": "5648fe194efc7d63b3af3486350a8e40c2e5f46b4cc8b4804acc2786fe1e5540"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104727Z-5b52d14a/navigation.jsonl",
+          "sha256": "001465ad297a197222690f1421612e11c6d3649a308f4a2bad1c5ab3acecb819"
+        }
+      ]
+    },
+    {
+      "run_id": "20261012T104809Z-204b60da",
+      "passed": true,
+      "failures": [],
+      "rejections": [],
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-startup-best-effort/6-ground.json",
+          "sha256": "1b85511247156215c95e50caad34c00275df51a4245098ef193ddc1cd4e9fdfa"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104809Z-204b60da/manifest.json",
+          "sha256": "8cfba41284172dcf2bd2b5a90c0b3fde4ea99027192b3332069ff42ac3031639"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104809Z-204b60da/events.jsonl",
+          "sha256": "4dd8a5c1c6ed03dcf94c4e4e1387a813ae9f771db57b53bd8f0f128ce39bc655"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104809Z-204b60da/navigation.jsonl",
+          "sha256": "cc608e113d004a5aea4c90a19591b7ac1290a5ec1bca5cbd1f756fe731838665"
+        }
+      ]
+    },
+    {
+      "run_id": "20261012T104853Z-67ac21ae",
+      "passed": true,
+      "failures": [],
+      "rejections": [],
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-startup-best-effort/7-ground.json",
+          "sha256": "863a166021aac42539d8eb3a0faac6e02c82a0b86347d33c512f56c07d5a7d3a"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104853Z-67ac21ae/manifest.json",
+          "sha256": "fba618d81bb3fe8eab25793b1486d357751c9117bb6769ec321e8785e29359df"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104853Z-67ac21ae/events.jsonl",
+          "sha256": "85eaa67c8c811e1cc2a7953157de91ac5f358e2f36f234135ee1c0c68f793e9f"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104853Z-67ac21ae/navigation.jsonl",
+          "sha256": "b3959c1ddbc7fb4d44cba2175519541a696e2035430ebb9457623bcf8763f4a4"
+        }
+      ]
+    },
+    {
+      "run_id": "20261012T104936Z-8f4f4a14",
+      "passed": true,
+      "failures": [],
+      "rejections": [],
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-startup-best-effort/8-ground.json",
+          "sha256": "f4ead3c4960dd9029107c76778db9f3704bb1b10520eb1a9f28f24dca63ffc2b"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104936Z-8f4f4a14/manifest.json",
+          "sha256": "8d6bb3e27b68e61492b743bc4b4ec94379d0c1da4c3392c152d89ef75d1d7cde"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104936Z-8f4f4a14/events.jsonl",
+          "sha256": "0698db1ac3244a029d1506e02b374e4318ad5e97e8645826ac7f77dc7fbf6ff0"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T104936Z-8f4f4a14/navigation.jsonl",
+          "sha256": "d77ae84ec08d7a0180b261ae0998d1b24d3d2fc2bea81f233e508188798ec3ae"
+        }
+      ]
+    },
+    {
+      "run_id": "20261012T105020Z-ae22f185",
+      "passed": true,
+      "failures": [],
+      "rejections": [],
+      "artifacts": [
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/health-startup-best-effort/9-ground.json",
+          "sha256": "0e5a18ba56a3192a3f2a10f90d3c9f99744ae06771611711392a6bf8fede4c19"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T105020Z-ae22f185/manifest.json",
+          "sha256": "a58877379c3c9ed85670ea86f664047af4a0c189a1ad3b4dc8234fdf8489fdf5"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T105020Z-ae22f185/events.jsonl",
+          "sha256": "560bac02613b2d40ff138d731a04c765c1dff4fe2aa66ae6d89b0856b3e37bf7"
+        },
+        {
+          "path": "/home/pine/workspace/ai/UAV/uav_simulation/.worktrees/lab-health/.runtime/20261012T105020Z-ae22f185/navigation.jsonl",
+          "sha256": "7fd2fd20c2fc2f0ce7eb2025235c5cca89fbc8815bbc16d7d72cc44af5b2b7c2"
+        }
+      ]
+    }
+  ]
+}
