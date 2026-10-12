@@ -15,7 +15,7 @@ from rclpy.callback_groups import ReentrantCallbackGroup, MutuallyExclusiveCallb
 from rclpy.clock import Clock, ClockType
 from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
-from rclpy.qos import qos_profile_sensor_data
+from rclpy.qos import qos_profile_sensor_data, QoSProfile, ReliabilityPolicy
 from std_srvs.srv import Trigger
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 from geometry_msgs.msg import PoseStamped, TransformStamped
@@ -82,8 +82,9 @@ class Bridge(Node):
             self.stop_map=StopAdmission(np.asarray(config['body_halfsize_m'])+config['clearance_m'])
             self.policy.stop_admission=self.admit_stop
             self.navigation_group=MutuallyExclusiveCallbackGroup()
-            self.create_subscription(DiagnosticArray, 'navigation/diagnostics', self.navigation_callback, 1, callback_group=self.navigation_group)
-            from rclpy.qos import QoSProfile,ReliabilityPolicy
+            # Health admission uses the latest sample; old reliable history is not useful.
+            self.create_subscription(DiagnosticArray, 'navigation/diagnostics', self.navigation_callback,
+                QoSProfile(depth=1,reliability=ReliabilityPolicy.BEST_EFFORT),callback_group=self.navigation_group)
             self.create_subscription(CollisionSnapshot,'navigation/collision_snapshot',self.collision_callback,
                 QoSProfile(depth=1,reliability=ReliabilityPolicy.BEST_EFFORT),callback_group=group)
         # The executor must not start a newer sample while an earlier telemetry
@@ -212,7 +213,17 @@ class Bridge(Node):
                     self.timing.arrival('navigation_applied',source if math.isfinite(source) else 0.,applied)
 
     def navigation_ready(self, now):
-        return not self.navigation_enabled or self.navigation.ready(now, self.get_clock().now().nanoseconds/1e9)
+        if not self.navigation_enabled:return True
+        sim=self.get_clock().now().nanoseconds/1e9;previous=self.navigation.failed
+        ready=self.navigation.ready(now,sim)
+        if self.navigation.failed and not previous:
+            source=self.navigation.source
+            self.record('navigation_gate_rejected',reason=self.navigation.failed,
+                source_stamp=source if source is not None and math.isfinite(source) else None,
+                source_age_s=sim-source if source is not None and math.isfinite(source) else None,
+                receipt_age_s=now-self.navigation.received,healthy=self.navigation.healthy,
+                channels=self.timing.snapshot(now,sim))
+        return ready
 
     def quality_callback(self, msg):
         with self.lock:

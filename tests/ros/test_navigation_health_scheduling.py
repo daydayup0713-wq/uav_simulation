@@ -46,3 +46,45 @@ def test_map_commit_during_health_read_does_not_mix_initial_metadata():
     value.get_clock=lambda:SimpleNamespace(now=lambda:SimpleNamespace(nanoseconds=10200000000))
     report=NavigationNode.report(value)
     assert not report['ready'] and report['source_stamp'] is None
+
+
+def test_bridge_records_exact_first_navigation_rejection_once():
+    from types import SimpleNamespace
+    from uav_lab_bridge.node import Bridge
+    from uav_lab_bridge.navigation_gate import NavigationGate
+    from uav_lab_bridge.runtime_timing import RuntimeTiming
+    stamp=[20.];events=[]
+    value=SimpleNamespace(navigation_enabled=True,navigation=NavigationGate(),timing=RuntimeTiming(),
+        get_clock=lambda:SimpleNamespace(now=lambda:SimpleNamespace(nanoseconds=int(stamp[0]*1e9))),
+        record=lambda event,**fields:events.append({'event':event,**fields}))
+    value.navigation.observe(True,19.8,'odom',10.)
+    assert Bridge.navigation_ready(value,10.1)
+    stamp[0]=21.
+    assert not Bridge.navigation_ready(value,10.2)
+    assert not Bridge.navigation_ready(value,10.3)
+    assert len(events)==1 and events[0]['event']=='navigation_gate_rejected'
+    assert events[0]['source_age_s']==pytest.approx(1.2)
+    assert events[0]['receipt_age_s']==pytest.approx(.2)
+
+
+def test_bridge_receives_latest_best_effort_health_without_reliable_history(monkeypatch,isolated_ros_domain):
+    from rclpy.qos import QoSProfile,ReliabilityPolicy
+    from diagnostic_msgs.msg import DiagnosticStatus,KeyValue
+    from uav_lab_bridge.node import Bridge
+    monkeypatch.delenv('LAB_RUN_DIR',raising=False)
+    rclpy.init(args=['--ros-args','-p','navigation_required:=true'],domain_id=isolated_ros_domain)
+    bridge=Bridge();source=rclpy.create_node('latest_navigation_health_source')
+    publisher=source.create_publisher(DiagnosticArray,'/uav001/navigation/diagnostics',
+        QoSProfile(depth=1,reliability=ReliabilityPolicy.BEST_EFFORT))
+    executor=MultiThreadedExecutor(num_threads=2);executor.add_node(bridge);executor.add_node(source)
+    message=DiagnosticArray();message.header.stamp.sec=10
+    message.status=[DiagnosticStatus(name='uav001/navigation',level=DiagnosticStatus.OK,message='READY',
+        values=[KeyValue(key=k,value=v) for k,v in {'ready':'True','frame':'odom','source_stamp':'10.0'}.items()])]
+    worker=threading.Thread(target=executor.spin,daemon=True);worker.start()
+    try:
+        deadline=time.monotonic()+1.5
+        while time.monotonic()<deadline and bridge.navigation.source is None:
+            publisher.publish(message);time.sleep(.02)
+        assert bridge.navigation.source==10. and bridge.navigation.healthy
+    finally:
+        executor.shutdown(timeout_sec=3);worker.join(3);source.destroy_node();bridge.destroy_node();rclpy.shutdown()

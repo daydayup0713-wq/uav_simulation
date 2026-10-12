@@ -87,7 +87,7 @@ Ctrl+C 中断 TAKEOFF/GOTO 时保留 ROS 上下文，有界等待目标响应并
 
 `/uav001/navigation/navigate`（Navigate Action）：同一目标，反馈phase/current_pose/replans，结果success/reason。重复请求拒绝，最多3次障碍更新重规划；取消悬停，人工HOLD/LAND停止，LAND继续完成。未观察/占据起终点、NO_PATH、SEARCH_BUDGET_EXCEEDED和控制拒绝明确区分。
 
-`navigation/occupied`为odom中占据体素中心PointCloud2；`navigation/path`为已验证的Path，两者transient-local。`navigation/diagnostics`含ready、source_stamp、source_age、map_version、frame及失败原因。源时间和单调通信看门狗分别检查，失败锁定。
+`navigation/occupied`为odom中占据体素中心PointCloud2；`navigation/path`为已验证的Path，两者transient-local。`navigation/diagnostics`含ready、source_stamp、source_age、map_version、frame及失败原因。源时间和单调通信看门狗分别检查，失败锁定。飞控适配器使用 BEST_EFFORT、深度1接收最新健康帧，避免可靠历史修复延迟当前帧；诊断发布仍兼容现有 CLI 与观测订阅。
 
 `localization/control_alignment`是冻结lio_odom←odom TransformStamped，仅为估计后的坐标适配；不增加TF父节点、不输入SLAM。实时地图用源时间插值位姿和归档安装外参注册。
 

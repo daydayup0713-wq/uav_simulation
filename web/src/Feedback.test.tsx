@@ -133,3 +133,13 @@ it('回放失败保留原因并提供只读重试，成功帧清除该错误',as
  expect(screen.queryByText('录制读取失败')).toBeNull();expect(screen.getByText('1 显示点')).toBeTruthy();
  expect(fetcher.mock.calls.every(([,options])=>!options?.method)).toBe(true);
 });
+
+it('遥测READY但飞控健康门槛拒绝时标记控制未就绪',async()=>{
+ vi.stubGlobal('location',{hostname:'127.0.0.1',port:'8080'});let socket:any;
+ vi.stubGlobal('WebSocket',class{onopen?:()=>void;onmessage?:(event:unknown)=>void;constructor(){socket=this;}close(){}});
+ await act(async()=>{render(<App/>);});
+ await act(async()=>{socket.onopen();socket.onmessage({data:JSON.stringify({kind:'telemetry',simulation_time:10,vehicle:null,layer_errors:{},
+  diagnostics:{'uav001/flight':{message:'READY',level:0,age_s:0,values:{armed:'False',navigation_ready:'False',external_ready:'True'}}}})});});
+ expect(screen.getByRole('heading',{name:'控制未就绪'})).toBeTruthy();
+ expect(screen.getByText(/遥测已就绪，但定位或导航控制门槛未通过/)).toBeTruthy();
+});
