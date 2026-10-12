@@ -38,7 +38,7 @@ def main():
     verified_private_build(root/'.deps/backends/glim/install','glim')
     args.output.mkdir(parents=True)
     def run(command,env=None):subprocess.run([str(x) for x in command],cwd=root,check=True,env=env)
-    run([root/'scripts/env.sh','env','PYTEST_DISABLE_PLUGIN_AUTOLOAD=1','/usr/bin/python3','-m','pytest','-q','tests/test_native_planners.py'])
+    run([root/'scripts/env.sh','env','PYTEST_DISABLE_PLUGIN_AUTOLOAD=1','/usr/bin/python3','-m','pytest','-q','tests/test_native_planners.py','tests/test_private_backend_environment.py'])
     snapshot,manifest=prepare_map(args.output/'map-input')
     run([root/'scripts/env.sh','/usr/bin/python3',root/'scripts/benchmark_planners.py',snapshot,'--manifest',manifest,
         '--output',args.output/'planning','--timeout','20'])
